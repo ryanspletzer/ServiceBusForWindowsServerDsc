@@ -1,0 +1,6 @@
+*.suo
+*.user
+*.coverage
+.vs
+.psproj
+.sln
