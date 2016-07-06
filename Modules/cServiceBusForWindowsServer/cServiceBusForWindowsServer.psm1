@@ -349,7 +349,7 @@ class cSBBase {
    This resource creates a Service Bus for Windows Server farm.
 #>
 [DscResource()]
-class cSBFarmCreation : cSBBase {
+class cSBFarm : cSBBase {
 
     <#
         Sets the resource provider credentials. The resource provider is a component that exposes the management API
@@ -792,7 +792,7 @@ class cSBFarmCreation : cSBBase {
 
     [void] SetSBFarm() {
         Write-Warning -Message ("The current Service Bus Farm exists, however settings have changed. The " +
-                                "cSBFarmSettings resource can only set certain settings once a farm has been " +
+                                "cSBFarm resource can only set certain settings once a farm has been " +
                                 "provisioned.")
         $setSBFarmParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
@@ -876,8 +876,8 @@ class cSBFarmCreation : cSBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [cSBFarmCreation] Get() {
-        $result = [cSBFarmCreation]::new()
+    [cSBFarm] Get() {
+        $result = [cSBFarm]::new()
 
         Write-Verbose -Message "Checking for SBFarm."
 

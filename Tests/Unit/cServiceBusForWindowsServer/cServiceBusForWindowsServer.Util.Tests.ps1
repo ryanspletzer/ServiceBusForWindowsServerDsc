@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version latest
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
+$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 
 $ModuleName = "cServiceBusForWindowsServer.Util"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\$ModuleName\$ModuleName.psm1")

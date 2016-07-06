@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
+$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $ModuleName = "cServiceBusForWindowsServer"

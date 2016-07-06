@@ -67,7 +67,7 @@
             DependsOn = '[Package]ServiceBus_1_1_CU1_Installation'
         }
 
-        cSBFarmCreation SBFarm {
+        cSBFarm SBFarm {
             DependsOn = '[xPendingReboot]Reboot_After_WebPI_Install'
             PsDscRunAsCredential = $DomainInstallCredential
             AdminApiCredentials = $AdminApiCredential

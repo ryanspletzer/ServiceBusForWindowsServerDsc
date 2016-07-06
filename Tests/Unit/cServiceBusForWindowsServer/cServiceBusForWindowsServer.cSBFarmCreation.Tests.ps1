@@ -7,14 +7,14 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
+$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $ModuleName = "cServiceBusForWindowsServer"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\$ModuleName.psm1")
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\cServiceBusForWindowsServer.Util\cServiceBusForWindowsServer.Util.psm1")
 
-Describe "cSBFarmCreation" {
+Describe "cSBFarm" {
     InModuleScope $ModuleName {
         # Arrange
         $testSBFarmCreation = [cSBFarmCreation]::new()
@@ -41,7 +41,7 @@ Describe "cSBFarmCreation" {
         }
         $testSBFarmCreation.TenantApiCredentials = New-Object @tenantApiCredentialParams
 
-        Import-Module (Join-Path ((Resolve-Path $PSScriptRoot\..\..).Path) "Modules\cServiceBusForWindowsServer")
+        Import-Module (Join-Path ((Resolve-Path $PSScriptRoot\..\..\..).Path) "Modules\cServiceBusForWindowsServer")
 
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
