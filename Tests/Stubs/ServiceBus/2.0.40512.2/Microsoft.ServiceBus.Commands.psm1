@@ -960,15 +960,8 @@ function Set-SBFarm() {
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [ValidateLength(1,256)]
-        [ValidatePattern("^(?<domain>[^@\\\\]+)\\\\(?<username>[^@\\\\]+)$|^(?<username>[^@\\\\]+)@(?<domain>[^@\\\\]+)$|^(?<username>[^@\\\\]+)$")]
         [string]
         ${AdminGroup},
-
-        [Parameter(Mandatory=$true,
-                   ParameterSetName="AutoCert")]
-        [ValidateNotNullOrEmpty()]
-        [securestring]
-        ${CertificateAutoGenerationKey},
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
@@ -977,7 +970,6 @@ function Set-SBFarm() {
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [ValidatePattern("^(?<domain>[^@\\\\]+)\\\\(?<username>[^@\\\\]+)$|^(?<username>[^@\\\\]+)@(?<domain>[^@\\\\]+)$|^(?<username>[^@\\\\]+)$")]
         [string]
         ${RunAsAccount},
 

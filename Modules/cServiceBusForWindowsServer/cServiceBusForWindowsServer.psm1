@@ -687,21 +687,26 @@ class cSBFarmCreation : cSBBase {
         It sets the resource to the desired state.
     #>
     [void] Set() {
+        if ($null -eq $this.Get()) {
+            $this.NewSBFarm()
+        } else {
+            $this.SetSBFarm()
+        }
+    }
+
+    [void] NewSBFarm() {
         Write-Verbose -Message "Getting configurable properties as hashtable for New-SBFarm params"
         $newSBFarmParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
-        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
-        $sbFarmConnectionStringParams = @{
-            DataSource         = $this.SBFarmDBConnectionStringDataSource
-            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
-            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
-            Credential         = $this.SBFarmDBConnectionStringCredential
-            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+        Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
+        if ($null -eq $this.CertificateAutoGenerationKey) {
+            Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from New-SBFarm params"
+            $newSBFarmParams.Remove("CertificateAutoGenerationKey")
+        } else {
+            Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
+            $newSBFarmParams.Remove("CertificateAutoGenerationKey")
+            $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
-        Write-Verbose -Message "Creating SBFarmDBConnectionString"
-        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
-        Write-Verbose -Message "Setting SBFarmDBConnectionString in New-SBFarm params"
-        $newSBFarmParams.SBFarmDBConnectionString = $sbFarmDBCxnString
 
         Write-Verbose -Message "Creating params for GatewayDBConnectionString"
         $gatewayConnectionStringParams = @{
@@ -751,12 +756,20 @@ class cSBFarmCreation : cSBBase {
         Write-Verbose -Message "Setting MessageContainerDBConnectionString in New-SBFarm params"
         $newSBFarmParams.MessageContainerDBConnectionString = $messageContainerDBCxnString
 
+        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
+        $sbFarmConnectionStringParams = @{
+            DataSource         = $this.SBFarmDBConnectionStringDataSource
+            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
+            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
+            Credential         = $this.SBFarmDBConnectionStringCredential
+            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+        }
+        Write-Verbose -Message "Creating SBFarmDBConnectionString"
+        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
+        Write-Verbose -Message "Setting SBFarmDBConnectionString in New-SBFarm params"
+        $newSBFarmParams.SBFarmDBConnectionString = $sbFarmDBCxnString
+
         Write-Verbose -Message "Removing components of DB connection strings from New-SBFarm params"
-        $newSBFarmParams.Remove("SBFarmDBConnectionStringDataSource")
-        $newSBFarmParams.Remove("SBFarmDBConnectionStringInitialCatalog")
-        $newSBFarmParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
-        $newSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
-        $newSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
         $newSBFarmParams.Remove("GatewayDBConnectionStringDataSource")
         $newSBFarmParams.Remove("GatewayDBConnectionStringInitialCatalog")
         $newSBFarmParams.Remove("GatewayDBConnectionStringIntegratedSecurity")
@@ -767,19 +780,63 @@ class cSBFarmCreation : cSBBase {
         $newSBFarmParams.Remove("MessageContainerDBConnectionStringIntegratedSecurity")
         $newSBFarmParams.Remove("MessageContainerDBConnectionStringCredential")
         $newSBFarmParams.Remove("MessageContainerDBConnectionStringEncrypt")
-
-        Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
-        if ($null -eq $this.CertificateAutoGenerationKey) {
-            Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from New-SBFarm params"
-            $newSBFarmParams.Remove("CertificateAutoGenerationKey")
-        } else {
-            Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
-            $newSBFarmParams.Remove("CertificateAutoGenerationKey")
-            $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
-        }
+        $newSBFarmParams.Remove("SBFarmDBConnectionStringDataSource")
+        $newSBFarmParams.Remove("SBFarmDBConnectionStringInitialCatalog")
+        $newSBFarmParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
+        $newSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
+        $newSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
 
         Write-Verbose -Message "Invoking New-SBFarm with configurable params"
         New-SBFarm @newSBFarmParams
+    }
+
+    [void] SetSBFarm() {
+        Write-Warning -Message ("The current Service Bus Farm exists, however settings have changed. The " +
+                                "cSBFarmSettings resource can only set certain settings once a farm has been " +
+                                "provisioned.")
+        $setSBFarmParams = $this.GetDscConfigurablePropertiesAsHashtable()
+
+        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
+        $sbFarmConnectionStringParams = @{
+            DataSource         = $this.SBFarmDBConnectionStringDataSource
+            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
+            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
+            Credential         = $this.SBFarmDBConnectionStringCredential
+            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+        }
+        Write-Verbose -Message "Creating SBFarmDBConnectionString"
+        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
+        Write-Verbose -Message "Setting SBFarmDBConnectionString in Set-SBFarm params"
+        $setSBFarmParams.Add('SBFarmDBConnectionString', $sbFarmDBCxnString)
+
+        Write-Verbose -Message "Removing unnecessary parameters from Set-SBFarm params"
+        $setSBFarmParams.Remove("AmqpPort")
+        $setSBFarmParams.Remove("AmqpsPort")
+        $setSBFarmParams.Remove("CertificateAutoGenerationKey")
+        $setSBFarmParams.Remove("EncryptionCertificateThumbprint")
+        $setSBFarmParams.Remove("FarmCertificateThumbprint")
+        $setSBFarmParams.Remove("GatewayDBConnectionStringDataSource")
+        $setSBFarmParams.Remove("GatewayDBConnectionStringInitialCatalog")
+        $setSBFarmParams.Remove("GatewayDBConnectionStringIntegratedSecurity")
+        $setSBFarmParams.Remove("GatewayDBConnectionStringCredential")
+        $setSBFarmParams.Remove("GatewayDBConnectionStringEncrypt")
+        $setSBFarmParams.Remove("HttpsPort")
+        $setSBFarmParams.Remove("InternalPortRangeStart")
+        $setSBFarmParams.Remove("MessageBrokerPort")
+        $setSBFarmParams.Remove("MessageContainerDBConnectionStringDataSource")
+        $setSBFarmParams.Remove("MessageContainerDBConnectionStringInitialCatalog")
+        $setSBFarmParams.Remove("MessageContainerDBConnectionStringIntegratedSecurity")
+        $setSBFarmParams.Remove("MessageContainerDBConnectionStringCredential")
+        $setSBFarmParams.Remove("MessageContainerDBConnectionStringEncrypt")
+        $setSBFarmParams.Remove("RPHttpsPort")
+        $setSBFarmParams.Remove("SBFarmDBConnectionStringDataSource")
+        $setSBFarmParams.Remove("SBFarmDBConnectionStringInitialCatalog")
+        $setSBFarmParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
+        $setSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
+        $setSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
+        $setSBFarmParams.Remove("TcpPort")
+
+        Set-SBFarm @setSBFarmParams
     }
 
     <#
@@ -793,10 +850,22 @@ class cSBFarmCreation : cSBBase {
             return $false
         }
 
+        $desiredValues = $this.ToHashtable()
+        $desiredValues.AdminApiUserName = $desiredValues.AdminApiCredentials.UserName
+        $desiredValues.TenantApiUserName = $desiredValues.TenantApiCredentials.UserName
+
         $params = @{
             CurrentValues = $CurrentValues.ToHashtable()
-            DesiredValues = $this.ToHashtable()
-            ValuesToCheck = @("SBFarmDBConnectionStringDataSource","SBFarmDBConnectionStringInitialCatalog")
+            DesiredValues = $desiredValues
+            ValuesToCheck = @(
+                "AdminApiUserName"
+                "AdminGroup",
+                "FarmDNS",
+                "RunAsAccount",
+                "SBFarmDBConnectionStringDataSource",
+                "SBFarmDBConnectionStringInitialCatalog",
+                "TenantApiUserName"
+            )
         }
         return Test-cServiceBusForWindowsServerSpecificParameters @params
     }
@@ -917,13 +986,50 @@ class cSBFarmCreation : cSBBase {
    This resource manages the settings for a Service Bus for Windows Server farm.
 
    The only reason to use this resource would be to change certain farm settings away from that which was set up
-   with cSBFarmCreation resource.
+   initially with the cSBFarmCreation resource.
+
+   When you change settings you should ***also change them on SBFarmCreationResource, e
 #>
 # class cSBFarmSettings : cSBBase {
+
+#     <#
+#         Sets the resource provider credentials. The resource provider is a component that exposes the management API
+#         to the portal. There are two Service Bus management portals; the Admin portal (which provides a set of
+#         resource provider APIs for farm administration), and the Tenant portal (which is the Windows Azure Management
+#         Portal). Use these credentials when you manually install the server farm and connect to the Admin portal.
+#     #>
+#     [DscProperty()]
+#     [pscredential]
+#     $AdminApiCredentials
+
+#     <#
+#         Respresents the admin group. If not specified the default value will be BUILTIN\Administrators.
+#     #>
+#     [DscProperty()]
+#     [string]
+#     $AdminGroup
+
+#     <#
+#         The DNS prefix that is mapped to all server farm nodes. This cmdlet is used when an administrator registers a
+#         server farm. The server farm node value is returned when you call the Get-SBClientConfiguration cmdlet to
+#         request a connection string.
+#     #>
+#     [DscProperty()]
+#     [string]
+#     $FarmDNS
+
+#     <#
+#         Represents the account under which the service runs. This account must be a domain account.
+#     #>
+#     [DscProperty(Mandatory)]
+#     [string]
+#     $RunAsAccount
+
 #     [void] Set() {
 #         # else, ensure all set-able settings are correct
 #         Write-Warning -Message ("The current Service Bus Farm exists, however settings have changed. The " +
-#                                 "cSBFarm resource can only set certain settings once a farm has been provisioned.")
+#                                 "cSBFarmSettings resource can only set certain settings once a farm has been " +
+#                                 "provisioned.")
 #         $setSBFarmParams = @{}
 #         $serviceRestartNeeded = $false
 

@@ -74,7 +74,7 @@ Describe "cSBFarmCreation" {
             }
         }
 
-        Context "A farm exists" {
+        Context "A farm exists and is in valid state" {
             #Arrange
             Mock Get-SBFarm {
                 return @{
@@ -143,6 +143,88 @@ Describe "cSBFarmCreation" {
             It "returns true from the test method" {
                 # Act | Assert
                 $testSBFarmCreation.Test() | Should Be $true
+            }
+        }
+
+        Context "A farm exists and is in invalid state" {
+            #Arrange
+            Mock Get-SBFarm {
+                return @{
+                    FarmType                      = 'SB'
+                    SBFarmDBConnectionString      = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBManagementDB;Integrated Security=True;Encrypt=False'
+                    ClusterConnectionEndpointPort = 9000
+                    ClientConnectionEndpointPort  = 9001
+                    LeaseDriverEndpointPort       = 9002
+                    ServiceConnectionEndpointPort = 9003
+                    RunAsAccount                  = 'oldservicebus@contoso'
+                    AdminGroup                    = 'BUILTIN\Administrators'
+                    GatewayDBConnectionString     = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBGatewayDB;Integrated Security=True;Encrypt=False'
+                    HttpsPort                     = 9355
+                    TcpPort                       = 9354
+                    MessageBrokerPort             = 9356
+                    AmqpsPort                     = 5671
+                    AmqpPort                      = 5672
+                    FarmCertificate               = @{
+                        Thumbprint  = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
+                        IsGenerated = 'False'
+                    }
+                    EncryptionCertificate         = @{
+                        Thumbprint  = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
+                        IsGenerated = 'False'
+                    }
+                    Hosts                         = @(
+                        @{
+                            Name               = 'servicebus01.contoso.com'
+                            ConfigurationState = 'HostConfigurationCompleted'
+                        },
+                        @{
+                            Name               = 'servicebus02.contoso.com'
+                            ConfigurationState = 'HostConfigurationCompleted'
+                        },
+                        @{
+                            Name               = 'servicebus03.contoso.com'
+                            ConfigurationState = 'HostConfigurationCompleted'
+                        }
+                    )
+                    RPHttpsPort                   = 9359
+                    RPHttpsUrl                    = 'https://oldservicebus.contoso.com:9359/'
+                    FarmDNS                       = 'oldservicebus.contoso.com'
+                    AdminApiUserName              = 'oldAdminUser'
+                    TenantApiUserName             = 'oldTenantUser'
+                    BrokerExternalUrls            = $null
+                }
+            }
+            Mock Get-SBMessageContainer {
+                return @{
+                    Id               = 1
+                    Status           = 'Active'
+                    Host             = 'servicebus01.contoso.com'
+                    DatabaseServer   = 'SQLSERVER.contoso.com'
+                    DatabaseName     = 'SBMessageContainer01'
+                    ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer01;Integrated Security=True;Encrypt=False'
+                    EntitiesCount    = 1
+                    DatabaseSizeInMB = 0
+                }
+            }
+            Mock Set-SBFarm {}
+
+            It "the get method returns current values" {
+                # Act | Assert
+                $testSBFarmCreation.Get() | Should Not BeNullOrEmpty
+                Write-Host ($testSBFarmCreation.AdminApiCredentials.UserName)
+            }
+
+            It "returns false from the test method" {
+                # Act | Assert
+                $testSBFarmCreation.Test() | Should Be $false
+            }
+
+            It "sets the settable settings for an existing farm" {
+                # Act
+                $testSBFarmCreation.Set()
+
+                # Assert
+                Assert-MockCalled -CommandName Set-SBFarm
             }
         }
     }
