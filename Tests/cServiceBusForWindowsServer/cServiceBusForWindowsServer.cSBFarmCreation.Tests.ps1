@@ -211,7 +211,6 @@ Describe "cSBFarmCreation" {
             It "the get method returns current values" {
                 # Act | Assert
                 $testSBFarmCreation.Get() | Should Not BeNullOrEmpty
-                Write-Host ($testSBFarmCreation.AdminApiCredentials.UserName)
             }
 
             It "returns false from the test method" {
