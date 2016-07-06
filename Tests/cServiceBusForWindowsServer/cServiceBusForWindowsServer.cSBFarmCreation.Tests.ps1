@@ -12,26 +12,28 @@ $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $ModuleName = "cServiceBusForWindowsServer"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\$ModuleName.psm1")
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\cServiceBusForWindowsServer.Util\cServiceBusForWindowsServer.Util.psm1")
 
 Describe "cSBFarmCreation" {
     InModuleScope $ModuleName {
         # Arrange
         $testSBFarmCreation = [cSBFarmCreation]::new()
         $adminApiCredentialParams = @{
-            TypeName     = pscredential
+            TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
                 "adminUser",
                 (ConvertTo-SecureString -String "password" -AsPlainText -Force)
             )
         }
         $testSBFarmCreation.AdminApiCredentials = New-Object @adminApiCredentialParams
+        $testSBFarmCreation.AdminGroup = 'BUILTIN\Administrators'
         $testSBFarmCreation.EncryptionCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
         $testSBFarmCreation.FarmCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
         $testSBFarmCreation.FarmDNS = 'servicebus.contoso.com'
         $testSBFarmCreation.RunAsAccount = "servicebus@contoso"
-        $testSBFarmCreation.SBFarmDBConnectionStringDataSource = 'SQLSERVER'
+        $testSBFarmCreation.SBFarmDBConnectionStringDataSource = 'SQLSERVER.contoso.com'
         $tenantApiCredentialParams = @{
-            TypeName     = pscredential
+            TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
                 "tenantUser",
                 (ConvertTo-SecureString -String "password" -AsPlainText -Force)
@@ -48,8 +50,8 @@ Describe "cSBFarmCreation" {
         Context "No farm is found or configured" {
             #Arrange
             Mock Get-SBFarm { throw ("Cannot validate argument parameter 'SBFarmDBConnectionString'. The " +
-                                     "database (SBManagementDB) located at SQL Server (SQLSERVER) couldn't be " +
-                                     "found or is not configured.") }
+                                     "database (SBManagementDB) located at SQL Server (SQLSERVER.contoso.com) " +
+                                     "couldn't be found or is not configured.") }
             Mock Get-SBMessageContainer { throw ("This host is not joined to any Service Bus farm. to join a " +
                                                  "farm run Add-SBHost cmdlet.") }
 
@@ -121,38 +123,16 @@ Describe "cSBFarmCreation" {
                 }
             }
             Mock Get-SBMessageContainer {
-                return @(
-                    @{
-                        Id               = 1
-                        Status           = 'Active'
-                        Host             = 'servicebus01.contoso.com'
-                        DatabaseServer   = 'SQLSERVER.contoso.com'
-                        DatabaseName     = 'SBMessageContainer01'
-                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer01;Integrated Security=True;Encrypt=False'
-                        EntitiesCount    = 1
-                        DatabaseSizeInMB = 0
-                    },
-                    @{
-                        Id               = 2
-                        Status           = 'Active'
-                        Host             = 'servicebus02.contoso.com'
-                        DatabaseServer   = 'SQLSERVER.contoso.com'
-                        DatabaseName     = 'SBMessageContainer02'
-                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer02;Integrated Security=True;Encrypt=False'
-                        EntitiesCount    = 1
-                        DatabaseSizeInMB = 0
-                    },
-                    @{
-                        Id               = 3
-                        Status           = 'Active'
-                        Host             = 'servicebus03.contoso.com'
-                        DatabaseServer   = 'SQLSERVER.contoso.com'
-                        DatabaseName     = 'SBMessageContainer03'
-                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer03;Integrated Security=True;Encrypt=False'
-                        EntitiesCount    = 1
-                        DatabaseSizeInMB = 0
-                    }
-                )
+                return @{
+                    Id               = 1
+                    Status           = 'Active'
+                    Host             = 'servicebus01.contoso.com'
+                    DatabaseServer   = 'SQLSERVER.contoso.com'
+                    DatabaseName     = 'SBMessageContainer01'
+                    ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer01;Integrated Security=True;Encrypt=False'
+                    EntitiesCount    = 1
+                    DatabaseSizeInMB = 0
+                }
             }
 
             It "the get method returns current values" {

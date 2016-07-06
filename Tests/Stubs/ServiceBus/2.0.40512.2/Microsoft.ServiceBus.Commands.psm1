@@ -323,9 +323,8 @@ function New-SBFarm() {
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [ValidateLength(1,256)]
-        [ValidatePattern("^(?<domain>[^@\\\\]+)\\\\(?<username>[^@\\\\]+)$|^(?<username>[^@\\\\]+)@(?<domain>[^@\\\\]+)$|^(?<username>[^@\\\\]+)$")]
         [string]
-        ${AdminGroup} = (GetBuiltInAdministratorsName),
+        ${AdminGroup} = 'BUILTIN\Administrators',
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNull()]
@@ -387,7 +386,7 @@ function New-SBFarm() {
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [tring]
+        [string]
         ${MessageContainerDBConnectionString} = ${SBFarmDBConnectionString},
 
         [Parameter(Mandatory=$false)]
@@ -396,16 +395,21 @@ function New-SBFarm() {
         [int32]
         ${RPHttpsPort} = 9359,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
-        [ValidatePattern("^(?<domain>[^@\\\\]+)\\\\(?<username>[^@\\\\]+)$|^(?<username>[^@\\\\]+)@(?<domain>[^@\\\\]+)$|^(?<username>[^@\\\\]+)$")]
         [string]
-        ${RunAsAccount} = (GetCurrentUserName),
+        ${RunAsAccount} = 'servicebus@contoso',
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${SBFarmDBConnectionString},
+
+        [Parameter(Mandatory=$false)]
+        [ValidateNotNull()]
+        [ValidateRange(1024,65535)]
+        [int32]
+        ${TcpPort} = 9354,
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNull()]
@@ -668,9 +672,8 @@ function Restore-SBFarm() {
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [ValidateLength(1,256)]
-        [ValidatePattern("^(?<domain>[^@\\\\]+)\\\\(?<username>[^@\\\\]+)$|^(?<username>[^@\\\\]+)@(?<domain>[^@\\\\]+)$|^(?<username>[^@\\\\]+)$")]
         [string]
-        ${AdminGroup} = (GetBuiltInAdministratorsName),
+        ${AdminGroup} = 'BUILTIN\Administrators',
 
         [Parameter(Mandatory=$false)]
         [ValidateNotNull()]
@@ -747,9 +750,8 @@ function Restore-SBFarm() {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidatePattern("^(?<domain>[^@\\\\]+)\\\\(?<username>[^@\\\\]+)$|^(?<username>[^@\\\\]+)@(?<domain>[^@\\\\]+)$|^(?<username>[^@\\\\]+)$")]
         [string]
-        ${RunAsAccount} = (GetCurrentUserName),
+        ${RunAsAccount} = 'servicebus@contoso',
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -1020,7 +1022,7 @@ function Set-SBNamespace() {
                    ValueFromPipelineByPropertyName=$true)]
         [ValidateNotNullOrEmpty()]
         [Alias("n")]
-        [tring]
+        [string]
         ${Name},
 
         [Parameter(Mandatory=$false,

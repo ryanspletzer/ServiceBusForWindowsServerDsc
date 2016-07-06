@@ -10,7 +10,7 @@ enum IntegratedSecurity {
     SSPI
 }
 
-#test
+
 <#
     This is the base Service Bus for Windows Server resource class that provides commonly used methods.
 #>
@@ -862,14 +862,14 @@ class cSBFarmCreation : cSBBase {
         $params = @{
             SqlConnectionString = $sbFarm.GatewayDBConnectionString
         }
-        $params.PropertyName = "DataSource"
-        $result.GatewayDBConnectionStringDataSource = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Data Source"
+        $result.GatewayDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Encrypt"
         $result.GatewayDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "InitialCatalog"
-        $result.GatewayDBConnectionStringInitialCatalog = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "IntegratedSecurity"
-        $result.GatewayDBConnectionStringIntegratedSecurity = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Initial Catalog"
+        $result.GatewayDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Integrated Security"
+        $result.GatewayDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
         $result.HttpsPort = $sbFarm.HttpsPort
         $result.InternalPortRangeStart = $sbFarm.ClusterConnectionEndpointPort
         $result.LeaseDriverEndpointPort = $sbFarm.LeaseDriverEndpointPort
@@ -879,14 +879,14 @@ class cSBFarmCreation : cSBBase {
             $params = @{
                 SqlConnectionString = $sbMessageContainer.ConnectionString
             }
-            $params.PropertyName = "DataSource"
-            $result.MessageContainerDBConnectionStringDataSource = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Data Source"
+            $result.MessageContainerDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
             $params.PropertyName = "Encrypt"
             $result.MessageContainerDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-            $params.PropertyName = "InitialCatalog"
-            $result.MessageContainerDBConnectionStringInitialCatalog = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-            $params.PropertyName = "IntegratedSecurity"
-            $result.MessageContainerDBConnectionStringIntegratedSecurity = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Initial Catalog"
+            $result.MessageContainerDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Integrated Security"
+            $result.MessageContainerDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
             $result.MessageContainerDBConnectionString = $sbMessageContainer.ConnectionString
         }
         $result.RPHttpsPort = $sbFarm.RPHttpsPort
@@ -896,14 +896,14 @@ class cSBFarmCreation : cSBBase {
         $params = @{
             SqlConnectionString = $sbFarm.SBFarmDBConnectionString
         }
-        $params.PropertyName = "DataSource"
-        $result.SBFarmDBConnectionStringDataSource = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Data Source"
+        $result.SBFarmDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Encrypt"
         $result.SBFarmDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "InitialCatalog"
-        $result.SBFarmDBConnectionStringInitialCatalog = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "IntegratedSecurity"
-        $result.SBFarmDBConnectionStringIntegratedSecurity = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Initial Catalog"
+        $result.SBFarmDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Integrated Security"
+        $result.SBFarmDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
         $result.TcpPort = $sbFarm.TcpPort
         $result.TenantApiCredentials = $this.TenantApiCredentials
         $result.TenantApiUserName = $sbFarm.TenantApiUserName
