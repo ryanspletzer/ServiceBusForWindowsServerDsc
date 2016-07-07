@@ -366,7 +366,7 @@ class cSBFarm : cSBBase {
     #>
     [DscProperty()]
     [string]
-    $AdminGroup
+    $AdminGroup = 'BUILTIN\Administrators'
 
     <#
         This optional parameter sets the AMQP port. The default 5672.
@@ -792,8 +792,9 @@ class cSBFarm : cSBBase {
 
     [void] SetSBFarm() {
         Write-Warning -Message ("The current Service Bus Farm exists, however settings have changed. The " +
-                                "cSBFarm resource can only set certain settings once a farm has been " +
-                                "provisioned.")
+                                "cSBFarm resource only able to detect/set certain changess once a farm has been " +
+                                "provisioned, including: AdminApiCredentials.UserName, AdminGroup, FarmDNS, " +
+                                "RunAsAccount, TenantApiCredentials.UserName")
         $setSBFarmParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
@@ -900,7 +901,6 @@ class cSBFarm : cSBBase {
         }
 
         if ($null -eq $sbFarm) {
-            Write-Verbose -Message "Unable to detect SBFarm."
             return $null
         }
 
