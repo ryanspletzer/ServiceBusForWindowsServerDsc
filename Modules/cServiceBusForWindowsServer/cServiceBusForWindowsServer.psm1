@@ -782,7 +782,7 @@ class cSBHost :cSBBase {
         Specifies a case-sensitive ExternalBroker URI.
     #>
     [DscProperty()]
-    [uri]
+    [string]
     $ExternalBrokerUrl
 
     <#
