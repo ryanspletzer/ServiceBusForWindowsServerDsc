@@ -26,9 +26,19 @@
         $TenantApiCredential
     )
 
-    Import-DscResource -Module xPendingReboot, PSDesiredStateConfiguration, cServiceBusForWindowsServer
+    Import-DscResource -Module xPendingReboot, xCredSSP, PSDesiredStateConfiguration, cServiceBusForWindowsServer
 
     Node $AllNodes.NodeName {
+
+        # Utilize CredSSP if your SQL server is on a remote machine for single server scenario.
+        <#
+        xCredSSP CredSSP {
+            Ensure = 'Present'
+            Role = 'Client'
+            DelegateComputers = $ConfigurationData.NonNodeData.SQLServer.DataSource
+        }
+        #>
+
         User LocalSBInstallUser {
             UserName = $LocalInstallCredential.UserName
             Description = "Local user account used to install Service Bus bits from Web Platform Installer"
