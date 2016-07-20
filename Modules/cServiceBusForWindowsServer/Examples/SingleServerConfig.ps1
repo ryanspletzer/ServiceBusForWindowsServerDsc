@@ -88,6 +88,11 @@
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             TenantApiCredentials = $TenantApiCredential
         }
+
+        cSBHost {
+            EnableFirewallRules = $true
+            RunAsPassword = $RunAsAccountCredential
+        }
     }
 }
 

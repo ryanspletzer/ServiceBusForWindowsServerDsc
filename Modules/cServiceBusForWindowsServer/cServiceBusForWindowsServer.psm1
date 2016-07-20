@@ -767,7 +767,7 @@ class cSBHost :cSBBase {
     <#
         Enables or disables your firewall rules.
     #>
-    [DscProperty()]
+    [DscProperty(Mandatory)]
     [bool]
     $EnableFirewallRules
 
