@@ -438,7 +438,7 @@ class cSBFarm : cSBBase {
         Hosts in the farm.
     #>
     [DscProperty(NotConfigurable)]
-    [object[]]
+    [pscustomobject[]]
     $Hosts
 
     <#

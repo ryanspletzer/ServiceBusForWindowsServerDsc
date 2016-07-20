@@ -26,7 +26,8 @@
         $TenantApiCredential
     )
 
-    Import-DscResource -Module xPendingReboot, xCredSSP, PSDesiredStateConfiguration, cServiceBusForWindowsServer
+    Import-DscResource -Module xPendingReboot, PSDesiredStateConfiguration, cServiceBusForWindowsServer
+    #Import-DscResource -Module xCredSSP
 
     Node $AllNodes.NodeName {
 
@@ -90,6 +91,8 @@
         }
 
         cSBHost {
+            DependsOn = '[cSBFarm]SBFarm'
+            PsDscRunAsCredential = $DomainInstallCredential
             EnableFirewallRules = $true
             RunAsPassword = $RunAsAccountCredential
         }
