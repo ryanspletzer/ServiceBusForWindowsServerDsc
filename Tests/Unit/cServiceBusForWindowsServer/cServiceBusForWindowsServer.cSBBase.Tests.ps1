@@ -81,7 +81,7 @@ Describe 'cSBBase' {
                 $ht = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
 
                 # Assert
-                $ht.Count | Should BeExactly 10
+                $ht.Count | Should BeExactly 9
             }
 
             It 'GetDscConfigurablePropertiesAsHashtable() returns configurable properties as a hashtable' {

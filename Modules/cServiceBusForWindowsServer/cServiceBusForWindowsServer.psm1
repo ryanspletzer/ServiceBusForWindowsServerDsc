@@ -892,7 +892,7 @@ class cSBHost :cSBBase {
             return
         }
 
-        Write-Host -Message "Checking if SBHost should be started"
+        Write-Verbose -Message "Checking if SBHost should be started"
         if ($this.SBHostShouldBeStarted($currentValues)) {
             Write-Verbose -Message "SBHost will be started"
             Write-Verbose -Message "Updating SBHost prior to starting"
@@ -955,14 +955,12 @@ class cSBHost :cSBBase {
         }
 
         Write-Verbose -Message "Checking for ExternalBrokerPort"
-        if ($null -eq $addSBHostParams.ExternalBrokerPort) {
-            Write-Host -Object ("ExternalBrokerPort: " + $addSBHostParams.ExternalBrokerPort)
+        if (0 -eq $addSBHostParams.ExternalBrokerPort) {
             Write-Verbose -Message "ExternalBrokerPort is absent, removing from Add-SBHost params"
             $addSBHostParams.Remove("ExternalBrokerPort")
         }
         Write-Verbose -Message "Checking for ExternalBrokerUrl"
         if ($null -eq $addSBHostParams.ExternalBrokerUrl) {
-            Write-Host -Object ("ExternalBrokerUrl: " + $addSBHostParams.ExternalBrokerPort)
             Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Add-SBHost params"
             $addSBHostParams.Remove("ExternalBrokerUrl")
         }
