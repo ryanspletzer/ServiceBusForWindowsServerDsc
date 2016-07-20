@@ -16,7 +16,7 @@ Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusFo
 Describe 'cSBBase' {
     InModuleScope $ModuleName {
         # Arrange
-        $testSBFarmCreation = [cSBFarmCreation]::new()
+        $testSBFarm = [cSBFarm]::new()
         $adminApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
@@ -24,12 +24,12 @@ Describe 'cSBBase' {
                 (ConvertTo-SecureString -String "password" -AsPlainText -Force)
             )
         }
-        $testSBFarmCreation.AdminApiCredentials = New-Object @adminApiCredentialParams
-        $testSBFarmCreation.EncryptionCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
-        $testSBFarmCreation.FarmCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
-        $testSBFarmCreation.FarmDNS = 'servicebus.contoso.com'
-        $testSBFarmCreation.RunAsAccount = "servicebus@contoso"
-        $testSBFarmCreation.SBFarmDBConnectionStringDataSource = 'SQLSERVER.contoso.com'
+        $testSBFarm.AdminApiCredentials = New-Object @adminApiCredentialParams
+        $testSBFarm.EncryptionCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
+        $testSBFarm.FarmCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
+        $testSBFarm.FarmDNS = 'servicebus.contoso.com'
+        $testSBFarm.RunAsAccount = "servicebus@contoso"
+        $testSBFarm.SBFarmDBConnectionStringDataSource = 'SQLSERVER.contoso.com'
         $tenantApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
@@ -37,20 +37,21 @@ Describe 'cSBBase' {
                 (ConvertTo-SecureString -String "password" -AsPlainText -Force)
             )
         }
-        $testSBFarmCreation.TenantApiCredentials = New-Object @tenantApiCredentialParams
+        $testSBFarm.TenantApiCredentials = New-Object @tenantApiCredentialParams
 
         Context 'Base methods' {
             It 'ToHashtable() returns class properties as a hashtable' {
                 # Arrange
-                $ht = $testSBFarmCreation.ToHashtable()
+                $ht = $testSBFarm.ToHashtable()
+
                 $propertyCount = 0
 
                 # Act
-                Get-Member -InputObject $testSBFarmCreation |
+                Get-Member -InputObject $testSBFarm |
                     Where-Object MemberType -eq 'Property' |
                     ForEach-Object {
                         # Assert
-                        $ht[$_.Name] | Should BeExactly $testSBFarmCreation.($_.Name)
+                        $ht[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
                         $propertyCount += 1
                     }
 
@@ -60,32 +61,32 @@ Describe 'cSBBase' {
 
             It 'GetProperty() returns property value' {
                 # Act | Assert
-                $testSBFarmCreation.GetProperty('RunAsAccount') | Should BeExactly 'servicebus@contoso'
+                $testSBFarm.GetProperty('RunAsAccount') | Should BeExactly 'servicebus@contoso'
             }
 
             It 'SetProperty() sets property value' {
                 # Act
-                $testSBFarmCreation.SetProperty('RunAsAccount','servicebus2@contoso.com')
-                $value = [string]$testSBFarmCreation.RunAsAccount
+                $testSBFarm.SetProperty('RunAsAccount','servicebus2@contoso.com')
+                $value = [string]$testSBFarm.RunAsAccount
 
                 # Assert
                 $value | Should BeExactly 'servicebus2@contoso.com'
 
-                # Undo
-                $testSBFarmCreation.RunAsAccount = 'servicebus@contoso.com'
+                # Cleanup
+                $testSBFarm.RunAsAccount = 'servicebus@contoso.com'
             }
 
             It 'GetDscNotConfigurablePropertiesAsHashtable() returns not configurable properties as a hashtable' {
                 # Act
-                $ht = $testSBFarmCreation.GetDscNotConfigurablePropertiesAsHashtable()
+                $ht = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
 
                 # Assert
-                $ht.Count | Should BeExactly 9
+                $ht.Count | Should BeExactly 10
             }
 
             It 'GetDscConfigurablePropertiesAsHashtable() returns configurable properties as a hashtable' {
                 # Act
-                $ht = $testSBFarmCreation.GetDscConfigurablePropertiesAsHashtable()
+                $ht = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
 
                 # Assert
                 $ht.Count | Should BeExactly 30

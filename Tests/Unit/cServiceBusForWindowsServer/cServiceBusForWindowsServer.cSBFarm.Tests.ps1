@@ -17,7 +17,7 @@ Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusFo
 Describe "cSBFarm" {
     InModuleScope $ModuleName {
         # Arrange
-        $testSBFarmCreation = [cSBFarmCreation]::new()
+        $testSBFarm = [cSBFarm]::new()
         $adminApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
@@ -25,13 +25,13 @@ Describe "cSBFarm" {
                 (ConvertTo-SecureString -String "password" -AsPlainText -Force)
             )
         }
-        $testSBFarmCreation.AdminApiCredentials = New-Object @adminApiCredentialParams
-        $testSBFarmCreation.AdminGroup = 'BUILTIN\Administrators'
-        $testSBFarmCreation.EncryptionCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
-        $testSBFarmCreation.FarmCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
-        $testSBFarmCreation.FarmDNS = 'servicebus.contoso.com'
-        $testSBFarmCreation.RunAsAccount = "servicebus@contoso"
-        $testSBFarmCreation.SBFarmDBConnectionStringDataSource = 'SQLSERVER.contoso.com'
+        $testSBFarm.AdminApiCredentials = New-Object @adminApiCredentialParams
+        $testSBFarm.AdminGroup = 'BUILTIN\Administrators'
+        $testSBFarm.EncryptionCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
+        $testSBFarm.FarmCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
+        $testSBFarm.FarmDNS = 'servicebus.contoso.com'
+        $testSBFarm.RunAsAccount = "servicebus@contoso"
+        $testSBFarm.SBFarmDBConnectionStringDataSource = 'SQLSERVER.contoso.com'
         $tenantApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
@@ -39,7 +39,7 @@ Describe "cSBFarm" {
                 (ConvertTo-SecureString -String "password" -AsPlainText -Force)
             )
         }
-        $testSBFarmCreation.TenantApiCredentials = New-Object @tenantApiCredentialParams
+        $testSBFarm.TenantApiCredentials = New-Object @tenantApiCredentialParams
 
         Import-Module (Join-Path ((Resolve-Path $PSScriptRoot\..\..\..).Path) "Modules\cServiceBusForWindowsServer")
 
@@ -55,19 +55,19 @@ Describe "cSBFarm" {
             Mock Get-SBMessageContainer { throw ("This host is not joined to any Service Bus farm. to join a " +
                                                  "farm run Add-SBHost cmdlet.") }
 
-            It "the get method returns null" {
+            It "returns null from the get method" {
                 # Act | Assert
-                $testSBFarmCreation.Get() | Should BeNullOrEmpty
+                $testSBFarm.Get() | Should BeNullOrEmpty
             }
 
             It "returns false from the test method" {
                 # Act | Assert
-                $testSBFarmCreation.Test() | Should Be $false
+                $testSBFarm.Test() | Should Be $false
             }
 
             It "calls the New-SBFarm cmdlet in the set method" {
                 # Act
-                $testSBFarmCreation.Set()
+                $testSBFarm.Set()
 
                 # Assert
                 Assert-MockCalled -CommandName New-SBFarm
@@ -135,14 +135,14 @@ Describe "cSBFarm" {
                 }
             }
 
-            It "the get method returns current values" {
+            It "returns current values from the get method" {
                 # Act | Assert
-                $testSBFarmCreation.Get() | Should Not BeNullOrEmpty
+                $testSBFarm.Get() | Should Not BeNullOrEmpty
             }
 
             It "returns true from the test method" {
                 # Act | Assert
-                $testSBFarmCreation.Test() | Should Be $true
+                $testSBFarm.Test() | Should Be $true
             }
         }
 
@@ -151,7 +151,7 @@ Describe "cSBFarm" {
             Mock Get-SBFarm {
                 return @{
                     FarmType                      = 'SB'
-                    SBFarmDBConnectionString      = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBManagementDB;Integrated Security=True;Encrypt=False'
+                    SBFarmDBConnectionString      = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBManagementDB;Integrated Security=True;Encrypt=True'
                     ClusterConnectionEndpointPort = 9000
                     ClientConnectionEndpointPort  = 9001
                     LeaseDriverEndpointPort       = 9002
@@ -208,19 +208,19 @@ Describe "cSBFarm" {
             }
             Mock Set-SBFarm {}
 
-            It "the get method returns current values" {
+            It "returns current values from the get method" {
                 # Act | Assert
-                $testSBFarmCreation.Get() | Should Not BeNullOrEmpty
+                $testSBFarm.Get() | Should Not BeNullOrEmpty
             }
 
             It "returns false from the test method" {
                 # Act | Assert
-                $testSBFarmCreation.Test() | Should Be $false
+                $testSBFarm.Test() | Should Be $false
             }
 
             It "sets the settable settings for an existing farm" {
                 # Act
-                $testSBFarmCreation.Set()
+                $testSBFarm.Set()
 
                 # Assert
                 Assert-MockCalled -CommandName Set-SBFarm

@@ -36,7 +36,7 @@ function GetCurrentUserName() {
 function Add-SBHost() {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [ValidateNotNull()]
         [securestring]
         ${CertificateAutoGenerationKey},
@@ -1190,6 +1190,7 @@ Export-ModuleMember -Function @(
     "Set-SBNamespace",
     "Set-SBRuntimeSetting",
     "Start-SBFarm",
+    "Start-SBHost",
     "Stop-SBFarm",
     "Stop-SBHost",
     "Update-SBHost"
