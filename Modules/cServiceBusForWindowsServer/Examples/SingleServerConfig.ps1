@@ -95,6 +95,7 @@
             PsDscRunAsCredential = $DomainInstallCredential
             EnableFirewallRules = $true
             RunAsPassword = $RunAsAccountCredential
+            SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
         }
     }
 }

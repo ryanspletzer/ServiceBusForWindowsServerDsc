@@ -437,9 +437,9 @@ class cSBFarm : cSBBase {
     <#
         Hosts in the farm.
     #>
-    [DscProperty(NotConfigurable)]
-    [pscustomobject[]]
-    $Hosts
+    # [DscProperty(NotConfigurable)]
+    # [pscustomobject[]]
+    # $Hosts
 
     <#
         This method is equivalent of the Set-TargetResource script function.
@@ -699,12 +699,12 @@ class cSBFarm : cSBBase {
         $result.GatewayDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Integrated Security"
         $result.GatewayDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
-        $result.Hosts = $sbFarm.Hosts | ForEach-Object {
-            [pscustomobject] @{
-                Name               = $_.Name
-                ConfigurationState = $_.ConfigurationState
-            }
-        }
+        # $result.Hosts = $sbFarm.Hosts | ForEach-Object {
+        #     [pscustomobject] @{
+        #         Name               = $_.Name
+        #         ConfigurationState = $_.ConfigurationState
+        #     }
+        # }
 
         $result.HttpsPort = $sbFarm.HttpsPort
         $result.InternalPortRangeStart = $sbFarm.ClusterConnectionEndpointPort
