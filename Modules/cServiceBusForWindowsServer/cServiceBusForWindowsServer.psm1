@@ -446,9 +446,12 @@ class cSBFarm : cSBBase {
         It sets the resource to the desired state.
     #>
     [void] Set() {
+        Write-Verbose -Message "Checking whether to make new SBFarm or set existing SBFarm"
         if ($null -eq $this.Get()) {
+            Write-Verbose -Message "No farm detected, new SBFarm will be created"
             $this.NewSBFarm()
         } else {
+            Write-Verbose -Message "Farm detected, settable SBFarm settings will be set"
             $this.SetSBFarm()
         }
     }
@@ -554,6 +557,7 @@ class cSBFarm : cSBBase {
                                 "cSBFarm resource only able to detect/set certain changess once a farm has been " +
                                 "provisioned, including: AdminApiCredentials.UserName, AdminGroup, FarmDNS, " +
                                 "RunAsAccount, TenantApiCredentials.UserName")
+        Write-Verbose -Message "Getting configurable properties as hashtable for Set-SBFarm params"
         $setSBFarmParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
@@ -596,6 +600,7 @@ class cSBFarm : cSBBase {
         $setSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
         $setSBFarmParams.Remove("TcpPort")
 
+        Write-Verbose -Message "Invoking Set-SBFarm with configurable params"
         Set-SBFarm @setSBFarmParams
     }
 
@@ -753,6 +758,9 @@ class cSBFarm : cSBBase {
 }
 
 
+<#
+   This resource adds, removes, starts, stops and updates settings for Service Bus for Windows Server host.
+#>
 [DscResource()]
 class cSBHost :cSBBase {
 
@@ -855,35 +863,54 @@ class cSBHost :cSBBase {
     $Ensure = [Ensure]::Present
 
     [void] Set() {
+        Write-Verbose -Message "Retrieving current SBHost values"
         $currentValues = $this.Get()
 
+        Write-Verbose -Message "Checking if SBHost should be added to the farm"
         if ($this.SBHostShouldBeAdded($currentValues)) {
+            Write-Verbose -Message "SBHost will be added to the farm"
             $this.AddSBHost()
+            Write-Verbose -Message "Checking if SBHost should be started"
             if ($this.Started -eq $true) {
+                Write-Verbose -Message "Starting SBHost"
                 Start-SBHost
             }
+            Write-Verbose -Message "Ending cSBHost.Set() after adding"
             return
         }
 
+        Write-Verbose -Message "Checking if SBHost should be removed from the farm"
         if ($this.SBHostShouldBeRemoved($currentValues)) {
+            Write-Verbose -Message "SBHost will be removed from the farm"
+            Write-Verbose -Message "Checking if SBHost should be stopped prior to removing"
             if ($currentValues.Started -eq $true) {
+                Write-Verbose -Message "Stopping SBHost"
                 Stop-SBHost
             }
             $this.RemoveSBHost()
+            Write-Verbose -Message "Ending cSBHost.Set() after removal"
             return
         }
 
+        Write-Host -Message "Checking if SBHost should be started"
         if ($this.SBHostShouldBeStarted($currentValues)) {
+            Write-Verbose -Message "SBHost will be started"
+            Write-Verbose -Message "Updating SBHost prior to starting"
             $this.UpdateSBHost()
+            Write-Verbose -Message "Starting SBHost"
             Start-SBHost
+            Write-Verbose -Message "Ending cSBHost.Set() after starting"
             return
         }
 
         Write-Verbose -Message ("cSBHost can only detect certain changes -- to change certain settings on a host, " +
                                 "push a configuration with the host stopped, then push a new config with the host " +
                                 "started and it will explicitly re-update the settings.")
+        Write-Verbose -Message "Checking if SBHost should be stopped"
         if ($this.SBHostShouldBeStopped($currentValues)) {
+            Write-Verbose -Message "Stopping SBHost"
             Stop-SBHost
+            Write-Verbose -Message "Ending cSBHost.Set() after stopping"
             return
         }
     }
@@ -914,6 +941,7 @@ class cSBHost :cSBBase {
     }
 
     [void] AddSBHost() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for Add-SBHost params"
         $addSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
@@ -924,6 +952,19 @@ class cSBHost :cSBBase {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $addSBHostParams.Remove("CertificateAutoGenerationKey")
             $addSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
+        }
+
+        Write-Verbose -Message "Checking for ExternalBrokerPort"
+        if ($null -eq $addSBHostParams.ExternalBrokerPort) {
+            Write-Host -Object ("ExternalBrokerPort: " + $addSBHostParams.ExternalBrokerPort)
+            Write-Verbose -Message "ExternalBrokerPort is absent, removing from Add-SBHost params"
+            $addSBHostParams.Remove("ExternalBrokerPort")
+        }
+        Write-Verbose -Message "Checking for ExternalBrokerUrl"
+        if ($null -eq $addSBHostParams.ExternalBrokerUrl) {
+            Write-Host -Object ("ExternalBrokerUrl: " + $addSBHostParams.ExternalBrokerPort)
+            Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Add-SBHost params"
+            $addSBHostParams.Remove("ExternalBrokerUrl")
         }
 
         Write-Verbose -Message "Swapping RunAsPassword pscredential for securestring"
@@ -943,6 +984,7 @@ class cSBHost :cSBBase {
         Write-Verbose -Message "Setting SBFarmDBConnectionString in Add-SBHost params"
         $addSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
 
+        Write-Verbose -Message "Removing unnecessary parameters from Add-SBHost params"
         $addSBHostParams.Remove("Ensure")
         $addSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
         $addSBHostParams.Remove("SBFarmDBConnectionStringInitialCatalog")
@@ -951,10 +993,12 @@ class cSBHost :cSBBase {
         $addSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
         $addSBHostParams.Remove("Started")
 
+        Write-Verbose -Message "Invoking Add-SBHost with configurable params"
         Add-SBHost @addSBHostParams
     }
 
     [void] UpdateSBHost() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for Update-SBHost params"
         $updateSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
@@ -965,6 +1009,17 @@ class cSBHost :cSBBase {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $updateSBHostParams.Remove("CertificateAutoGenerationKey")
             $updateSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
+        }
+
+        Write-Verbose -Message "Checking for ExternalBrokerPort"
+        if ($null -eq $updateSBHostParams.ExternalBrokerPort) {
+            Write-Verbose -Message "ExternalBrokerPort is absent, removing from Update-SBHost params"
+            $updateSBHostParams.Remove("ExternalBrokerPort")
+        }
+        Write-Verbose -Message "Checking for ExternalBrokerUrl"
+        if ($null -eq $updateSBHostParams.ExternalBrokerUrl) {
+            Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Update-SBHost params"
+            $updateSBHostParams.Remove("ExternalBrokerUrl")
         }
 
         Write-Verbose -Message "Swapping RunAsPassword pscredential for securestring"
@@ -984,6 +1039,7 @@ class cSBHost :cSBBase {
         Write-Verbose -Message "Setting SBFarmDBConnectionString in Update-SBHost params"
         $updateSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
 
+        Write-Verbose -Message "Removing unnecessary parameters from Update-SBHost params"
         $updateSBHostParams.Remove("Ensure")
         $updateSBHostParams.Remove("EnableFirewallRules")
         $updateSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
@@ -993,13 +1049,16 @@ class cSBHost :cSBBase {
         $updateSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
         $updateSBHostParams.Remove("Started")
 
+        Write-Verbose -Message "Invoking Update-SBHost with configurable params"
         Update-SBHost @updateSBHostParams
     }
 
     [void] RemoveSBHost() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for Remove-SBHost params"
         $removeSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         # TODO: fix for non-domain joined machine
+        Write-Verbose -Message "Constructing hostname for Remove-SBHost params"
         $removeSBHostParams.HostName = "$env:COMPUTERNAME.$((Get-WmiObject -Class WIN32_ComputerSystem).Domain)"
 
         Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
@@ -1015,6 +1074,7 @@ class cSBHost :cSBBase {
         Write-Verbose -Message "Setting SBFarmDBConnectionString in Remove-SBHost params"
         $removeSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
 
+        Write-Verbose -Message "Removing unnecessary parameters from Remove-SBHost params"
         $removeSBHostParams.Remove("CertificateAutoGenerationKey")
         $removeSBHostParams.Remove("Ensure")
         $removeSBHostParams.Remove("EnableFirewallRules")
@@ -1028,6 +1088,7 @@ class cSBHost :cSBBase {
         $removeSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
         $removeSBHostParams.Remove("Started")
 
+        Write-Verbose -Message "Invoking Remove-SBHost with configurable params"
         Remove-SBHost @removeSBHostParams
     }
 
@@ -1137,3 +1198,103 @@ class cSBHost :cSBBase {
         return $result
     }
 }
+
+
+# [DscResource()]
+# class cSBNameSpace {
+#     [DscProperty(Key)]
+#     [Ensure]
+#     $Ensure
+
+#     [void] Set() {
+
+#     }
+
+#     [bool] Test() {
+#         return $true
+#     }
+
+#     [cSBNamespace] Get() {
+#         return $this
+#     }
+# }
+
+
+# [DscResource()]
+# class cSBMessageContainer {
+#     [DscProperty(Key)]
+#     [Ensure]
+#     $Ensure
+
+#     [void] Set() {
+
+#     }
+
+#     [bool] Test() {
+#         return $true
+#     }
+
+#     [cSBMessageContainer] Get() {
+#         return $this
+#     }
+# }
+
+
+# [DscResource()]
+# class cSBAuthorizationRule {
+#     [DscProperty(Key)]
+#     [Ensure]
+#     $Ensure
+
+#     [void] Set() {
+
+#     }
+
+#     [bool] Test() {
+#         return $true
+#     }
+
+#     [cSBAuthorizationRule] Get() {
+#         return $this
+#     }
+# }
+
+
+# [DscResource()]
+# class cSBHostCEIP {
+#     [DscProperty(Key)]
+#     [Ensure]
+#     $Ensure
+
+#     [void] Set() {
+
+#     }
+
+#     [bool] Test() {
+#         return $true
+#     }
+
+#     [cSBHostCEIP] Get() {
+#         return $this
+#     }
+# }
+
+
+# [DscResource()]
+# class cSBRunTimeSetting {
+#     [DscProperty(Key)]
+#     [Ensure]
+#     $Ensure
+
+#     [void] Set() {
+
+#     }
+
+#     [bool] Test() {
+#         return $true
+#     }
+
+#     [cSBRunTimeSetting] Get() {
+#         return $this
+#     }
+# }

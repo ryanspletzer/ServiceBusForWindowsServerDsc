@@ -23,20 +23,56 @@
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [pscredential]
-        $TenantApiCredential
+        $TenantApiCredential<#,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [pscredential]
+        $CertificateImportPassphraseCredential#>
     )
 
     Import-DscResource -Module xPendingReboot, PSDesiredStateConfiguration, cServiceBusForWindowsServer
     #Import-DscResource -Module xCredSSP
+    #Import-DscResource -Module xCertificate
 
     Node $AllNodes.NodeName {
 
-        # Utilize CredSSP if your SQL server is on a remote machine for single server scenario.
+        # Utilize xCredSSP module if your SQL server is on a remote machine for single server scenario.
         <#
         xCredSSP CredSSP {
             Ensure = 'Present'
             Role = 'Client'
             DelegateComputers = $ConfigurationData.NonNodeData.SQLServer.DataSource
+        }
+        #>
+
+        # Utilize xCertificate module to install example's sample certs, or certs of your own.
+        <#
+        xCertificateImport RootCertificateImport {
+            Thumbprint = $ConfigurationData.NonNodeData.Certificates.Root.Thumbprint
+            Path = $ConfigurationData.NonNodeData.Certificates.Root.Path
+            Location = 'LocalMachine'
+            Store = 'Root'
+            Ensure = 'Present'
+        }
+
+        # Only necessary if you need to import an intermediate
+        xCertificateImport IntermediateCertificateImport {
+            Thumbprint = $ConfigurationData.NonNodeData.Certificates.Intermediate.Thumbprint
+            Path = $ConfigurationData.NonNodeData.Certificates.Intermediate.Path
+            Location = 'LocalMachine'
+            Store = 'Root'
+            Ensure = 'Present'
+        }
+
+        xPfxImport PfxImport {
+            Thumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
+            Path = $ConfigurationData.NonNodeData.Certificates.Pfx.Path
+            Location = 'LocalMachine'
+            Store = 'My'
+            Exportable = $false
+            Credential = $CertificateImportPassphraseCredential
+            Ensure = 'Present'
         }
         #>
 
@@ -82,8 +118,8 @@
             DependsOn = '[xPendingReboot]Reboot_After_WebPI_Install'
             PsDscRunAsCredential = $DomainInstallCredential
             AdminApiCredentials = $AdminApiCredential
-            EncryptionCertificateThumbprint = $ConfigurationData.NonNodeData.ServiceBus.Farm.EncryptionCertificateThumbprint
-            FarmCertificateThumbprint = $ConfigurationData.NonNodeData.ServiceBus.Farm.FarmCertificateThumbprint
+            EncryptionCertificateThumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
+            FarmCertificateThumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
             FarmDNS = $ConfigurationData.NonNodeData.ServiceBus.Farm.FarmDNS
             RunAsAccount = $RunAsAccountCredential.UserName
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
