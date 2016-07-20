@@ -90,7 +90,7 @@
             TenantApiCredentials = $TenantApiCredential
         }
 
-        cSBHost {
+        cSBHost SBHost {
             DependsOn = '[cSBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             EnableFirewallRules = $true
