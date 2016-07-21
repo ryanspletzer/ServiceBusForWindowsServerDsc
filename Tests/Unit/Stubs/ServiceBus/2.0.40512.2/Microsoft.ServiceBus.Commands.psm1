@@ -444,7 +444,7 @@ function New-SBNamespace() {
                    ValueFromPipelineByPropertyName=$true)]
         [Alias("scheme")]
         [ValidateNotNull()]
-        [object[]]
+        [string]
         ${AddressingScheme} = 1,
 
         [Parameter(Mandatory=$false,
@@ -511,7 +511,7 @@ function New-SBNamespace() {
                 return $false
             }
         })]
-        [Alias("primary")]
+        [Alias("secondary")]
         [string]
         ${SecondarySymmetricKey},
 
@@ -1047,7 +1047,7 @@ function Set-SBNamespace() {
                 return $false
             }
         })]
-        [Alias("primary")]
+        [Alias("secondary")]
         [string]
         ${SecondarySymmetricKey},
 
@@ -1182,7 +1182,8 @@ Export-ModuleMember -Function @(
     "New-SBNamespace",
     "Remove-SBAuthorizationRule",
     "Remove-SBHost",
-    "Remove-SBMessageContainer"
+    "Remove-SBMessageContainer",
+    "Remove-SBNamespace",
     "Set-SBAuthorizationRule",
     "Set-SBCertificate",
     "Set-SBCertificateAutoGenerationKey",

@@ -11,6 +11,28 @@ enum IntegratedSecurity {
 }
 
 
+enum AddressingScheme {
+    Cloud
+    DNSRegistered
+    Path
+    PathWithServiceId
+}
+
+
+enum NamespaceState {
+    Unknown
+    Creating
+    Created
+    Activating
+    Enabling
+    Active
+    Disabling
+    Disabled
+    Removing
+    Removed
+}
+
+
 <#
     This is the base Service Bus for Windows Server resource class that provides commonly used methods.
 #>
@@ -97,7 +119,7 @@ class cSBBase {
 
 
 <#
-   This resource creates a Service Bus for Windows Server farm.
+   This resource creates and sets certain settings for a Service Bus for Windows Server farm.
 #>
 [DscResource()]
 class cSBFarm : cSBBase {
@@ -442,6 +464,159 @@ class cSBFarm : cSBBase {
     # $Hosts
 
     <#
+        This method is equivalent of the Get-TargetResource script function.
+        The implementation should use the keys to find appropriate resources.
+        This method returns an instance of this class with the updated key
+        properties.
+    #>
+    [cSBFarm] Get() {
+        $result = [cSBFarm]::new()
+
+        Write-Verbose -Message "Checking for SBFarm."
+
+        $connectionStringParams = @{
+            DataSource         = $this.SBFarmDBConnectionStringDataSource
+            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
+            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
+            Credential         = $this.SBFarmDBConnectionStringCredential
+            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+        }
+        Write-Verbose -Message "Building connection string."
+        $connectionString = New-SqlConnectionString @connectionStringParams
+        Write-Verbose -Message "Trying to get SBFarm."
+        $sbFarm = $null
+        try {
+            $sbFarm = Get-SBFarm -SBFarmDBConnectionString $connectionString
+            Write-Verbose -Message "Successfully retrieved SBFarm."
+        } catch {
+            Write-Verbose -Message "Unable to detect SBFarm."
+        }
+
+        if ($null -eq $sbFarm) {
+            return $null
+        }
+
+        Write-Verbose -Message "Trying to get default SBMessageContainer."
+        $sbMessageContainer = $null
+        try {
+            $sbMessageContainer = Get-SBMessageContainer -Id 1
+            Write-Verbose -Message "Successfully retrieved default SBMessageContainer."
+        } catch {
+            Write-Verbose -Message "Unable to detect initial SBMessageContainer."
+        }
+
+        $result.AdminApiCredentials = $this.AdminApiCredentials
+        $result.AdminApiUserName = $sbFarm.AdminApiUserName
+        $result.AdminGroup = $sbFarm.AdminGroup
+        $result.AmqpPort = $sbFarm.AmqpPort
+        $result.AmqpsPort = $sbFarm.AmqpsPort
+        #$result.BrokerExternalUrls = $sbFarm.BrokerExternalUrls
+        $result.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey
+        $result.ClientConnectionEndpointPort = $sbFarm.ClientConnectionEndpointPort
+        $result.ClusterConnectionEndpointPort = $sbFarm.ClusterConnectionEndpointPort
+        $result.EncryptionCertificateThumbprint = $sbFarm.EncryptionCertificate.Thumbprint
+        $result.FarmCertificateThumbprint = $sbFarm.FarmCertificate.Thumbprint
+        $result.FarmDNS = $sbFarm.FarmDNS
+        $result.FarmType = $sbFarm.FarmType
+
+        $result.GatewayDBConnectionString = $sbFarm.GatewayDBConnectionString
+        $result.GatewayDBConnectionStringCredential = $this.GatewayDBConnectionStringCredential
+        $params = @{
+            SqlConnectionString = $sbFarm.GatewayDBConnectionString
+        }
+        $params.PropertyName = "Data Source"
+        $result.GatewayDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Encrypt"
+        $result.GatewayDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Initial Catalog"
+        $result.GatewayDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Integrated Security"
+        $result.GatewayDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        # $result.Hosts = $sbFarm.Hosts | ForEach-Object {
+        #     [pscustomobject] @{
+        #         Name               = $_.Name
+        #         ConfigurationState = $_.ConfigurationState
+        #     }
+        # }
+
+        $result.HttpsPort = $sbFarm.HttpsPort
+        $result.InternalPortRangeStart = $sbFarm.ClusterConnectionEndpointPort
+        $result.LeaseDriverEndpointPort = $sbFarm.LeaseDriverEndpointPort
+        $result.MessageBrokerPort = $sbFarm.MessageBrokerPort
+
+        $result.MessageContainerDBConnectionStringCredential = $this.MessageContainerDatabaseCredential
+        if ($null -ne $sbMessageContainer) {
+            $params = @{
+                SqlConnectionString = $sbMessageContainer.ConnectionString
+            }
+            $params.PropertyName = "Data Source"
+            $result.MessageContainerDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Encrypt"
+            $result.MessageContainerDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Initial Catalog"
+            $result.MessageContainerDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Integrated Security"
+            $result.MessageContainerDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionString = $sbMessageContainer.ConnectionString
+        }
+
+        $result.RPHttpsPort = $sbFarm.RPHttpsPort
+        $result.RunAsAccount = $sbFarm.RunAsAccount
+
+        $result.SBFarmDBConnectionString = $sbFarm.SBFarmDBConnectionString
+        $result.SBFarmDBConnectionStringCredential = $this.SBFarmDBConnectionStringCredential
+        $params = @{
+            SqlConnectionString = $sbFarm.SBFarmDBConnectionString
+        }
+        $params.PropertyName = "Data Source"
+        $result.SBFarmDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Encrypt"
+        $result.SBFarmDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Initial Catalog"
+        $result.SBFarmDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $params.PropertyName = "Integrated Security"
+        $result.SBFarmDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
+
+        $result.TcpPort = $sbFarm.TcpPort
+        $result.TenantApiCredentials = $this.TenantApiCredentials
+        $result.TenantApiUserName = $sbFarm.TenantApiUserName
+
+        return $result
+    }
+
+    <#
+        This method is equivalent of the Test-TargetResource script function.
+        It should return True or False, showing whether the resource
+        is in a desired state.
+    #>
+    [bool] Test() {
+        $currentValues = $this.Get()
+
+        if ($null -eq $currentValues) {
+            return $false
+        }
+
+        $desiredValues = $this.ToHashtable()
+        $desiredValues.AdminApiUserName = $desiredValues.AdminApiCredentials.UserName
+        $desiredValues.TenantApiUserName = $desiredValues.TenantApiCredentials.UserName
+
+        $params = @{
+            CurrentValues = $currentValues.ToHashtable()
+            DesiredValues = $desiredValues
+            ValuesToCheck = @(
+                "AdminApiUserName"
+                "AdminGroup",
+                "FarmDNS",
+                "RunAsAccount",
+                "SBFarmDBConnectionStringDataSource",
+                "SBFarmDBConnectionStringInitialCatalog",
+                "TenantApiUserName"
+            )
+        }
+        return Test-cSBWSParameterState @params
+    }
+
+    <#
         This method is equivalent of the Set-TargetResource script function.
         It sets the resource to the desired state.
     #>
@@ -603,166 +778,14 @@ class cSBFarm : cSBBase {
         Write-Verbose -Message "Invoking Set-SBFarm with configurable params"
         Set-SBFarm @setSBFarmParams
     }
-
-    <#
-        This method is equivalent of the Set-TargetResource script function.
-        It sets the resource to the desired state.
-    #>
-    [bool] Test() {
-        $currentValues = $this.Get()
-
-        if ($null -eq $currentValues) {
-            return $false
-        }
-
-        $desiredValues = $this.ToHashtable()
-        $desiredValues.AdminApiUserName = $desiredValues.AdminApiCredentials.UserName
-        $desiredValues.TenantApiUserName = $desiredValues.TenantApiCredentials.UserName
-
-        $params = @{
-            CurrentValues = $currentValues.ToHashtable()
-            DesiredValues = $desiredValues
-            ValuesToCheck = @(
-                "AdminApiUserName"
-                "AdminGroup",
-                "FarmDNS",
-                "RunAsAccount",
-                "SBFarmDBConnectionStringDataSource",
-                "SBFarmDBConnectionStringInitialCatalog",
-                "TenantApiUserName"
-            )
-        }
-        return Test-cServiceBusForWindowsServerSpecificParameters @params
-    }
-
-    <#
-        This method is equivalent of the Get-TargetResource script function.
-        The implementation should use the keys to find appropriate resources.
-        This method returns an instance of this class with the updated key
-        properties.
-    #>
-    [cSBFarm] Get() {
-        $result = [cSBFarm]::new()
-
-        Write-Verbose -Message "Checking for SBFarm."
-
-        $connectionStringParams = @{
-            DataSource         = $this.SBFarmDBConnectionStringDataSource
-            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
-            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
-            Credential         = $this.SBFarmDBConnectionStringCredential
-            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
-        }
-        Write-Verbose -Message "Building connection string."
-        $connectionString = New-SqlConnectionString @connectionStringParams
-        Write-Verbose -Message "Trying to get SBFarm."
-        $sbFarm = $null
-        try {
-            $sbFarm = Get-SBFarm -SBFarmDBConnectionString $connectionString
-            Write-Verbose -Message "Successfully retrieved SBFarm."
-        } catch {
-            Write-Verbose -Message "Unable to detect SBFarm."
-        }
-
-        if ($null -eq $sbFarm) {
-            return $null
-        }
-
-        Write-Verbose -Message "Trying to get default SBMessageContainer."
-        $sbMessageContainer = $null
-        try {
-            $sbMessageContainer = Get-SBMessageContainer -Id 1
-            Write-Verbose -Message "Successfully retrieved default SBMessageContainer."
-        } catch {
-            Write-Verbose -Message "Unable to detect initial SBMessageContainer."
-        }
-
-        $result.AdminApiCredentials = $this.AdminApiCredentials
-        $result.AdminApiUserName = $sbFarm.AdminApiUserName
-        $result.AdminGroup = $sbFarm.AdminGroup
-        $result.AmqpPort = $sbFarm.AmqpPort
-        $result.AmqpsPort = $sbFarm.AmqpsPort
-        #$result.BrokerExternalUrls = $sbFarm.BrokerExternalUrls
-        $result.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey
-        $result.ClientConnectionEndpointPort = $sbFarm.ClientConnectionEndpointPort
-        $result.ClusterConnectionEndpointPort = $sbFarm.ClusterConnectionEndpointPort
-        $result.EncryptionCertificateThumbprint = $sbFarm.EncryptionCertificate.Thumbprint
-        $result.FarmCertificateThumbprint = $sbFarm.FarmCertificate.Thumbprint
-        $result.FarmDNS = $sbFarm.FarmDNS
-        $result.FarmType = $sbFarm.FarmType
-
-        $result.GatewayDBConnectionString = $sbFarm.GatewayDBConnectionString
-        $result.GatewayDBConnectionStringCredential = $this.GatewayDBConnectionStringCredential
-        $params = @{
-            SqlConnectionString = $sbFarm.GatewayDBConnectionString
-        }
-        $params.PropertyName = "Data Source"
-        $result.GatewayDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Encrypt"
-        $result.GatewayDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Initial Catalog"
-        $result.GatewayDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Integrated Security"
-        $result.GatewayDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
-        # $result.Hosts = $sbFarm.Hosts | ForEach-Object {
-        #     [pscustomobject] @{
-        #         Name               = $_.Name
-        #         ConfigurationState = $_.ConfigurationState
-        #     }
-        # }
-
-        $result.HttpsPort = $sbFarm.HttpsPort
-        $result.InternalPortRangeStart = $sbFarm.ClusterConnectionEndpointPort
-        $result.LeaseDriverEndpointPort = $sbFarm.LeaseDriverEndpointPort
-        $result.MessageBrokerPort = $sbFarm.MessageBrokerPort
-
-        $result.MessageContainerDBConnectionStringCredential = $this.MessageContainerDatabaseCredential
-        if ($null -ne $sbMessageContainer) {
-            $params = @{
-                SqlConnectionString = $sbMessageContainer.ConnectionString
-            }
-            $params.PropertyName = "Data Source"
-            $result.MessageContainerDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
-            $params.PropertyName = "Encrypt"
-            $result.MessageContainerDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-            $params.PropertyName = "Initial Catalog"
-            $result.MessageContainerDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
-            $params.PropertyName = "Integrated Security"
-            $result.MessageContainerDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
-            $result.MessageContainerDBConnectionString = $sbMessageContainer.ConnectionString
-        }
-
-        $result.RPHttpsPort = $sbFarm.RPHttpsPort
-        $result.RunAsAccount = $sbFarm.RunAsAccount
-
-        $result.SBFarmDBConnectionString = $sbFarm.SBFarmDBConnectionString
-        $result.SBFarmDBConnectionStringCredential = $this.SBFarmDBConnectionStringCredential
-        $params = @{
-            SqlConnectionString = $sbFarm.SBFarmDBConnectionString
-        }
-        $params.PropertyName = "Data Source"
-        $result.SBFarmDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Encrypt"
-        $result.SBFarmDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Initial Catalog"
-        $result.SBFarmDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Integrated Security"
-        $result.SBFarmDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
-
-        $result.TcpPort = $sbFarm.TcpPort
-        $result.TenantApiCredentials = $this.TenantApiCredentials
-        $result.TenantApiUserName = $sbFarm.TenantApiUserName
-
-        return $result
-    }
 }
 
 
 <#
-   This resource adds, removes, starts, stops and updates settings for Service Bus for Windows Server host.
+   This resource adds, removes, starts, stops and updates settings for Service Bus for a Windows Server host.
 #>
 [DscResource()]
-class cSBHost :cSBBase {
+class cSBHost : cSBBase {
 
     <#
         This passphrase is required for certificate auto generation. This parameter is mandatory if you want
@@ -858,257 +881,16 @@ class cSBHost :cSBBase {
     <#
         Marks whether the host should be present or absent. Default is present.
     #>
-    [DscProperty()]
+    [DscProperty(Key)]
     [Ensure]
     $Ensure = [Ensure]::Present
 
-    [void] Set() {
-        Write-Verbose -Message "Retrieving current SBHost values"
-        $currentValues = $this.Get()
-
-        Write-Verbose -Message "Checking if SBHost should be added to the farm"
-        if ($this.SBHostShouldBeAdded($currentValues)) {
-            Write-Verbose -Message "SBHost will be added to the farm"
-            $this.AddSBHost()
-            Write-Verbose -Message "Checking if SBHost should be started"
-            if ($this.Started -eq $true) {
-                Write-Verbose -Message "Starting SBHost"
-                Start-SBHost
-            }
-            Write-Verbose -Message "Ending cSBHost.Set() after adding"
-            return
-        }
-
-        Write-Verbose -Message "Checking if SBHost should be removed from the farm"
-        if ($this.SBHostShouldBeRemoved($currentValues)) {
-            Write-Verbose -Message "SBHost will be removed from the farm"
-            Write-Verbose -Message "Checking if SBHost should be stopped prior to removing"
-            if ($currentValues.Started -eq $true) {
-                Write-Verbose -Message "Stopping SBHost"
-                Stop-SBHost
-            }
-            $this.RemoveSBHost()
-            Write-Verbose -Message "Ending cSBHost.Set() after removal"
-            return
-        }
-
-        Write-Verbose -Message "Checking if SBHost should be started"
-        if ($this.SBHostShouldBeStarted($currentValues)) {
-            Write-Verbose -Message "SBHost will be started"
-            Write-Verbose -Message "Updating SBHost prior to starting"
-            $this.UpdateSBHost()
-            Write-Verbose -Message "Starting SBHost"
-            Start-SBHost
-            Write-Verbose -Message "Ending cSBHost.Set() after starting"
-            return
-        }
-
-        Write-Verbose -Message ("cSBHost can only detect certain changes -- to change certain settings on a host, " +
-                                "push a configuration with the host stopped, then push a new config with the host " +
-                                "started and it will explicitly re-update the settings.")
-        Write-Verbose -Message "Checking if SBHost should be stopped"
-        if ($this.SBHostShouldBeStopped($currentValues)) {
-            Write-Verbose -Message "Stopping SBHost"
-            Stop-SBHost
-            Write-Verbose -Message "Ending cSBHost.Set() after stopping"
-            return
-        }
-    }
-
-    [bool] SBHostShouldBeAdded([cSBHost]$CurrentValues) {
-        return (($this.Ensure -eq 'Present') -and ($null -eq $CurrentValues))
-    }
-
-    [bool] SBHostShouldBeStarted([cSBHost]$CurrentValues) {
-        if ($null -eq $CurrentValues) {
-            return $false
-        }
-        return (($this.Started -eq $true) -and ($CurrentValues.Started -eq $false))
-    }
-
-    [bool] SBHostShouldBeStopped([cSBHost]$CurrentValues) {
-        if ($null -eq $CurrentValues) {
-            return $false
-        }
-        return (($this.Started -eq $false) -and ($CurrentValues.Started -eq $true))
-    }
-
-    [bool] SBHostShouldBeRemoved([cSBHost]$CurrentValues) {
-        if ($null -eq $CurrentValues) {
-            return $false
-        }
-        return (($this.Ensure -eq 'Absent') -and ($CurrentValues.Ensure -eq 'Present'))
-    }
-
-    [void] AddSBHost() {
-        Write-Verbose -Message "Getting configurable properties as hashtable for Add-SBHost params"
-        $addSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
-
-        Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
-        if ($null -eq $this.CertificateAutoGenerationKey) {
-            Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from Add-SBHost params"
-            $addSBHostParams.Remove("CertificateAutoGenerationKey")
-        } else {
-            Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
-            $addSBHostParams.Remove("CertificateAutoGenerationKey")
-            $addSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
-        }
-
-        Write-Verbose -Message "Checking for ExternalBrokerPort"
-        if (0 -eq $addSBHostParams.ExternalBrokerPort) {
-            Write-Verbose -Message "ExternalBrokerPort is absent, removing from Add-SBHost params"
-            $addSBHostParams.Remove("ExternalBrokerPort")
-        }
-        Write-Verbose -Message "Checking for ExternalBrokerUrl"
-        if ($null -eq $addSBHostParams.ExternalBrokerUrl) {
-            Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Add-SBHost params"
-            $addSBHostParams.Remove("ExternalBrokerUrl")
-        }
-
-        Write-Verbose -Message "Swapping RunAsPassword pscredential for securestring"
-        $addSBHostParams.Remove("RunAsPassword")
-        $addSBHostParams.RunAsPassword = $this.RunAsPassword.Password
-
-        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
-        $sbFarmConnectionStringParams = @{
-            DataSource         = $this.SBFarmDBConnectionStringDataSource
-            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
-            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
-            Credential         = $this.SBFarmDBConnectionStringCredential
-            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
-        }
-        Write-Verbose -Message "Creating SBFarmDBConnectionString"
-        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
-        Write-Verbose -Message "Setting SBFarmDBConnectionString in Add-SBHost params"
-        $addSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
-
-        Write-Verbose -Message "Removing unnecessary parameters from Add-SBHost params"
-        $addSBHostParams.Remove("Ensure")
-        $addSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
-        $addSBHostParams.Remove("SBFarmDBConnectionStringInitialCatalog")
-        $addSBHostParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
-        $addSBHostParams.Remove("SBFarmDBConnectionStringCredential")
-        $addSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
-        $addSBHostParams.Remove("Started")
-
-        Write-Verbose -Message "Invoking Add-SBHost with configurable params"
-        Add-SBHost @addSBHostParams
-    }
-
-    [void] UpdateSBHost() {
-        Write-Verbose -Message "Getting configurable properties as hashtable for Update-SBHost params"
-        $updateSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
-
-        Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
-        if ($null -eq $this.CertificateAutoGenerationKey) {
-            Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from Update-SBHost params"
-            $updateSBHostParams.Remove("CertificateAutoGenerationKey")
-        } else {
-            Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
-            $updateSBHostParams.Remove("CertificateAutoGenerationKey")
-            $updateSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
-        }
-
-        Write-Verbose -Message "Checking for ExternalBrokerPort"
-        if ($null -eq $updateSBHostParams.ExternalBrokerPort) {
-            Write-Verbose -Message "ExternalBrokerPort is absent, removing from Update-SBHost params"
-            $updateSBHostParams.Remove("ExternalBrokerPort")
-        }
-        Write-Verbose -Message "Checking for ExternalBrokerUrl"
-        if ($null -eq $updateSBHostParams.ExternalBrokerUrl) {
-            Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Update-SBHost params"
-            $updateSBHostParams.Remove("ExternalBrokerUrl")
-        }
-
-        Write-Verbose -Message "Swapping RunAsPassword pscredential for securestring"
-        $updateSBHostParams.Remove("RunAsPassword")
-        $updateSBHostParams.RunAsPassword = $this.RunAsPassword.Password
-
-        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
-        $sbFarmConnectionStringParams = @{
-            DataSource         = $this.SBFarmDBConnectionStringDataSource
-            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
-            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
-            Credential         = $this.SBFarmDBConnectionStringCredential
-            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
-        }
-        Write-Verbose -Message "Creating SBFarmDBConnectionString"
-        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
-        Write-Verbose -Message "Setting SBFarmDBConnectionString in Update-SBHost params"
-        $updateSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
-
-        Write-Verbose -Message "Removing unnecessary parameters from Update-SBHost params"
-        $updateSBHostParams.Remove("Ensure")
-        $updateSBHostParams.Remove("EnableFirewallRules")
-        $updateSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
-        $updateSBHostParams.Remove("SBFarmDBConnectionStringInitialCatalog")
-        $updateSBHostParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
-        $updateSBHostParams.Remove("SBFarmDBConnectionStringCredential")
-        $updateSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
-        $updateSBHostParams.Remove("Started")
-
-        Write-Verbose -Message "Invoking Update-SBHost with configurable params"
-        Update-SBHost @updateSBHostParams
-    }
-
-    [void] RemoveSBHost() {
-        Write-Verbose -Message "Getting configurable properties as hashtable for Remove-SBHost params"
-        $removeSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
-
-        # TODO: fix for non-domain joined machine
-        Write-Verbose -Message "Constructing hostname for Remove-SBHost params"
-        $removeSBHostParams.HostName = "$env:COMPUTERNAME.$((Get-WmiObject -Class WIN32_ComputerSystem).Domain)"
-
-        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
-        $sbFarmConnectionStringParams = @{
-            DataSource         = $this.SBFarmDBConnectionStringDataSource
-            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
-            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
-            Credential         = $this.SBFarmDBConnectionStringCredential
-            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
-        }
-        Write-Verbose -Message "Creating SBFarmDBConnectionString"
-        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
-        Write-Verbose -Message "Setting SBFarmDBConnectionString in Remove-SBHost params"
-        $removeSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
-
-        Write-Verbose -Message "Removing unnecessary parameters from Remove-SBHost params"
-        $removeSBHostParams.Remove("CertificateAutoGenerationKey")
-        $removeSBHostParams.Remove("Ensure")
-        $removeSBHostParams.Remove("EnableFirewallRules")
-        $removeSBHostParams.Remove("ExternalBrokerPort")
-        $removeSBHostParams.Remove("ExternalBrokerUrl")
-        $removeSBHostParams.Remove("RunAsPassword")
-        $removeSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
-        $removeSBHostParams.Remove("SBFarmDBConnectionStringInitialCatalog")
-        $removeSBHostParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
-        $removeSBHostParams.Remove("SBFarmDBConnectionStringCredential")
-        $removeSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
-        $removeSBHostParams.Remove("Started")
-
-        Write-Verbose -Message "Invoking Remove-SBHost with configurable params"
-        Remove-SBHost @removeSBHostParams
-    }
-
-    [bool] Test() {
-        $currentValues = $this.Get()
-
-        if ($null -eq $currentValues) {
-            return $false
-        }
-
-        $params = @{
-            CurrentValues = $currentValues.ToHashtable()
-            DesiredValues = $this.ToHashtable()
-            ValuesToCheck = @(
-                "Ensure",
-                "Started",
-                "SBFarmDBConnectionStringDataSource"
-            )
-        }
-        return Test-cServiceBusForWindowsServerSpecificParameters @params
-    }
-
+    <#
+        This method is equivalent of the Get-TargetResource script function.
+        The implementation should use the keys to find appropriate resources.
+        This method returns an instance of this class with the updated key
+        properties.
+    #>
     [cSBHost] Get() {
         $result = [cSBHost]::new()
 
@@ -1147,7 +929,9 @@ class cSBHost :cSBBase {
 
         if ($null -eq $existingHost) {
             Write-Verbose -Message "Host is not present in SBFarm.Hosts."
-            return $null
+            $result.Ensure = [Ensure]::Absent
+            $result.Started = $false
+            return $result
         }
 
         Write-Verbose -Message "Trying to get SBFarmStatus of current host."
@@ -1195,27 +979,521 @@ class cSBHost :cSBBase {
 
         return $result
     }
+
+    <#
+        This method is equivalent of the Test-TargetResource script function.
+        It should return True or False, showing whether the resource
+        is in a desired state.
+    #>
+    [bool] Test() {
+        $currentValues = $this.Get()
+
+        if ($null -eq $currentValues) {
+            return $false
+        }
+
+        if ($this.SBHostShouldBeAdded($currentValues)) {
+            return $false
+        }
+
+        if ($this.SBHostShouldBeRemoved($currentValues)) {
+            return $false
+        }
+
+        if ($this.SBHostShouldBeStarted($currentValues)) {
+            return $false
+        }
+
+        if ($this.SBHostShouldBeStopped($currentValues)) {
+            return $false
+        }
+
+        $params = @{
+            CurrentValues = $currentValues.ToHashtable()
+            DesiredValues = $this.ToHashtable()
+            ValuesToCheck = @(
+                "SBFarmDBConnectionStringDataSource"
+            )
+        }
+        return Test-cSBWSParameterState @params
+    }
+
+    [bool] SBHostShouldBeAdded([cSBHost]$CurrentValues) {
+        return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
+    }
+
+    [bool] SBHostShouldBeRemoved([cSBHost]$CurrentValues) {
+        return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
+    }
+
+    [bool] SBHostShouldBeStarted([cSBHost]$CurrentValues) {
+        return (($this.Started -eq $true) -and ($CurrentValues.Started -eq $false))
+    }
+
+    [bool] SBHostShouldBeStopped([cSBHost]$CurrentValues) {
+        return (($this.Started -eq $false) -and ($CurrentValues.Started -eq $true))
+    }
+
+    <#
+        This method is equivalent of the Set-TargetResource script function.
+        It sets the resource to the desired state.
+    #>
+    [void] Set() {
+        Write-Verbose -Message "Retrieving current SBHost values"
+        $currentValues = $this.Get()
+
+        Write-Verbose -Message "Checking if SBHost should be added to the farm"
+        if ($this.SBHostShouldBeAdded($currentValues)) {
+            Write-Verbose -Message "SBHost will be added to the farm"
+            $this.AddSBHost()
+            Write-Verbose -Message "Checking if SBHost should be started"
+            if ($this.Started -eq $true) {
+                Write-Verbose -Message "Starting SBHost"
+                Start-SBHost
+            }
+            return
+        }
+
+        Write-Verbose -Message "Checking if SBHost should be removed from the farm"
+        if ($this.SBHostShouldBeRemoved($currentValues)) {
+            Write-Verbose -Message "SBHost will be removed from the farm"
+            Write-Verbose -Message "Checking if SBHost should be stopped prior to removing"
+            if ($currentValues.Started -eq $true) {
+                Write-Verbose -Message "Stopping SBHost"
+                Stop-SBHost
+            }
+            $this.RemoveSBHost()
+            Write-Verbose -Message "Ending cSBHost.Set() after removal"
+            return
+        }
+
+        Write-Verbose -Message "Checking if SBHost should be started"
+        if ($this.SBHostShouldBeStarted($currentValues)) {
+            Write-Verbose -Message "SBHost will be started"
+            Write-Verbose -Message "Updating SBHost prior to starting"
+            $this.UpdateSBHost()
+            Write-Verbose -Message "Starting SBHost"
+            Start-SBHost
+            return
+        }
+
+        Write-Verbose -Message ("cSBHost can only detect certain changes -- to change certain settings on a host, " +
+                                "push a configuration with the host stopped, then push a new config with the host " +
+                                "started and it will explicitly re-update the settings.")
+        Write-Verbose -Message "Checking if SBHost should be stopped"
+        if ($this.SBHostShouldBeStopped($currentValues)) {
+            Write-Verbose -Message "Stopping SBHost"
+            Stop-SBHost
+            return
+        }
+    }
+
+    [void] AddSBHost() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for Add-SBHost params"
+        $addSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
+
+        Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
+        if ($null -eq $this.CertificateAutoGenerationKey) {
+            Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from Add-SBHost params"
+            $addSBHostParams.Remove("CertificateAutoGenerationKey")
+        } else {
+            Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
+            $addSBHostParams.Remove("CertificateAutoGenerationKey")
+            $addSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
+        }
+
+        Write-Verbose -Message "Checking for ExternalBrokerPort"
+        if (0 -eq $addSBHostParams.ExternalBrokerPort) {
+            Write-Verbose -Message "ExternalBrokerPort is absent, removing from Add-SBHost params"
+            $addSBHostParams.Remove("ExternalBrokerPort")
+        }
+        Write-Verbose -Message "Checking for ExternalBrokerUrl"
+        if ($null -eq $addSBHostParams.ExternalBrokerUrl) {
+            Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Add-SBHost params"
+            $addSBHostParams.Remove("ExternalBrokerUrl")
+        }
+
+        Write-Verbose -Message "Swapping RunAsPassword pscredential for securestring"
+        $addSBHostParams.Remove("RunAsPassword")
+        $addSBHostParams.RunAsPassword = $this.RunAsPassword.Password
+
+        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
+        $sbFarmConnectionStringParams = @{
+            DataSource         = $this.SBFarmDBConnectionStringDataSource
+            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
+            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
+            Credential         = $this.SBFarmDBConnectionStringCredential
+            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+        }
+        Write-Verbose -Message "Creating SBFarmDBConnectionString"
+        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
+        Write-Verbose -Message "Setting SBFarmDBConnectionString in Add-SBHost params"
+        $addSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
+
+        Write-Verbose -Message "Removing unnecessary parameters from Add-SBHost params"
+        $addSBHostParams.Remove("Ensure")
+        $addSBHostParams.Remove("SBFarmDBConnectionStringCredential")
+        $addSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
+        $addSBHostParams.Remove("SBFarmDBConnectionStringInitialCatalog")
+        $addSBHostParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
+        $addSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
+        $addSBHostParams.Remove("Started")
+
+        Write-Verbose -Message "Invoking Add-SBHost with configurable params"
+        Add-SBHost @addSBHostParams
+    }
+
+    [void] RemoveSBHost() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for Remove-SBHost params"
+        $removeSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
+
+        # TODO: fix for non-domain joined machine
+        Write-Verbose -Message "Constructing hostname for Remove-SBHost params"
+        $removeSBHostParams.HostName = "$env:COMPUTERNAME.$((Get-WmiObject -Class WIN32_ComputerSystem).Domain)"
+
+        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
+        $sbFarmConnectionStringParams = @{
+            DataSource         = $this.SBFarmDBConnectionStringDataSource
+            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
+            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
+            Credential         = $this.SBFarmDBConnectionStringCredential
+            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+        }
+        Write-Verbose -Message "Creating SBFarmDBConnectionString"
+        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
+        Write-Verbose -Message "Setting SBFarmDBConnectionString in Remove-SBHost params"
+        $removeSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
+
+        Write-Verbose -Message "Removing unnecessary parameters from Remove-SBHost params"
+        $removeSBHostParams.Remove("CertificateAutoGenerationKey")
+        $removeSBHostParams.Remove("Ensure")
+        $removeSBHostParams.Remove("EnableFirewallRules")
+        $removeSBHostParams.Remove("ExternalBrokerPort")
+        $removeSBHostParams.Remove("ExternalBrokerUrl")
+        $removeSBHostParams.Remove("RunAsPassword")
+        $removeSBHostParams.Remove("SBFarmDBConnectionStringCredential")
+        $removeSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
+        $removeSBHostParams.Remove("SBFarmDBConnectionStringInitialCatalog")
+        $removeSBHostParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
+        $removeSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
+        $removeSBHostParams.Remove("Started")
+
+        Write-Verbose -Message "Invoking Remove-SBHost with configurable params"
+        Remove-SBHost @removeSBHostParams
+    }
+
+    [void] UpdateSBHost() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for Update-SBHost params"
+        $updateSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
+
+        Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
+        if ($null -eq $this.CertificateAutoGenerationKey) {
+            Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from Update-SBHost params"
+            $updateSBHostParams.Remove("CertificateAutoGenerationKey")
+        } else {
+            Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
+            $updateSBHostParams.Remove("CertificateAutoGenerationKey")
+            $updateSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
+        }
+
+        Write-Verbose -Message "Checking for ExternalBrokerPort"
+        if ($null -eq $updateSBHostParams.ExternalBrokerPort) {
+            Write-Verbose -Message "ExternalBrokerPort is absent, removing from Update-SBHost params"
+            $updateSBHostParams.Remove("ExternalBrokerPort")
+        }
+        Write-Verbose -Message "Checking for ExternalBrokerUrl"
+        if ($null -eq $updateSBHostParams.ExternalBrokerUrl) {
+            Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Update-SBHost params"
+            $updateSBHostParams.Remove("ExternalBrokerUrl")
+        }
+
+        Write-Verbose -Message "Swapping RunAsPassword pscredential for securestring"
+        $updateSBHostParams.Remove("RunAsPassword")
+        $updateSBHostParams.RunAsPassword = $this.RunAsPassword.Password
+
+        Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
+        $sbFarmConnectionStringParams = @{
+            DataSource         = $this.SBFarmDBConnectionStringDataSource
+            InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
+            IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
+            Credential         = $this.SBFarmDBConnectionStringCredential
+            Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+        }
+        Write-Verbose -Message "Creating SBFarmDBConnectionString"
+        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
+        Write-Verbose -Message "Setting SBFarmDBConnectionString in Update-SBHost params"
+        $updateSBHostParams.SBFarmDBConnectionString = $sbFarmDBCxnString
+
+        Write-Verbose -Message "Removing unnecessary parameters from Update-SBHost params"
+        $updateSBHostParams.Remove("Ensure")
+        $updateSBHostParams.Remove("EnableFirewallRules")
+        $updateSBHostParams.Remove("SBFarmDBConnectionStringCredential")
+        $updateSBHostParams.Remove("SBFarmDBConnectionStringDataSource")
+        $updateSBHostParams.Remove("SBFarmDBConnectionStringInitialCatalog")
+        $updateSBHostParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
+        $updateSBHostParams.Remove("SBFarmDBConnectionStringEncrypt")
+        $updateSBHostParams.Remove("Started")
+
+        Write-Verbose -Message "Invoking Update-SBHost with configurable params"
+        Update-SBHost @updateSBHostParams
+    }
 }
 
 
-# [DscResource()]
-# class cSBNameSpace {
-#     [DscProperty(Key)]
-#     [Ensure]
-#     $Ensure
+<#
+   This resource adds, removes, updates settings for a Service Bus for Windows Server namespace.
+#>
+[DscResource()]
+class cSBNameSpace : cSBBase {
 
-#     [void] Set() {
+    <#
+        Specifies the addressing scheme used in the service namespace. The possible values for this parameter are
+        Path (default value), DNSRegistered, Cloud, and PathWithServiceId.
+    #>
+    [DscProperty()]
+    [AddressingScheme]
+    $AddressingScheme = [AddressingScheme]::Path
 
-#     }
+    <#
+        Specifies the DNS Entry.
+    #>
+    [DscProperty()]
+    [string]
+    $DNSEntry
 
-#     [bool] Test() {
-#         return $true
-#     }
+    <#
+        Specifies the name of the trusted security issuer.
+    #>
+    [DscProperty()]
+    [string]
+    $IssuerName
 
-#     [cSBNamespace] Get() {
-#         return $this
-#     }
-# }
+    <#
+        Specifies a case-sensitive issuer URI.
+    #>
+    [DscProperty()]
+    [string]
+    $IssuerUri
+
+    <#
+        Specifies user or group names that will be managers of the service namespace.
+    #>
+    [DscProperty(Mandatory)]
+    [string[]]
+    $ManageUsers
+
+    <#
+        Specifies the name for the new Service Bus for Windows Server service namespace.
+    #>
+    [DscProperty(Key)]
+    [ValidateLength(6,50)]
+    [string]
+    $Name
+
+    <#
+        Specifies the primary key to be used in this service namespace.
+    #>
+    [DscProperty()]
+    [string]
+    $PrimarySymmetricKey
+
+    <#
+        Specifies the secondary key to be used in this service namespace.
+    #>
+    [DscProperty()]
+    [string]
+    $SecondarySymmetricKey
+
+    <#
+        An optional parameter that associates a namespace with a subscription. For example, this parameter is useful
+        if an administrator creates a namespace on behalf of a user.
+    #>
+    [DscProperty()]
+    [Guid]
+    $SubscriptionId
+
+    <#
+        Marks whether the namespace should be present or absent. Default is present.
+    #>
+    [DscProperty(Key)]
+    [Ensure]
+    $Ensure = [Ensure]::Present
+
+    <#
+        If Ensure is Absent and the namespace is present, setting this property to true will add the -Force
+        to Remove-SBNamespace call. Default value is false.
+    #>
+    [DscProperty()]
+    [bool]
+    $ForceRemoval = $false
+
+    <#
+        Marks the creation time of the namepsace.
+    #>
+    [DscProperty(NotConfigurable)]
+    [datetime]
+    $CreatedTime
+
+    <#
+        Marks the state of the namespace.
+    #>
+    [DscProperty(NotConfigurable)]
+    [string]
+    $State
+
+    <#
+        This method is equivalent of the Get-TargetResource script function.
+        The implementation should use the keys to find appropriate resources.
+        This method returns an instance of this class with the updated key
+        properties.
+    #>
+    [cSBNamespace] Get() {
+        $result = [cSBNamespace]::new()
+
+        Write-Verbose -Message "Checking for SBNamespace $($this.Name)."
+
+        Write-Verbose -Message "Trying to get SBNamespace $($this.Name)."
+        $sbNamespace = $null
+        try {
+            $sbNamespace = Get-SBNamespace -Name $this.Name
+            Write-Verbose -Message "Successfully retrieved SBNamespace $($this.Name)."
+        } catch {
+            Write-Verbose -Message "Unable to detect SBNamespace $($this.Name)."
+        }
+
+        if ($null -eq $sbNamespace) {
+            $result.Ensure = [Ensure]::Absent
+            return $result
+        }
+
+        $result.AddressingScheme = $sbNamespace.AddressingScheme
+        $result.CreatedTime = $sbNamespace.CreatedTime
+        $result.DNSEntry = $sbNamespace.DNSEntry
+        $result.Ensure = [Ensure]::Present
+        $result.IssuerName = $sbNamespace.IssuerName
+        $result.IssuerUri = $sbNamespace.IssuerUri
+        $result.ManageUsers = $sbNamespace.ManageUsers
+        $result.Name = $sbNamespace.Name
+        $result.PrimarySymmetricKey = $sbNamespace.PrimarySymmetricKey
+        $result.SecondarySymmetricKey = $sbNamespace.SecondarySymmetricKey
+        $result.State = $sbNamespace.State.ToString()
+        $result.SubscriptionId = $sbNamespace.SubscriptionId
+
+        return $result
+    }
+
+    <#
+        This method is equivalent of the Test-TargetResource script function.
+        It should return True or False, showing whether the resource
+        is in a desired state.
+    #>
+    [bool] Test() {
+        $currentValues = $this.Get()
+
+        if ($this.SBNamespaceShouldBeCreated($currentValues)) {
+            return $false
+        }
+
+        if ($this.SBNamespaceShouldBeRemoved($currentValues)) {
+            return $false
+        }
+
+        if ($this.SBNamespaceShouldBeUpdated($currentValues)) {
+            return $false
+        }
+
+        return $true
+    }
+
+    [bool] SBNamespaceShouldBeCreated([cSBNameSpace]$CurrentValues) {
+        return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
+    }
+
+    [bool] SBNamespaceShouldBeRemoved([cSBNameSpace]$CurrentValues) {
+        return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
+    }
+
+    [bool] SBNamespaceShouldBeUpdated([cSBNameSpace]$CurrentValues) {
+        $params = @{
+            CurrentValues = $CurrentValues.ToHashtable()
+            DesiredValues = $this.ToHashtable()
+            ValuesToCheck = @(
+                'IssuerName',
+                'IssuerUri',
+                'ManageUsers',
+                'PrimarySymmetricKey',
+                'SecondarySymmetricKey',
+                'SubscriptionId'
+            )
+        }
+        return (-not (Test-cSBWSParameterState @params))
+    }
+
+
+    <#
+        This method is equivalent of the Set-TargetResource script function.
+        It sets the resource to the desired state.
+    #>
+    [void] Set() {
+        Write-Verbose -Message "Retrieving current SBNamespace values for namespace $($this.Name)"
+        $currentValues = $this.Get()
+
+        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be created"
+        if ($this.SBNamespaceShouldBeCreated($currentValues)) {
+            Write-Verbose -Message "Creating SBNamespace with Name $($this.Name)"
+            $this.NewSBNamespace()
+            return
+        }
+
+        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be removed"
+        if ($this.SBNamespaceShouldBeRemoved($currentValues)) {
+            Write-Verbose -Message "Removing SBNamespace with Name $($this.Name)"
+            $this.RemoveSBNamespace()
+            return
+        }
+
+        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be udpated"
+        if ($this.SBNamespaceShouldBeUpdated($currentValues)) {
+            Write-Verbose -Message "Updating SBNamespace with Name $($this.Name)"
+            $this.SetSBNamespace()
+            return
+        }
+    }
+
+    [void] NewSBNamespace() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for New-SBNamespace params"
+        $newSBNamespaceParams = $this.GetDscConfigurablePropertiesAsHashtable()
+        Write-Verbose -Message "Removing unnecessary parameters from New-SBNamespace params"
+        $newSBNamespaceParams.Remove("Ensure")
+        $newSBNamespaceParams.Remove("ForceRemoval")
+
+        Write-Verbose -Message "Invoking New-SBNamespace with configurable params"
+        New-SBNamespace @newSBNamespaceParams
+    }
+
+    [void] RemoveSBNamespace() {
+        Write-Verbose -Message "Invoking Remove-SBNamespace with configurable params"
+        if ($this.ForceRemoval -eq $true) {
+            Write-Verbose -Message "ForceRemoval was specified, adding -Force parameter to Remove-SBNamespace"
+            Remove-SBNamespace -Name $this.Name -Force
+            return
+        }
+        Remove-SBNamespace -Name $this.Name
+    }
+
+    [void] SetSBNamespace() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for Set-SBNamespace params"
+        $setSBNamespaceParams = $this.GetDscConfigurablePropertiesAsHashtable()
+        Write-Verbose -Message "Removing unnecessary parameters from Set-SBNamespace params"
+        $setSBNamespaceParams.Remove("AddressingScheme")
+        $setSBNamespaceParams.Remove("DNSEntry")
+        $setSBNamespaceParams.Remove("Ensure")
+        $setSBNamespaceParams.Remove("ForceRemoval")
+
+        Write-Verbose -Message "Invoking Set-SBNamespace with configurable params"
+        Set-SBNamespace @setSBNamespaceParams
+    }
+}
 
 
 # [DscResource()]

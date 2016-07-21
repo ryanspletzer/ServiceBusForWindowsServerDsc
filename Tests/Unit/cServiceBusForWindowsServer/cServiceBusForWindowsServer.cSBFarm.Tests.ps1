@@ -49,23 +49,27 @@ Describe "cSBFarm" {
 
         Context "No farm is found or configured" {
             #Arrange
-            Mock Get-SBFarm { throw ("Cannot validate argument parameter 'SBFarmDBConnectionString'. The " +
-                                     "database (SBManagementDB) located at SQL Server (SQLSERVER.contoso.com) " +
-                                     "couldn't be found or is not configured.") }
-            Mock Get-SBMessageContainer { throw ("This host is not joined to any Service Bus farm. to join a " +
-                                                 "farm run Add-SBHost cmdlet.") }
+            Mock Get-SBFarm {
+                throw ("Cannot validate argument parameter 'SBFarmDBConnectionString'. The " +
+                       "database (SBManagementDB) located at SQL Server (SQLSERVER.contoso.com) " +
+                       "couldn't be found or is not configured.")
+            }
+            Mock Get-SBMessageContainer {
+                throw ("This host is not joined to any Service Bus farm. to join a " +
+                       "farm run Add-SBHost cmdlet.")
+            }
 
-            It "returns null from the get method" {
+            It "returns null from the Get method" {
                 # Act | Assert
                 $testSBFarm.Get() | Should BeNullOrEmpty
             }
 
-            It "returns false from the test method" {
+            It "returns false from the Test method" {
                 # Act | Assert
                 $testSBFarm.Test() | Should Be $false
             }
 
-            It "calls the New-SBFarm cmdlet in the set method" {
+            It "calls the New-SBFarm cmdlet in the Set method" {
                 # Act
                 $testSBFarm.Set()
 
@@ -135,12 +139,12 @@ Describe "cSBFarm" {
                 }
             }
 
-            It "returns current values from the get method" {
+            It "returns current values from the Get method" {
                 # Act | Assert
                 $testSBFarm.Get() | Should Not BeNullOrEmpty
             }
 
-            It "returns true from the test method" {
+            It "returns true from the Test method" {
                 # Act | Assert
                 $testSBFarm.Test() | Should Be $true
             }
@@ -208,17 +212,17 @@ Describe "cSBFarm" {
             }
             Mock Set-SBFarm {}
 
-            It "returns current values from the get method" {
+            It "returns current values from the Get method" {
                 # Act | Assert
                 $testSBFarm.Get() | Should Not BeNullOrEmpty
             }
 
-            It "returns false from the test method" {
+            It "returns false from the Test method" {
                 # Act | Assert
                 $testSBFarm.Test() | Should Be $false
             }
 
-            It "sets the settable settings for an existing farm" {
+            It "calls the Set-SBFarm cmdlet in the Set method" {
                 # Act
                 $testSBFarm.Set()
 

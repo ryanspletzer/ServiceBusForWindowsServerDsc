@@ -1,9 +1,9 @@
 #
 # xServiceBusForWindowsServer.Util.Tests.ps1
 #
-# Credit to xSharePoint DSC Resource module for nested Util approach and ideas for tests in this file:
+# Credit to SharePointDsc Resource module for nested Util approach and ideas for tests in this file:
 #
-# https://github.com/PowerShell/xSharePoint/blob/dev/Tests/xSharePoint/xSharePoint.Util.Tests.ps1
+# https://github.com/PowerShell/SharePointDsc/blob/dev/Modules/SharePointDsc/Modules/SharePointDsc.Util/SharePointDsc.Util.psm1
 #
 
 [CmdletBinding()]
@@ -22,20 +22,20 @@ Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusFo
 
 Describe "cServiceBusForWindowsServer.Util" {
 
-    Context "Validate Test-cServiceBusForWindowsServerSpecificParameters" {
+    Context "Validate Test-cSBWSParameterState" {
         It "Returns true for two identical tables" {
             # Arrange
             $desired = @{ Example = "test" }
             # Act | Assert
-            Test-cServiceBusForWindowsServerSpecificParameters -CurrentValues $desired -DesiredValues $desired | Should Be $true
+            Test-cSBWSParameterState -CurrentValues $desired -DesiredValues $desired | Should Be $true
         }
 
         It "Returns false when a value is different" {
             # Arrange
             $current = @{ Example = "something" }
             $desired = @{ Example = "test" }
-            # Act | Assert
-            Test-cServiceBusForWindowsServerSpecificParameters -CurrentValues $current -DesiredValues $desired | Should Be $false
+            # Act
+            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
 
         It "Returns false when a value is missing" {
@@ -43,31 +43,31 @@ Describe "cServiceBusForWindowsServer.Util" {
             $current = @{ }
             $desired = @{ Example = "test" }
             # Act | Assert
-            Test-cServiceBusForWindowsServerSpecificParameters -CurrentValues $current -DesiredValues $desired | Should Be $false
+            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
 
         It "Returns true when only a specified value matches, but other non-listed values do not" {
             # Arrange
             $current = @{ Example = "test"; SecondExample = "true" }
-            $desired = @{ Example = "test"; SecondExample = "false" }
+            $desired = @{ Example = "test"; SecondExample = "false"  }
             # Act | Assert
-            Test-cServiceBusForWindowsServerSpecificParameters -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("Example") | Should Be $true
+            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("Example") | Should Be $true
         }
 
         It "Returns false when only specified values do not match, but other non-listed values do " {
             # Arrange
             $current = @{ Example = "test"; SecondExample = "true" }
-            $desired = @{ Example = "test"; SecondExample = "false" }
+            $desired = @{ Example = "test"; SecondExample = "false"  }
             # Act | Assert
-            Test-cServiceBusForWindowsServerSpecificParameters -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("SecondExample") | Should Be $false
+            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("SecondExample") | Should Be $false
         }
 
-        It "Returns false when an empty array is used in the current values " {
+        It "Returns false when an empty array is used in the current values" {
             # Arrange
             $current = @{ }
-            $desired = @{ Example = "test"; SecondExample = "false" }
+            $desired = @{ Example = "test"; SecondExample = "false"  }
             # Act | Assert
-            Test-cServiceBusForWindowsServerSpecificParameters -CurrentValues $current -DesiredValues $desired | Should Be $false
+            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
     }
 

@@ -1,113 +1,185 @@
 #
 # xServiceBusForWindowsServer.Util.psm1
 #
-# Credit to xSharePoint DSC Resource module for nested Util approach and ideas for helper cmdlets in this file:
+# Credit to SharePointDsc Resource module for nested Util approach and ideas for helper cmdlets in this file:
 #
-# https://github.com/PowerShell/xSharePoint/blob/dev/Modules/xSharePoint/Modules/xSharePoint.Util/xSharePoint.Util.psm1
+# https://github.com/PowerShell/SharePointDsc/blob/dev/Modules/SharePointDsc/Modules/SharePointDsc.Util/SharePointDsc.Util.psm1
 #
 
 
-function Test-cServiceBusForWindowsServerSpecificParameters() {
-    <#
-    .SYNOPSIS
-        Removes a user from local administrators.
+function Test-cSBWSObjectHasProperty() {
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [parameter(Mandatory = $true,Position=1)]  [Object] $Object,
+        [parameter(Mandatory = $true,Position=2)]  [String] $PropertyName
+    )
+    if (([bool]($Object.PSobject.Properties.name -contains $PropertyName)) -eq $true) {
+        if ($null -ne $Object.$PropertyName) {
+            return $true
+        }
+    }
+    return $false
+}
 
-    .DESCRIPTION
-        Removes a user from local administrators.
 
-    .PARAMETER CurrentValues
-        A HashTable of actual values.
-
-    .PARAMETER DesiredValues
-        A HashTable of desired values.
-
-    .PARAMETER ValuesToCheck
-        An array of values to check.
-
-    .INPUTS
-
-    .OUTPUTS
-
-    .EXAMPLE
-        Example of how to run the script
-
-    .LINK
-        Links to further documentation
-
-    .NOTES
-        Detail on what the script does, if this is needed
-
-    #>
+function Test-cSBWSParameterState() {
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory=$true,
-                   Position=1)]
-        [hashTable]
+        [parameter(Mandatory = $true, Position=1)]
+        [HashTable]
         $CurrentValues,
 
-        [parameter(Mandatory=$true,
-                   Position=2)]
-        [hashTable]
+        [parameter(Mandatory = $true, Position=2)]
+        [Object]
         $DesiredValues,
 
-        [parameter(Mandatory=$false,
-                   Position=3)]
-        [array]
+        [parameter(Mandatory = $false, Position=3)]
+        [Array]
         $ValuesToCheck
     )
 
-    begin {
-        $returnValue = $true
+    $returnValue = $true
 
-        $CurrentValues.Keys | %{Write-Debug -Message "Current $_ : $($CurrentValues.$_)"}
-
-        $DesiredValues.Keys | %{Write-Debug -Message "Desired $_ : $($DesiredValues.$_)"}
-
-        if (($ValuesToCheck -eq $null) -or ($ValuesToCheck.Count -lt 1)) {
-            $KeyList = $DesiredValues.Keys
-        } else {
-            $KeyList = $ValuesToCheck
-        }
+    if (($DesiredValues.GetType().Name -ne "HashTable") `
+        -and ($DesiredValues.GetType().Name -ne "CimInstance") `
+        -and ($DesiredValues.GetType().Name -ne "PSBoundParametersDictionary"))
+    {
+        throw ("Property 'DesiredValues' in Test-SPDscParameterState must be either a " + `
+               "Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
     }
 
-    process {
-        $KeyList | ForEach-Object {
-            if ($_ -ne "Verbose") {
-                if (($CurrentValues.ContainsKey($_) -eq $false) -or
-                    ($CurrentValues.$_ -ne $DesiredValues.$_)) {
-                    if ($DesiredValues.ContainsKey($_)) {
-                        $desiredType = $DesiredValues.$_.GetType()
-                        $fieldName = $_
-                        Write-Debug -Message "CurrentValues $fieldName : $($CurrentValues.$fieldName)"
-                        Write-Debug -Message "DesiredValues $fieldName : $($DesiredValues.$fieldName)"
-                        switch ($desiredType.Name) {
+    if (($DesiredValues.GetType().Name -eq "CimInstance") -and ($null -eq $ValuesToCheck))
+    {
+        throw ("If 'DesiredValues' is a Hashtable then property 'ValuesToCheck' must contain " + `
+               "a value")
+    }
+
+    if (($null -eq $ValuesToCheck) -or ($ValuesToCheck.Count -lt 1))
+    {
+        $KeyList = $DesiredValues.Keys
+    }
+    else
+    {
+        $KeyList = $ValuesToCheck
+    }
+
+    $KeyList | ForEach-Object -Process {
+        if ($_ -ne "Verbose")
+        {
+            if (($CurrentValues.ContainsKey($_) -eq $false) `
+            -or ($CurrentValues.$_ -ne $DesiredValues.$_) `
+            -or (($DesiredValues.ContainsKey($_) -eq $true) -and ($DesiredValues.$_.GetType().IsArray)))
+            {
+                if ($DesiredValues.GetType().Name -eq "HashTable" -or `
+                    $DesiredValues.GetType().Name -eq "PSBoundParametersDictionary")
+                {
+
+                    $CheckDesiredValue = $DesiredValues.ContainsKey($_)
+                }
+                else
+                {
+                    $CheckDesiredValue = Test-SPDSCObjectHasProperty $DesiredValues $_
+                }
+
+                if ($CheckDesiredValue)
+                {
+                    $desiredType = $DesiredValues.$_.GetType()
+                    $fieldName = $_
+                    if ($desiredType.IsArray -eq $true)
+                    {
+                        if (($CurrentValues.ContainsKey($fieldName) -eq $false) `
+                        -or ($null -eq $CurrentValues.$fieldName))
+                        {
+                            Write-Verbose -Message ("Expected to find an array value for " + `
+                                                    "property $fieldName in the current " + `
+                                                    "values, but it was either not present or " + `
+                                                    "was null. This has caused the test method " + `
+                                                    "to return false.")
+                            $returnValue = $false
+                        }
+                        else
+                        {
+                            $arrayCompare = Compare-Object -ReferenceObject $CurrentValues.$fieldName `
+                                                           -DifferenceObject $DesiredValues.$fieldName
+                            if ($null -ne $arrayCompare)
+                            {
+                                Write-Verbose -Message ("Found an array for property $fieldName " + `
+                                                        "in the current values, but this array " + `
+                                                        "does not match the desired state. " + `
+                                                        "Details of the changes are below.")
+                                $arrayCompare | ForEach-Object -Process {
+                                    Write-Verbose -Message "$($_.InputObject) - $($_.SideIndicator)"
+                                }
+                                $returnValue = $false
+                            }
+                        }
+                    }
+                    else
+                    {
+                        switch ($desiredType.Name)
+                        {
                             "String" {
-                                if ([string]::IsNullOrEmpty($CurrentValues.$fieldName) -and
-                                    [string]::IsNullOrEmpty($DesiredValues.$fieldName)) {
-                                    } else {
+                                if ([string]::IsNullOrEmpty($CurrentValues.$fieldName) `
+                                -and [string]::IsNullOrEmpty($DesiredValues.$fieldName))
+                                {}
+                                else
+                                {
+                                    Write-Verbose -Message ("String value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
                                     $returnValue = $false
                                 }
                             }
                             "Int32" {
-                                if (($DesiredValues.$fieldName -eq 0) -and
-                                    ($CurrentValues.$fieldName -eq $null)) {
-                                    } else {
+                                if (($DesiredValues.$fieldName -eq 0) `
+                                -and ($null -eq $CurrentValues.$fieldName))
+                                {}
+                                else
+                                {
+                                    Write-Verbose -Message ("Int32 value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                    $returnValue = $false
+                                }
+                            }
+                            "Int16" {
+                                if (($DesiredValues.$fieldName -eq 0) `
+                                -and ($null -eq $CurrentValues.$fieldName))
+                                {}
+                                else
+                                {
+                                    Write-Verbose -Message ("Int16 value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
                                     $returnValue = $false
                                 }
                             }
                             default {
+                                Write-Verbose -Message ("Unable to compare property $fieldName " + `
+                                                        "as the type ($($desiredType.Name)) is " + `
+                                                        "not handled by the " + `
+                                                        "Test-SPDscParameterState cmdlet")
                                 $returnValue = $false
                             }
                         }
                     }
                 }
             }
-
         }
-        Write-Debug -Message "Test ReturnValue = $returnValue"
-        return $returnValue
     }
+    return $returnValue
 }
 
 
@@ -276,11 +348,11 @@ function Compare-SecureStrings {
 
         [Parameter(Mandatory)]
         [securestring]
-        $ComparisonSecureString
+        $DifferenceSecureString
     )
     process {
         return ((ConvertTo-PlainText -SecureString $ReferenceSecureString) -eq
-                (ConvertTo-PlainText -SecureString $ComparisonSecureString))
+                (ConvertTo-PlainText -SecureString $DifferenceSecureString))
     }
 }
 

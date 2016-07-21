@@ -19,7 +19,7 @@ Describe "cSBHost" {
         # Arrange
         $testSBHost = [cSBHost]::new()
         $testSBHost.EnableFirewallRules = $true
-        $testSBHost.Ensure = 'Present'
+        $testSBHost.Ensure = [Ensure]::Present
         $testSBHost.ExternalBrokerPort = 1024
         $testSBHost.ExternalBrokerUrl = 'externalbroker.azurewebsites.net'
         $runAsPasswordCredentialParams = @{
@@ -156,17 +156,20 @@ Describe "cSBHost" {
                 )
             }
 
-            It "returns null from the get method" {
-                # Act | Assert
-                $testSBHost.Get() | Should BeNullOrEmpty
+            It "returns result with Ensure value as Absent from the Get method" {
+                # Act
+                $currentValues = $testSBHost.Get()
+
+                # Assert
+                $currentValues.Ensure | Should BeExactly 'Absent'
             }
 
-            It "returns false from the test method" {
+            It "returns false from the Test method" {
                 # Act | Assert
                 $testSBHost.Test() | Should Be $false
             }
 
-            It "calls Add-SBHost cmdlet in the set method" {
+            It "calls Add-SBHost cmdlet in the Set method" {
                 # Act
                 $testSBHost.Set()
 
@@ -174,7 +177,7 @@ Describe "cSBHost" {
                 Assert-MockCalled -CommandName Add-SBHost
             }
 
-            It "calls Start-SBHost cmdlet in the set method" {
+            It "calls Start-SBHost cmdlet in the Set method" {
                 # Act
                 $testSBHost.Set()
 
@@ -327,17 +330,17 @@ Describe "cSBHost" {
 
             $testSBHost.Ensure = 'Absent'
 
-            It "returns current values from the get method" {
+            It "returns current values from the Get method" {
                 # Act | Assert
                 $testSBHost.Get() | Should Not BeNullOrEmpty
             }
 
-            It "returns false from the test method" {
+            It "returns false from the Test method" {
                 # Act | Assert
                 $testSBHost.Test() | Should Be $false
             }
 
-            It "calls Stop-SBHost in the set method" {
+            It "calls Stop-SBHost in the Set method" {
                 # Act
                 $testSBHost.Set()
 
@@ -345,7 +348,7 @@ Describe "cSBHost" {
                 Assert-MockCalled -CommandName Stop-SBHost
             }
 
-            It "calls Remove-SBHost in the set method" {
+            It "calls Remove-SBHost in the Set method" {
                 # Act
                 $testSBHost.Set()
 
@@ -499,17 +502,17 @@ Describe "cSBHost" {
                 )
             }
 
-            It "returns current values from the get method" {
+            It "returns current values from the Get method" {
                 # Act | Assert
                 $testSBHost.Get() | Should Not BeNullOrEmpty
             }
 
-            It "returns false from the test method" {
+            It "returns false from the Test method" {
                 # Act | Assert
                 $testSBHost.Test() | Should Be $false
             }
 
-            It "calls Update-SBHost in the set method" {
+            It "calls Update-SBHost in the Set method" {
                 # Act
                 $testSBHost.Set()
 
@@ -517,7 +520,7 @@ Describe "cSBHost" {
                 Assert-MockCalled -CommandName Update-SBHost
             }
 
-            It "calls Start-SBHost in the set method" {
+            It "calls Start-SBHost in the Set method" {
                 # Act
                 $testSBHost.Set()
 
@@ -670,17 +673,17 @@ Describe "cSBHost" {
 
             $testSBHost.Started = $false
 
-            It "returns current values from the get method" {
+            It "returns current values from the Get method" {
                 # Act | Assert
                 $testSBHost.Get() | Should Not BeNullOrEmpty
             }
 
-            It "returns false from the test method" {
+            It "returns false from the Test method" {
                 # Act | Assert
                 $testSBHost.Test() | Should Be $false
             }
 
-            It "calls Stop-SBHost in the set method" {
+            It "calls Stop-SBHost in the Set method" {
                 # Act
                 $testSBHost.Set()
 
