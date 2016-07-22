@@ -26,7 +26,7 @@
         Certificates = @{
             RootCert = @{
                 Path = 'C:\Program Files\WindowsPowerShell\Modules\cServiceBusForWindowsServer\Examples\root.cer'
-                Thumbprint = '‎2E5D900A6080DBA3127ABD125BC1D03E27FA9906'
+                Thumbprint = '2E5D900A6080DBA3127ABD125BC1D03E27FA9906'
             }
             <#
             Intermediate = @{
