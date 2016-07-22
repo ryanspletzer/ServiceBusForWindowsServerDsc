@@ -115,7 +115,7 @@
         }
 
         cSBFarm SBFarm {
-            DependsOn = '[xPendingReboot]Reboot_After_WebPI_Install'
+            DependsOn = '[xPendingReboot]Reboot_After_WebPI_Install'<#,'[xPfxImport]PfxImport'#>
             PsDscRunAsCredential = $DomainInstallCredential
             AdminApiCredentials = $AdminApiCredential
             EncryptionCertificateThumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
@@ -132,6 +132,13 @@
             EnableFirewallRules = $true
             RunAsPassword = $RunAsAccountCredential
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
+        }
+
+        cSBNamespace {
+            DependsOn = '[cSBFarm]SBFarm'
+            PsDscRunAsCredentials = $DomainInstallCredential
+            Name = 'ContosoNamespace'
+            ManageUsers = 'BUILTIN\Administrators','ServiceBusAdmins@CONTOSO'
         }
     }
 }
