@@ -141,7 +141,7 @@ $domainInstallCred = (Get-Credential -Message 'Domain Install Credential') # Mak
 $runAsAccountCred = (Get-Credential -Message 'RunAsAccount Credential in the form samaccountname@DOMAIN without the suffix (e.g. servicebus@CONTOSO)')
 $adminApiCred = (Get-Credential -UserName 'adminUser' -Message 'Admin API Credential')
 $tenantApiCred = (Get-Credential -UserName 'tenantUser' -Message 'Tenant API Credential')
-# $certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Message 'SSL Cert Import Passphrase')
+#$certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Message 'SSL Cert Import Passphrase')
 
 $SingleServerConfigParams = @{
     OutputPath              = 'C:\Program Files\WindowsPowerShell\Configuration\Schema'
