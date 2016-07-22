@@ -1286,7 +1286,6 @@ class cSBNameSpace : cSBBase {
         Specifies the name for the new Service Bus for Windows Server service namespace.
     #>
     [DscProperty(Key)]
-    [ValidateLength(6,50)]
     [string]
     $Name
 
@@ -1309,7 +1308,7 @@ class cSBNameSpace : cSBBase {
         if an administrator creates a namespace on behalf of a user.
     #>
     [DscProperty()]
-    [Guid]
+    [string]
     $SubscriptionId
 
     <#
