@@ -134,9 +134,9 @@
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
         }
 
-        cSBNamespace {
+        cSBNamespace ContosoNamespace {
             DependsOn = '[cSBFarm]SBFarm'
-            PsDscRunAsCredentials = $DomainInstallCredential
+            PsDscRunAsCredential = $DomainInstallCredential
             Name = 'ContosoNamespace'
             ManageUsers = 'BUILTIN\Administrators','ServiceBusAdmins@CONTOSO'
         }
