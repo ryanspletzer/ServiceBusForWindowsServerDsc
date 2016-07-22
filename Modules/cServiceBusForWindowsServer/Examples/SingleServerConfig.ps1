@@ -130,6 +130,7 @@
             DependsOn = '[cSBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             EnableFirewallRules = $true
+            Ensure = 'Present'
             RunAsPassword = $RunAsAccountCredential
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
         }
@@ -137,6 +138,7 @@
         cSBNamespace ContosoNamespace {
             DependsOn = '[cSBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
+            Ensure = 'Present'
             Name = 'ContosoNamespace'
             ManageUsers = 'BUILTIN\Administrators','ServiceBusAdmins@CONTOSO'
         }

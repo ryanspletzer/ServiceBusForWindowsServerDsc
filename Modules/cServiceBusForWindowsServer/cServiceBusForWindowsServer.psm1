@@ -883,7 +883,7 @@ class cSBHost : cSBBase {
     #>
     [DscProperty(Key)]
     [Ensure]
-    $Ensure = [Ensure]::Present
+    $Ensure
 
     <#
         This method is equivalent of the Get-TargetResource script function.
@@ -1317,7 +1317,7 @@ class cSBNameSpace : cSBBase {
     #>
     [DscProperty(Key)]
     [Ensure]
-    $Ensure = [Ensure]::Present
+    $Ensure
 
     <#
         If Ensure is Absent and the namespace is present, setting this property to true will add the -Force
