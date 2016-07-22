@@ -1555,7 +1555,7 @@ class cSBNameSpace : cSBBase {
 #     }
 # }
 
-
+# OR SETTINGS PLURAL???
 # [DscResource()]
 # class cSBRunTimeSetting {
 #     [DscProperty(Key)]
