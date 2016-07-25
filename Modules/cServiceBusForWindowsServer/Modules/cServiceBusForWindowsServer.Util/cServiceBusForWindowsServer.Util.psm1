@@ -9,7 +9,7 @@
 
 function Test-cSBWSObjectHasProperty() {
     [CmdletBinding()]
-    [OutputType([System.Boolean])]
+    [OutputType([bool])]
     param
     (
         [parameter(Mandatory = $true,Position=1)]  [Object] $Object,
