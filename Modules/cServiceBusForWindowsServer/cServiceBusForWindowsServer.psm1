@@ -37,7 +37,7 @@ class cSBBase {
     <#
         Allows for getting properties on the class object by name.
     #>
-    [object] GetProperty([System.Object]$name) {
+    [object] GetProperty([object]$name) {
         $type = $this.GetType()
         $propertyInfo = $type.GetProperty($name)
         return $propertyInfo.GetValue($this)
@@ -46,7 +46,7 @@ class cSBBase {
     <#
         Allows for setting properties on the class object by name.
     #>
-    [void] SetProperty([System.Object]$name, [System.Object]$value) {
+    [void] SetProperty([object]$name, [object]$value) {
         $type = $this.GetType()
         $propertyInfo = $type.GetProperty($name)
         $propertyInfo.SetValue($this, $value)
@@ -536,13 +536,13 @@ class cSBFarm : cSBBase {
                 SqlConnectionString = $sbMessageContainer.ConnectionString
             }
             $params.PropertyName = "Data Source"
-            $result.MessageContainerDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
             $params.PropertyName = "Encrypt"
-            $result.MessageContainerDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
             $params.PropertyName = "Initial Catalog"
-            $result.MessageContainerDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
             $params.PropertyName = "Integrated Security"
-            $result.MessageContainerDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
             $result.MessageContainerDBConnectionString = $sbMessageContainer.ConnectionString
         }
 
@@ -555,13 +555,13 @@ class cSBFarm : cSBBase {
             SqlConnectionString = $sbFarm.SBFarmDBConnectionString
         }
         $params.PropertyName = "Data Source"
-        $result.SBFarmDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Encrypt"
-        $result.SBFarmDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Initial Catalog"
-        $result.SBFarmDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Integrated Security"
-        $result.SBFarmDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
 
         $result.TcpPort = $sbFarm.TcpPort
         $result.TenantApiCredentials = $this.TenantApiCredentials
@@ -944,13 +944,13 @@ class cSBHost : cSBBase {
             SqlConnectionString = $sbFarm.SBFarmDBConnectionString
         }
         $params.PropertyName = "Data Source"
-        $result.SBFarmDBConnectionStringDataSource = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Encrypt"
-        $result.SBFarmDBConnectionStringEncrypt = [System.Boolean](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Initial Catalog"
-        $result.SBFarmDBConnectionStringInitialCatalog = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Integrated Security"
-        $result.SBFarmDBConnectionStringIntegratedSecurity = [System.String](Get-SqlConnectionStringPropertyValue @params)
+        $result.SBFarmDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
 
         if ($null -ne $sbFarmStatus) {
             $sbFarmStatus |
