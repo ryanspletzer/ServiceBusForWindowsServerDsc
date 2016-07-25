@@ -18,26 +18,17 @@ Describe "cSBMessageContainer" {
     InModuleScope $ModuleName {
         # Arrange
         $testSBMessageContainer = [cSBMessageContainer]::new()
-
-        $testSBNamespace = [cSBNamespace]::new()
-        $testSBNamespace.AddressingScheme = 'Path'
-        $testSBNamespace.DNSEntry = "servicebusnamespace.contoso.com"
-        $testSBNamespace.IssuerName = "ContosoNamespace"
-        $testSBNamespace.IssuerUri = "ContosoNamespace"
-        $testSBNamespace.ManageUsers = "BUILTIN\Administrators",'ServiceBusAdmins@contoso.com'
-        $testSBNamespace.Name = "ContosoNamespace"
-        $testSBNamespace.PrimarySymmetricKey = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
-        $testSBNamespace.SecondarySymmetricKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
-        $testSBNamespace.SubscriptionId = "00000000000000000000000000000000"
+        $testSBMessageContainer.ContainerDBConnectionStringDataSource = "SQLSERVER.contoso.com"
+        $testSBMessageContainer.ContainerDBConnectionStringInitialCatalog = "SBMessageContainer02"
+        $testSBMessageContainer.Ensure = 'Present'
 
         Import-Module (Join-Path ((Resolve-Path $PSScriptRoot\..\..\..).Path) "Modules\cServiceBusForWindowsServer")
 
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
 
-        Mock New-SBNamespace {}
-        Mock Set-SBNamespace {}
-        Mock Remove-SBNamespace {}
+        Mock New-SBMessageContainer {}
+        Mock Remove-SBMessageContainer {}
 
         Context "No container exists for a given database name" {
             # Arrange
@@ -47,7 +38,7 @@ Describe "cSBMessageContainer" {
 
             It "returns object with Ensure = Absent from the Get method" {
                 # Act
-                $currentValues = $testSBNamespace.Get()
+                $currentValues = $testSBMessageContainer.Get()
 
                 # Arrange
                 $currentValues.Ensure | Should BeExactly 'Absent'
@@ -55,12 +46,12 @@ Describe "cSBMessageContainer" {
 
             It "returns false from the Test method" {
                 # Act | Assert
-                $testSBNamespace.Test() | Should Be $false
+                $testSBMessageContainer.Test() | Should Be $false
             }
 
-            It "calls the New-SBNamespace cmdlet in the Set method" {
+            It "calls the New-SBMessageContainer cmdlet in the Set method" {
                 # Act
-                $testSBNamespace.Set()
+                $testSBMessageContainer.Set()
 
                 # Assert
                 Assert-MockCalled -CommandName New-SBNamespace

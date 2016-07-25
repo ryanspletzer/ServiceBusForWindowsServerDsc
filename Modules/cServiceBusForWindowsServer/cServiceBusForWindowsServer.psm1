@@ -1761,7 +1761,25 @@ class cSBMessageContainer {
         is in a desired state.
     #>
     [bool] Test() {
+        $currentValues = $this.Get()
+
+        if ($this.SBMessageContainerShouldBeCreated($currentValues)) {
+            return $false
+        }
+
+        if ($this.SBMessageContainerShouldBeRemoved($currentValues)) {
+            return $false
+        }
+
         return $true
+    }
+
+    [bool] SBMessageContainerShouldBeCreated([cSBMessageContainer]$CurrentValues) {
+        return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
+    }
+
+    [bool] SBMessageContainerShouldBeRemoved([cSBMessageContainer]$CurrentValues) {
+        return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
     <#
