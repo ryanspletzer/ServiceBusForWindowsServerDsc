@@ -1286,6 +1286,7 @@ class cSBNameSpace : cSBBase {
         Specifies the name for the new Service Bus for Windows Server service namespace.
     #>
     [DscProperty(Key)]
+    [ValidateLength(6,50)]
     [string]
     $Name
 
@@ -1462,6 +1463,47 @@ class cSBNameSpace : cSBBase {
     [void] NewSBNamespace() {
         Write-Verbose -Message "Getting configurable properties as hashtable for New-SBNamespace params"
         $newSBNamespaceParams = $this.GetDscConfigurablePropertiesAsHashtable()
+
+        Write-Verbose -Message "Throwing AddressingScheme param to string for New-SBNamespace params"
+        Write-Verbose -Message "$($newSBNamespaceParams.AddressingScheme)"
+        $newSBNamespaceParams.AddressingScheme = $newSBNamespaceParams.AddressingScheme.ToString()
+
+        Write-Verbose -Message "Checking for DNSEntry"
+        if ($null -eq $this.DNSEntry) {
+            Write-Verbose -Message "DNSEntry is absent, removing from New-SBNamespace params"
+            $newSBNamespaceParams.Remove("DNSEntry")
+        }
+
+        Write-Verbose -Message "Checking for IssuerName"
+        if ($null -eq $this.IssuerName) {
+            Write-Verbose -Message "IssuerName is absent, removing from New-SBNamespace params"
+            $newSBNamespaceParams.Remove("IssuerName")
+        }
+
+        Write-Verbose -Message "Checking for IssuerUri"
+        if ($null -eq $this.IssuerUri) {
+            Write-Verbose -Message "IssuerUri is absent, removing from New-SBNamespace params"
+            $newSBNamespaceParams.Remove("IssuerUri")
+        }
+
+        Write-Verbose -Message "Checking for PrimarySymmetricKey"
+        if ($null -eq $this.PrimarySymmetricKey) {
+            Write-Verbose -Message "PrimarySymmetricKey is absent, removing from New-SBNamespace params"
+            $newSBNamespaceParams.Remove("PrimarySymmetricKey")
+        }
+
+        Write-Verbose -Message "Checking for SecondarySymmetricKey"
+        if ($null -eq $this.SecondarySymmetricKey) {
+            Write-Verbose -Message "SecondarySymmetricKey is absent, removing from New-SBNamespace params"
+            $newSBNamespaceParams.Remove("SecondarySymmetricKey")
+        }
+
+        Write-Verbose -Message "Checking for SubscriptionId"
+        if ($null -eq $this.SubscriptionId) {
+            Write-Verbose -Message "SubscriptionId is absent, removing from New-SBNamespace params"
+            $newSBNamespaceParams.Remove("SubscriptionId")
+        }
+
         Write-Verbose -Message "Removing unnecessary parameters from New-SBNamespace params"
         $newSBNamespaceParams.Remove("Ensure")
         $newSBNamespaceParams.Remove("ForceRemoval")
@@ -1483,6 +1525,37 @@ class cSBNameSpace : cSBBase {
     [void] SetSBNamespace() {
         Write-Verbose -Message "Getting configurable properties as hashtable for Set-SBNamespace params"
         $setSBNamespaceParams = $this.GetDscConfigurablePropertiesAsHashtable()
+
+        Write-Verbose -Message "Checking for IssuerName"
+        if ($null -eq $this.IssuerName) {
+            Write-Verbose -Message "IssuerName is absent, removing from Set-SBNamespace params"
+            $setSBNamespaceParams.Remove("IssuerName")
+        }
+
+        Write-Verbose -Message "Checking for IssuerUri"
+        if ($null -eq $this.IssuerUri) {
+            Write-Verbose -Message "IssuerUri is absent, removing from Set-SBNamespace params"
+            $setSBNamespaceParams.Remove("IssuerUri")
+        }
+
+        Write-Verbose -Message "Checking for PrimarySymmetricKey"
+        if ($null -eq $this.PrimarySymmetricKey) {
+            Write-Verbose -Message "PrimarySymmetricKey is absent, removing from Set-SBNamespace params"
+            $setSBNamespaceParams.Remove("PrimarySymmetricKey")
+        }
+
+        Write-Verbose -Message "Checking for SecondarySymmetricKey"
+        if ($null -eq $this.SecondarySymmetricKey) {
+            Write-Verbose -Message "SecondarySymmetricKey is absent, removing from Set-SBNamespace params"
+            $setSBNamespaceParams.Remove("SecondarySymmetricKey")
+        }
+
+        Write-Verbose -Message "Checking for SubscriptionId"
+        if ($null -eq $this.SubscriptionId) {
+            Write-Verbose -Message "SubscriptionId is absent, removing from Set-SBNamespace params"
+            $setSBNamespaceParams.Remove("SubscriptionId")
+        }
+
         Write-Verbose -Message "Removing unnecessary parameters from Set-SBNamespace params"
         $setSBNamespaceParams.Remove("AddressingScheme")
         $setSBNamespaceParams.Remove("DNSEntry")

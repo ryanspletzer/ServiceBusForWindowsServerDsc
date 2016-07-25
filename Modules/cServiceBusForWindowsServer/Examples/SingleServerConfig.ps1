@@ -23,31 +23,20 @@
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [pscredential]
-        $TenantApiCredential<#,
+        $TenantApiCredential,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [pscredential]
-        $CertificateImportPassphraseCredential#>
+        $CertificateImportPassphraseCredential
     )
 
     Import-DscResource -Module xPendingReboot, PSDesiredStateConfiguration, cServiceBusForWindowsServer
-    #Import-DscResource -Module xCredSSP
-    #Import-DscResource -Module xCertificate
+    Import-DscResource -Module xCertificate
 
     Node $AllNodes.NodeName {
 
-        # Utilize xCredSSP module if your SQL server is on a remote machine for single server scenario.
-        <#
-        xCredSSP CredSSP {
-            Ensure = 'Present'
-            Role = 'Client'
-            DelegateComputers = $ConfigurationData.NonNodeData.SQLServer.DataSource
-        }
-        #>
-
         # Utilize xCertificate module to install example's sample certs, or certs of your own.
-        <#
         xCertificateImport RootCertificateImport {
             Thumbprint = $ConfigurationData.NonNodeData.Certificates.Root.Thumbprint
             Path = $ConfigurationData.NonNodeData.Certificates.Root.Path
@@ -56,7 +45,8 @@
             Ensure = 'Present'
         }
 
-        # Only necessary if you need to import an intermediate
+        # Only necessary if you need to import an intermediate because of lack of OCSP.
+        <#
         xCertificateImport IntermediateCertificateImport {
             Thumbprint = $ConfigurationData.NonNodeData.Certificates.Intermediate.Thumbprint
             Path = $ConfigurationData.NonNodeData.Certificates.Intermediate.Path
@@ -64,6 +54,7 @@
             Store = 'Root'
             Ensure = 'Present'
         }
+        #>
 
         xPfxImport PfxImport {
             Thumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
@@ -74,7 +65,6 @@
             Credential = $CertificateImportPassphraseCredential
             Ensure = 'Present'
         }
-        #>
 
         User LocalSBInstallUser {
             UserName = $LocalInstallCredential.UserName
@@ -86,7 +76,7 @@
             PasswordNeverExpires = $true
         }
 
-        Group Administrators {
+        Group AddDomainCredToAdministrators {
             DependsOn = '[User]LocalSBInstallUser'
             Credential = $DomainInstallCredential
             GroupName = 'Administrators'
@@ -94,28 +84,39 @@
             MembersToInclude = 'ServiceBusInstall',$DomainInstallCredential.UserName
         }
 
-        xPendingReboot Reboot_Before_WebPI_Install {
-            Name = "Reboot_Before_WebPI_Install"
-        }
-
-        Package ServiceBus_1_1_CU1_Installation {
+        File LocalWebpiServiceBusInstallBits {
+            PsDscRunAsCredential = $DomainInstallCredential
+            CheckSum = 'ModifiedDate'
+            DestinationPath = "C:\WebpiServiceBusInstallBits"
             Ensure = 'Present'
-            Name = "Service Bus 1.1"
-            Path = "C:\Temp\bin\WebpiCmd.exe"
-            ProductId = "F438C511-5A64-433E-97EC-5E5343DA670A"
-            Arguments = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:C:\Temp\feeds\latest\webproductlist.xml"
-            PsDscRunAsCredential = $LocalInstallCredential
-            ReturnCode = 0
-            DependsOn = '[xPendingReboot]Reboot_Before_WebPI_Install','[User]LocalSBInstallUser'
+            Force = $true
+            SourcePath = $ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.Path
+            Recurse = $true
+            Type = 'Directory'
         }
 
-        xPendingReboot Reboot_After_WebPI_Install {
-            Name = "Reboot_After_WebPI_Install"
-            DependsOn = '[Package]ServiceBus_1_1_CU1_Installation'
+        xPendingReboot RebootBeforeWebpiInstall {
+            Name = "RebootBeforeWebpiInstall"
+        }
+
+        Package ServiceBus1_1_CU1Installation {
+            PsDscRunAsCredential = $LocalInstallCredential
+            DependsOn = '[xPendingReboot]RebootBeforeWebpiInstall','[User]LocalSBInstallUser'
+            Ensure = 'Present'
+            Arguments = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:C:\WebpiServiceBusInstallBits\feeds\latest\webproductlist.xml"
+            Name = "Service Bus 1.1"
+            Path = "C:\WebpiServiceBusInstallBits\bin\WebpiCmd.exe"
+            ProductId = "F438C511-5A64-433E-97EC-5E5343DA670A"
+            ReturnCode = 0
+        }
+
+        xPendingReboot RebootAfterWebpiInstall {
+            Name = "RebootAfterWebpiInstall"
+            DependsOn = '[Package]ServiceBus1_1_CU1Installation'
         }
 
         cSBFarm SBFarm {
-            DependsOn = '[xPendingReboot]Reboot_After_WebPI_Install'<#,'[xPfxImport]PfxImport'#>
+            DependsOn = '[xPendingReboot]RebootAfterWebpiInstall','[xPfxImport]PfxImport'
             PsDscRunAsCredential = $DomainInstallCredential
             AdminApiCredentials = $AdminApiCredential
             EncryptionCertificateThumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
@@ -140,7 +141,7 @@
             PsDscRunAsCredential = $DomainInstallCredential
             Ensure = 'Present'
             Name = 'ContosoNamespace'
-            ManageUsers = 'BUILTIN\Administrators','ServiceBusAdmins@CONTOSO'
+            ManageUsers = $DomainInstallCredential.UserName
         }
     }
 }
@@ -150,7 +151,7 @@ $domainInstallCred = (Get-Credential -Message 'Domain Install Credential') # Mak
 $runAsAccountCred = (Get-Credential -Message 'RunAsAccount Credential in the form samaccountname@DOMAIN without the suffix (e.g. servicebus@CONTOSO)')
 $adminApiCred = (Get-Credential -UserName 'adminUser' -Message 'Admin API Credential')
 $tenantApiCred = (Get-Credential -UserName 'tenantUser' -Message 'Tenant API Credential')
-#$certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Message 'SSL Cert Import Passphrase')
+$certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Message 'SSL Cert Import Passphrase')
 
 $SingleServerConfigParams = @{
     OutputPath              = 'C:\Program Files\WindowsPowerShell\Configuration\Schema'
@@ -161,7 +162,7 @@ $SingleServerConfigParams = @{
     RunAsAccountCredential  = $runAsAccountCred
     AdminApiCredential      = $adminApiCred
     TenantApiCredential     = $tenantApiCred
-    #CertificateImportPassphraseCredential = $certificateImportPassphraseCredential
+    CertificateImportPassphraseCredential = $certificateImportPassphraseCredential
 }
 SingleServerConfig @SingleServerConfigParams
 Start-DscConfiguration -Path 'C:\Program Files\WindowsPowerShell\Configuration\Schema' -Wait -Verbose -Force
