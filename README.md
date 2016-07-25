@@ -39,6 +39,6 @@ Review the "examples" directory in the cServiceBusForWindowsServer module for so
 
 ## Version History
 
-### 0.2.0
+### 0.4.0
 
 * Initial release of cServiceBusForWindowsServer
