@@ -1787,7 +1787,18 @@ class cSBMessageContainer {
         It sets the resource to the desired state.
     #>
     [void] Set() {
+        Write-Verbose -Message "Retrieving current SBMessageContainer values for container $($this.ContainerDBConnectionStringInitialCatalog)"
+        $currentValues = $this.Get()
 
+        Write-Verbose -Message "Checking if SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog) should be created"
+        if ($this.SBMessageContainerShouldBeCreated($currentValues)) {
+
+        }
+
+        Write-Verbose -Message "Checking if SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog) should be removed"
+        if ($this.SBMessageContainerShouldBeRemoved($currentValues)) {
+            
+        }
     }
 }
 
