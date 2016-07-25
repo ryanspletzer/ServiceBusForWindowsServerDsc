@@ -1715,14 +1715,17 @@ class cSBMessageContainer {
         Write-Verbose -Message "Trying to get SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
         $sbMessageContainer = $null
         try {
-            $sbMessageContainer = Get-SBMessageContainer -ContainerDBConnectionString $connectionString
-            Write-Verbose -Message "Successfully retrieved SBMessageContainer"
+            $sbMessageContainer = Get-SBMessageContainer | 
+                                      Where-Object { 
+                                          $_.DatabaseName -eq $this.ContainerDBConnectionStringInitialCatalog 
+                                      }
         } catch {
-            Write-Verbose -Message "Unable to detect SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
+            Write-Verbose -Message "Unable to retrieve SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
         }
 
         if ($null -eq $sbMessageContainer) {
-            return $null
+            $result.Ensure = [Ensure]::Absent
+            return $result
         }
 
         $params = @{
