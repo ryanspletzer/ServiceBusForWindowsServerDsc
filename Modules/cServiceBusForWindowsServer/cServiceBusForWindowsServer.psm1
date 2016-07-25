@@ -19,20 +19,6 @@ enum AddressingScheme {
 }
 
 
-enum NamespaceState {
-    Unknown
-    Creating
-    Created
-    Activating
-    Enabling
-    Active
-    Disabling
-    Disabled
-    Removing
-    Removed
-}
-
-
 <#
     This is the base Service Bus for Windows Server resource class that provides commonly used methods.
 #>
@@ -879,7 +865,7 @@ class cSBHost : cSBBase {
     $Started = $true
 
     <#
-        Marks whether the host should be present or absent. Default is present.
+        Marks whether the host should be present or absent.
     #>
     [DscProperty(Key)]
     [Ensure]
@@ -1313,7 +1299,7 @@ class cSBNameSpace : cSBBase {
     $SubscriptionId
 
     <#
-        Marks whether the namespace should be present or absent. Default is present.
+        Marks whether the namespace should be present or absent.
     #>
     [DscProperty(Key)]
     [Ensure]
@@ -1567,25 +1553,176 @@ class cSBNameSpace : cSBBase {
     }
 }
 
+<#
+   This resource adds and removes Service Bus for Windows Server message containers.
+#>
+[DscResource()]
+class cSBMessageContainer {
 
-# [DscResource()]
-# class cSBMessageContainer {
-#     [DscProperty(Key)]
-#     [Ensure]
-#     $Ensure
+    <#
+        The credential for connecting to the container database. Not required if integrated authentication will be
+        used.
+    #>
+    [DscProperty()]
+    [pscredential]
+    $ContainerDBConnectionStringCredential
 
-#     [void] Set() {
+    <#
+        Represents the database server used for the farm management database. This is used in the
+        ContainerDBConnectionString when creating the farm. This can optionally use named instance and port info if
+        those are being used.
+    #>
+    [DscProperty(Key)]
+    [string]
+    $ContainerDBConnectionStringDataSource
 
-#     }
+    <#
+        Represents whether the connection to the database server housing the container database will use SSL
+        or not.
+    #>
+    [DscProperty()]
+    [bool]
+    $ContainerDBConnectionStringEncrypt = $false
 
-#     [bool] Test() {
-#         return $true
-#     }
+    <#
+        The name of the container database.
+    #>
+    [DscProperty(Key)]
+    [string]
+    $ContainerDBConnectionStringInitialCatalog
 
-#     [cSBMessageContainer] Get() {
-#         return $this
-#     }
-# }
+    <#
+        Represents whether authentication to the container database will use integrated Windows authentication
+        or SSPI (Security Support Provider Interface) which supports Kerberos, Windows or basic SQL authentication.
+        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). The default
+        value is SSPI.
+    #>
+    [DscProperty()]
+    [IntegratedSecurity]
+    $ContainerDBConnectionStringIntegratedSecurity = [IntegratedSecurity]::SSPI
+
+    <#
+        The credential for connecting to the farm management database. Not required if integrated authentication
+        will be used.
+    #>
+    [DscProperty()]
+    [pscredential]
+    $SBFarmDBConnectionStringCredential
+
+    <#
+        Represents the database server used for the farm management database. This is used in the
+        SBFarmDBConnectionString when creating the farm. This can optionally use named instance and port info if
+        those are being used.
+    #>
+    [DscProperty()]
+    [string]
+    $SBFarmDBConnectionStringDataSource
+
+    <#
+        Represents whether the connection to the database server housing the farm management database will use SSL
+        or not.
+    #>
+    [DscProperty()]
+    [bool]
+    $SBFarmDBConnectionStringEncrypt = $false
+
+    <#
+        The name of the farm management database. The default is 'SBManagementDB'.
+    #>
+    [DscProperty()]
+    [string]
+    $SBFarmDBConnectionStringInitialCatalog = 'SBManagementDB'
+
+    <#
+        Represents whether authentication to the farm management database will use integrated Windows authentication
+        or SSPI (Security Support Provider Interface) which supports Kerberos, Windows or basic SQL authentication.
+        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). The default
+        value is SSPI.
+    #>
+    [DscProperty()]
+    [IntegratedSecurity]
+    $SBFarmDBConnectionStringIntegratedSecurity = [IntegratedSecurity]::SSPI
+
+    <#
+        Marks whether the container should be present or absent.
+    #>
+    [DscProperty(Key)]
+    [Ensure]
+    $Ensure
+
+    <#
+        Id of the container.
+    #>
+    [DscProperty(NotConfigurable)]
+    [int64]
+    $Id
+
+    <#
+        Status of the container.
+    #>
+    [DscProperty(NotConfigurable)]
+    [string]
+    $Status
+
+    <#
+        Current service bus host associated to the container.
+    #>
+    [DscProperty(NotConfigurable)]
+    [string]
+    $Host
+
+    <#
+        The database connection string of the container.
+    #>
+    [DscProperty(NotConfigurable)]
+    [string]
+    $ContainerDBConnectionString
+
+    <#
+        Count of entities in the container.
+    #>
+    [DscProperty(NotConfigurable)]
+    [int32]
+    $EntitiesCount
+
+    <#
+        The size of the container database in megabytes.
+    #>
+    [DscProperty(NotConfigurable)]
+    [double]
+    $DatabaseSizeInMB
+
+    <#
+        This method is equivalent of the Get-TargetResource script function.
+        The implementation should use the keys to find appropriate resources.
+        This method returns an instance of this class with the updated key
+        properties.
+    #>
+    [cSBMessageContainer] Get() {
+        $result = [cSBMessageContainer]::new()
+
+        Write-Verbose -Message "Checking for SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
+
+        return $this
+    }
+
+    <#
+        This method is equivalent of the Test-TargetResource script function.
+        It should return True or False, showing whether the resource
+        is in a desired state.
+    #>
+    [bool] Test() {
+        return $true
+    }
+
+    <#
+        This method is equivalent of the Set-TargetResource script function.
+        It sets the resource to the desired state.
+    #>
+    [void] Set() {
+
+    }
+}
 
 
 # [DscResource()]
