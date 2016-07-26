@@ -632,7 +632,7 @@ class cSBFarm : cSBBase {
         }
 
         Write-Verbose -Message "Creating params for GatewayDBConnectionString"
-        $gatewayConnectionStringParams = @{
+        $gatewayDBConnectionStringParams = @{
             DataSource         = $this.GatewayDBConnectionStringDataSource
             InitialCatalog     = $this.GatewayDBConnectionStringInitialCatalog
             IntegratedSecurity = $this.GatewayDBConnectionStringIntegratedSecurity.ToString()
@@ -643,20 +643,20 @@ class cSBFarm : cSBBase {
             [string]::IsNullOrEmpty($this.GatewayDBConnectionStringDataSource)) {
             Write-Verbose -Message ("GatewayDBConnectionStringDataSource not specified, " +
                                     "using SBFarmDBConnectionStringDataSource")
-            $gatewayConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
+            $gatewayDBConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
         }
         if ($null -eq $this.GatewayDBConnectionStringCredential) {
             Write-Verbose -Message ("GatewayDBConnectionStringCredential not specified, " +
                                     "using SBFarmDBConnectionStringCredential")
-            $gatewayConnectionStringParams.Credential = $this.SBFarmDBConnectionStringCredential
+            $gatewayDBConnectionStringParams.Credential = $this.SBFarmDBConnectionStringCredential
         }
         Write-Verbose -Message "Creating GatewayDBConnectionString"
-        $gatewayDBCxnString = New-SqlConnectionString @gatewayConnectionStringParams
+        $gatewayDBCxnString = New-SqlConnectionString @gatewayDBConnectionStringParams
         Write-Verbose -Message "Setting GatewayDBConnectionString in New-SBFarm params"
         $newSBFarmParams.GatewayDBConnectionString = $gatewayDBCxnString
 
         Write-Verbose -Message "Creating params for MessageContainerDBConnectionString"
-        $messageContainerConnectionStringParams = @{
+        $messageContainerDBConnectionStringParams = @{
             DataSource         = $this.MessageContainerDBConnectionStringDataSource
             InitialCatalog     = $this.MessageContainerDBConnectionStringInitialCatalog
             IntegratedSecurity = $this.MessageContainerDBConnectionStringIntegratedSecurity.ToString()
@@ -667,20 +667,20 @@ class cSBFarm : cSBBase {
             [string]::IsNullOrEmpty($this.MessageContainerDBConnectionStringDataSource)) {
             Write-Verbose -Message ("MessageContainerDBConnectionStringDataSource not specified, " +
                                     "using SBFarmDBConnectionStringDataSource")
-            $messageContainerConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
+            $messageContainerDBConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
         }
         if ($null -eq $this.MessageContainerDBConnectionStringCredential) {
             Write-Verbose -Message ("MessageContainerDBConnectionStringCredential not specified, " +
                                     "using SBFarmDBConnectionStringCredential")
-            $messageContainerConnectionStringParams.Credential = $this.SBFarmDBConnectionStringCredential
+            $messageContainerDBConnectionStringParams.Credential = $this.SBFarmDBConnectionStringCredential
         }
         Write-Verbose -Message "Creating MessageContainerDBConnectionString"
-        $messageContainerDBCxnString = New-SqlConnectionString @messageContainerConnectionStringParams
+        $messageContainerDBCxnString = New-SqlConnectionString @messageContainerDBConnectionStringParams
         Write-Verbose -Message "Setting MessageContainerDBConnectionString in New-SBFarm params"
         $newSBFarmParams.MessageContainerDBConnectionString = $messageContainerDBCxnString
 
         Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
-        $sbFarmConnectionStringParams = @{
+        $sbFarmDBConnectionStringParams = @{
             DataSource         = $this.SBFarmDBConnectionStringDataSource
             InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
             IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
@@ -688,7 +688,7 @@ class cSBFarm : cSBBase {
             Encrypt            = $this.SBFarmDBConnectionStringEncrypt
         }
         Write-Verbose -Message "Creating SBFarmDBConnectionString"
-        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmConnectionStringParams
+        $sbFarmDBCxnString = New-SqlConnectionString @sbFarmDBConnectionStringParams
         Write-Verbose -Message "Setting SBFarmDBConnectionString in New-SBFarm params"
         $newSBFarmParams.SBFarmDBConnectionString = $sbFarmDBCxnString
 
@@ -1557,7 +1557,7 @@ class cSBNameSpace : cSBBase {
    This resource adds and removes Service Bus for Windows Server message containers.
 #>
 [DscResource()]
-class cSBMessageContainer {
+class cSBMessageContainer : cSBBase {
 
     <#
         The credential for connecting to the container database. Not required if integrated authentication will be
@@ -1703,21 +1703,12 @@ class cSBMessageContainer {
 
         Write-Verbose -Message "Checking for SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
 
-        $connectionStringParams = @{
-            DataSource         = $this.ContainerDBConnectionStringDataSource
-            InitialCatalog     = $this.ContainerDBConnectionStringInitialCatalog
-            IntegratedSecurity = $this.ContainerDBConnectionStringIntegratedSecurity.ToString()
-            Credential         = $this.ContainerDBConnectionStringCredential
-            Encrypt            = $this.ContainerDBConnectionStringEncrypt
-        }
-        Write-Verbose -Message "Building connection string."
-        $connectionString = New-SqlConnectionString @connectionStringParams
         Write-Verbose -Message "Trying to get SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
         $sbMessageContainer = $null
         try {
-            $sbMessageContainer = Get-SBMessageContainer | 
-                                      Where-Object { 
-                                          $_.DatabaseName -eq $this.ContainerDBConnectionStringInitialCatalog 
+            $sbMessageContainer = Get-SBMessageContainer |
+                                      Where-Object {
+                                          $_.DatabaseName -eq $this.ContainerDBConnectionStringInitialCatalog
                                       }
         } catch {
             Write-Verbose -Message "Unable to retrieve SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
@@ -1729,17 +1720,17 @@ class cSBMessageContainer {
         }
 
         $params = @{
-            SqlConnectionString = $sbMessageContainer.ContainerDBConnectionString
+            SqlConnectionString = $sbMessageContainer.ConnectionString
         }
-        $result.ContainerDBConnectionString = $sbMessageContainer.ContainerDBConnectionString
+        $result.ContainerDBConnectionString = $sbMessageContainer.ConnectionString
         $result.ContainerDBConnectionStringCredential = $this.ContainerDBConnectionStringCredential
         $result.ContainerDBConnectionStringDataSource = $sbMessageContainer.DatabaseServer
         $params.PropertyName = "Encrypt"
         $result.ContainerDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
         $result.ContainerDBConnectionStringInitialCatalog = $sbMessageContainer.DatabaseName
         $params.PropertyName = "Integrated Security"
-        $result.ContainerDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringProperty @params)
-        
+        $result.ContainerDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
+
         $result.DatabaseSizeInMB = $sbMessageContainer.DatabaseSizeInMB
         $result.Ensure = [Ensure]::Present
         $result.EntitiesCount = $sbMessageContainer.EntitiesCount
@@ -1752,7 +1743,7 @@ class cSBMessageContainer {
         $result.SBFarmDBConnectionStringIntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity
         $result.Status = $sbMessageContainer.Status
 
-        return $this
+        return $result
     }
 
     <#
@@ -1792,13 +1783,77 @@ class cSBMessageContainer {
 
         Write-Verbose -Message "Checking if SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog) should be created"
         if ($this.SBMessageContainerShouldBeCreated($currentValues)) {
-
+            $this.NewSBMessageContainer()
         }
 
         Write-Verbose -Message "Checking if SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog) should be removed"
         if ($this.SBMessageContainerShouldBeRemoved($currentValues)) {
-            
+            $this.RemoveSBMessageContainer()
         }
+    }
+
+    [void] NewSBMessageContainer() {
+        Write-Verbose -Message "Getting configurable properties as hashtable for New-SBMessageContainer params"
+        $newSBMessageContainerParams = $this.GetDscConfigurablePropertiesAsHashtable()
+
+        Write-Verbose -Message "Checking for SBFarmDBConnectionString properties"
+        if (($null -ne $this.SBFarmDBConnectionStringDataSource) -and
+            ($null -ne $this.SBFarmDBConnectionStringInitialCatalog)) {
+            Write-Verbose -Message "SBFarmDBConnectionString properties are present"
+            Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
+            $sbFarmDBConnectionStringParams = @{
+                DataSource         = $this.SBFarmDBConnectionStringDataSource
+                InitialCatalog     = $this.SBFarmDBConnectionStringInitialCatalog
+                IntegratedSecurity = $this.SBFarmDBConnectionStringIntegratedSecurity.ToString()
+                Credential         = $this.SBFarmDBConnectionStringCredential
+                Encrypt            = $this.SBFarmDBConnectionStringEncrypt
+            }
+            Write-Verbose -Message "Creating SBFarmDBConnectionString"
+            $sbFarmDBCxnString = New-SqlConnectionString @sbFarmDBConnectionStringParams
+            Write-Verbose -Message "Setting SBFarmDBConnectionString in New-SBMessageContainer params"
+            $newSBMessageContainerParams.SBFarmDBConnectionString = $sbFarmDBCxnString
+        }
+
+        Write-Verbose -Message "Creating params for ContainerDBConnectionString"
+        $containerDBConnectionStringParams = @{
+            DataSource         = $this.ContainerDBConnectionStringDataSource
+            InitialCatalog     = $this.ContainerDBConnectionStringInitialCatalog
+            IntegratedSecurity = $this.ContainerDBConnectionStringIntegratedSecurity.ToString()
+            Credential         = $this.ContainerDBConnectionStringCredential
+            Encrypt            = $this.ContainerDBConnectionStringEncrypt
+        }
+        Write-Verbose -Message "Creating ConnectionDBConnectionString"
+        $containerDBCxnString = New-SqlConnectionString @containerDBConnectionStringParams
+        Write-Verbose -Message "Setting ConnectionDBConnectionString in New-SBMessageContainer params"
+        $newSBMessageContainerParams.ContainerDBConnectionString = $containerDBCxnString
+
+        Write-Verbose -Message "Removing unnecessary parameters from New-SBMessageContainer params"
+        $newSBMessageContainerParams.Remove("ContainerDBConnectionStringCredential")
+        $newSBMessageContainerParams.Remove("ContainerDBConnectionStringDataSource")
+        $newSBMessageContainerParams.Remove("ContainerDBConnectionStringEncrypt")
+        $newSBMessageContainerParams.Remove("ContainerDBConnectionStringInitialCatalog")
+        $newSBMessageContainerParams.Remove("ContainerDBConnectionStringIntegratedSecurity")
+        $newSBMessageContainerParams.Remove("Ensure")
+        $newSBMessageContainerParams.Remove("SBFarmDBConnectionStringCredential")
+        $newSBMessageContainerParams.Remove("SBFarmDBConnectionStringDataSource")
+        $newSBMessageContainerParams.Remove("SBFarmDBConnectionStringEncrypt")
+        $newSBMessageContainerParams.Remove("SBFarmDBConnectionStringInitialCatalog")
+        $newSBMessageContainerParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
+
+        Write-Verbose -Message "Invoking New-SBMessageContainer with configurable params"
+        New-SBMessageContainer @newSBMessageContainerParams
+    }
+
+    [void] RemoveSBMessageContainer() {
+        Write-Verbose -Message ("Retrieving SBMessageContainer by database name " +
+                                "$($this.ContainerDBConnectionStringInitialCatalog) to get its Id.")
+        $sbMessageContainer = Get-SBMessageContainer |
+                                 Where-Object {
+                                     $_.DatabaseName -eq $this.ContainerDBConnectionStringInitialCatalog
+                                 }
+
+        Write-Verbose -Message "Invoking Remove-SBMessageContainer with Id $($sbMessageContainer.Id)"
+        Remove-SBMessageContainer -Id $sbMessageContainer.Id -Force
     }
 }
 

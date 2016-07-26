@@ -20,6 +20,7 @@ Describe "cSBNamespace" {
         $testSBNamespace = [cSBNamespace]::new()
         $testSBNamespace.AddressingScheme = 'Path'
         $testSBNamespace.DNSEntry = "servicebusnamespace.contoso.com"
+        $testSBNamespace.Ensure = 'Present'
         $testSBNamespace.IssuerName = "ContosoNamespace"
         $testSBNamespace.IssuerUri = "ContosoNamespace"
         $testSBNamespace.ManageUsers = "BUILTIN\Administrators",'ServiceBusAdmins@contoso.com'

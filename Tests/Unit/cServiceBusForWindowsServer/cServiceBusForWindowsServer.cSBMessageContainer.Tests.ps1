@@ -54,34 +54,52 @@ Describe "cSBMessageContainer" {
                 $testSBMessageContainer.Set()
 
                 # Assert
-                Assert-MockCalled -CommandName New-SBNamespace
+                Assert-MockCalled -CommandName New-SBMessageContainer
             }
         }
 
-        Context "Namespace exists for a given name and should be removed" {
+        Context "Container exists for a given database name and should be removed" {
             # Arrange
-            $createdTime = [datetime]::Now
-            Mock Get-SBNamespace {
-                return @{
-                    AddressingScheme = 'Path'
-                    CreatedTime = [datetime]::Now
-                    DNSEntry = 'servicebusnamespace.contoso.com'
-                    IssuerName = 'ContosoNamespace'
-                    IssuerUri = 'ContosoNamespace'
-                    ManageUsers = 'BUILTIN\Administrators','ServiceBusAdmins@contoso.com'
-                    Name = "ContosoNamespace"
-                    PrimarySymmetricKey = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
-                    SecondarySymmetricKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
-                    State = "Active"
-                    SubscriptionId = "00000000000000000000000000000000"
-                }
+            Mock Get-SBMessageContainer {
+                return @(
+                    @{
+                        Id = 1
+                        Status = 'Active'
+                        Host = 'servicebus01.contoso.com'
+                        DatabaseServer = 'SQLSERVER.contoso.com'
+                        DatabaseName = 'SBMessageContainer01'
+                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer01;Integrated Security=True;Encrypt=False'
+                        EntitiesCount = 0
+                        DatabaseSizeInMB = 6.25
+                    },
+                    @{
+                        Id = 2
+                        Status = 'Active'
+                        Host = 'servicebus02.contoso.com'
+                        DatabaseServer = 'SQLSERVER.contoso.com'
+                        DatabaseName = 'SBMessageContainer02'
+                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer02;Integrated Security=True;Encrypt=False'
+                        EntitiesCount = 0
+                        DatabaseSizeInMB = 6.25
+                    },
+                    @{
+                        Id = 3
+                        Status = 'Active'
+                        Host = 'servicebus03.contoso.com'
+                        DatabaseServer = 'SQLSERVER.contoso.com'
+                        DatabaseName = 'SBMessageContainer03'
+                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer03;Integrated Security=True;Encrypt=False'
+                        EntitiesCount = 0
+                        DatabaseSizeInMB = 6.25
+                    }
+                )
             }
 
-            $testSBNamespace.Ensure = 'Absent'
+            $testSBMessageContainer.Ensure = 'Absent'
 
             It "returns object with Ensure = Present from the Get method" {
                 # Act
-                $currentValues = $testSBNamespace.Get()
+                $currentValues = $testSBMessageContainer.Get()
 
                 # Assert
                 $currentValues.Ensure | Should Be 'Present'
@@ -89,60 +107,27 @@ Describe "cSBMessageContainer" {
 
             It "returns false from the Test method" {
                 # Act | Assert
-                $testSBNamespace.Test() | Should Be $false
+                $testSBMessageContainer.Test() | Should Be $false
             }
 
-            It "calls the Remove-SBNamespace cmdlet in the Set method" {
+            It "calls Get-SBMessageContainer cmdlet in the Set method to retreive Id" {
                 # Act
-                $testSBNamespace.Set()
+                $testSBMessageContainer.Set()
 
                 # Assert
-                Assert-MockCalled -CommandName Remove-SBNamespace
+                Assert-MockCalled -CommandName Get-SBMessageContainer
+            }
+
+            It "calls the Remove-SBMessageContainer cmdlet in the Set method" {
+                # Act
+                $testSBMessageContainer.Set()
+
+                # Assert
+                Assert-MockCalled -CommandName Remove-SBMessageContainer
             }
 
             # Cleanup
-            $testSBNamespace.Ensure = 'Present'
-        }
-
-        Context "Namespace exists for a given name and should be updated" {
-            # Arrange
-            $createdTime = [datetime]::Now
-            Mock Get-SBNamespace {
-                return @{
-                    AddressingScheme = 'Path'
-                    CreatedTime = [datetime]::Now
-                    DNSEntry = 'servicebusnamespace.contoso.com'
-                    IssuerName = 'oldContosoNamespace'
-                    IssuerUri = 'oldContosoNamespace'
-                    ManageUsers = 'BUILTIN\Administrators','oldServiceBusAdmins@contoso.com'
-                    Name = "ContosoNamespace"
-                    PrimarySymmetricKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
-                    SecondarySymmetricKey = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
-                    State = "Active"
-                    SubscriptionId = "00000000000000000000000000000001"
-                }
-            }
-
-            It "returns object with Ensure = Present from the Get method" {
-                # Act
-                $currentValues = $testSBNamespace.Get()
-
-                # Assert
-                $currentValues.Ensure | Should Be 'Present'
-            }
-
-            It "returns false from the Test method" {
-                # Act | Assert
-                $testSBNamespace.Test() | Should Be $false
-            }
-
-            It "calls the Set-SBNamespace cmdlet in the Set method" {
-                # Act
-                $testSBNamespace.Set()
-
-                # Assert
-                Assert-MockCalled -CommandName Set-SBNamespace
-            }
+            $testSBMessageContainer.Ensure = 'Present'
         }
     }
 }
