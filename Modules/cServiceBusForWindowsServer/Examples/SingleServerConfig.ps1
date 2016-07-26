@@ -148,7 +148,7 @@
             DependsOn = '[cSBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.SBMessageContainers.SBMessageContainer01
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.SBMessageContainer01
             Ensure = 'Present'
         }
 
@@ -156,7 +156,7 @@
             DependsOn = '[cSBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.SBMessageContainers.SBMessageContainer02
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.SBMessageContainer02
             Ensure = 'Present'
         }
 
@@ -164,7 +164,7 @@
             DependsOn = '[cSBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.SBMessageContainers.SBMessageContainer03
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.SBMessageContainer03
             Ensure = 'Present'
         }
     }
