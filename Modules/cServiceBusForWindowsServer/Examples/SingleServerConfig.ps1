@@ -121,7 +121,7 @@
             AdminApiCredentials = $AdminApiCredential
             EncryptionCertificateThumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
             FarmCertificateThumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
-            FarmDNS = $ConfigurationData.NonNodeData.ServiceBus.Farm.FarmDNS
+            FarmDNS = $ConfigurationData.NonNodeData.ServiceBus.SBFarm.FarmDNS
             RunAsAccount = $RunAsAccountCredential.UserName
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             TenantApiCredentials = $TenantApiCredential
@@ -140,8 +140,32 @@
             DependsOn = '[cSBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             Ensure = 'Present'
-            Name = 'ContosoNamespace'
+            Name = $ConfigurationData.NonNodeData.ServiceBus.SBNameSpaces.ContosoNamespace
             ManageUsers = $DomainInstallCredential.UserName
+        }
+
+        cSBMessageContainer SBMessageContainer01 {
+            DependsOn = '[cSBHost]SBHost'
+            PsDscRunAsCredential = $DomainInstallCredential
+            ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.SBMessageContainers.SBMessageContainer01
+            Ensure = 'Present'
+        }
+
+        cSBMessageContainer SBMessageContainer02 {
+            DependsOn = '[cSBHost]SBHost'
+            PsDscRunAsCredential = $DomainInstallCredential
+            ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.SBMessageContainers.SBMessageContainer02
+            Ensure = 'Present'
+        }
+
+        cSBMessageContainer SBMessageContainer03 {
+            DependsOn = '[cSBHost]SBHost'
+            PsDscRunAsCredential = $DomainInstallCredential
+            ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.SBMessageContainers.SBMessageContainer03
+            Ensure = 'Present'
         }
     }
 }

@@ -19,8 +19,16 @@
             DataSource = 'databaseservername'
         }
         ServiceBus = @{
-            Farm = @{
+            SBFarm = @{
                 FarmDNS = 'servicebus.contoso.com'
+            }
+            SBNamespaces = @{
+                ContosoNamespace = 'ContosoNamespace'
+            }
+            SBMessageContainers = @{
+                SBMessageContainer01 = 'SBMessageContainer01'
+                SBMessageContainer02 = 'SBMessageContainer02'
+                SBMessageContainer03 = 'SBMessageContainer03'
             }
         }
         Certificates = @{
