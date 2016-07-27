@@ -2,7 +2,7 @@
 Configuration PushMetaConfig {
     Node localhost {
         Settings {
-            ActionAfterReboot = 'ContinueConfiguration'
+            ActionAfterReboot = 'StopConfiguration'
             ConfigurationModeFrequencyMins = 15
             RebootNodeIfNeeded = $True
             ConfigurationMode = 'ApplyAndMonitor'

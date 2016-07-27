@@ -31,8 +31,7 @@
         $CertificateImportPassphraseCredential
     )
 
-    Import-DscResource -Module xPendingReboot, PSDesiredStateConfiguration, cServiceBusForWindowsServer
-    Import-DscResource -Module xCertificate
+    Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, cServiceBusForWindowsServer
 
     Node $AllNodes.NodeName {
 
@@ -95,13 +94,9 @@
             Type = 'Directory'
         }
 
-        xPendingReboot RebootBeforeWebpiInstall {
-            Name = "RebootBeforeWebpiInstall"
-        }
-
         Package ServiceBus1_1_CU1Installation {
             PsDscRunAsCredential = $LocalInstallCredential
-            DependsOn = '[xPendingReboot]RebootBeforeWebpiInstall','[User]LocalSBInstallUser'
+            DependsOn = '[User]LocalSBInstallUser'
             Ensure = 'Present'
             Arguments = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:C:\WebpiServiceBusInstallBits\feeds\latest\webproductlist.xml"
             Name = "Service Bus 1.1"
@@ -110,13 +105,8 @@
             ReturnCode = 0
         }
 
-        xPendingReboot RebootAfterWebpiInstall {
-            Name = "RebootAfterWebpiInstall"
-            DependsOn = '[Package]ServiceBus1_1_CU1Installation'
-        }
-
         cSBFarm SBFarm {
-            DependsOn = '[xPendingReboot]RebootAfterWebpiInstall','[xPfxImport]PfxImport'
+            DependsOn = '[xPfxImport]PfxImport'
             PsDscRunAsCredential = $DomainInstallCredential
             AdminApiCredentials = $AdminApiCredential
             EncryptionCertificateThumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
@@ -148,7 +138,7 @@
             DependsOn = '[cSBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.SBMessageContainer01
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.1
             Ensure = 'Present'
         }
 
@@ -156,7 +146,7 @@
             DependsOn = '[cSBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.SBMessageContainer02
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.2
             Ensure = 'Present'
         }
 
@@ -164,7 +154,7 @@
             DependsOn = '[cSBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.SBMessageContainer03
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.3
             Ensure = 'Present'
         }
     }

@@ -26,9 +26,9 @@
                 ContosoNamespace = 'ContosoNamespace'
             }
             SBMessageContainers = @{
-                SBMessageContainer01 = 'SBMessageContainer01'
-                SBMessageContainer02 = 'SBMessageContainer02'
-                SBMessageContainer03 = 'SBMessageContainer03'
+                1 = 'SBMessageContainer01'
+                2 = 'SBMessageContainer02'
+                3 = 'SBMessageContainer03'
             }
         }
         Certificates = @{

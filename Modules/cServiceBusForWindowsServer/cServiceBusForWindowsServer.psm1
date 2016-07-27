@@ -714,6 +714,7 @@ class cSBFarm : cSBBase {
     }
 
     [void] SetSBFarm() {
+        # TODO: If certain settings are being changed / Set, do a Stop-SBFarm / Start-SBFarm - ???
         Write-Verbose -Message ("The current Service Bus Farm exists, however settings have changed. The " +
                                 "cSBFarm resource only able to detect/set certain changess once a farm has been " +
                                 "provisioned, including: AdminApiCredentials.UserName, AdminGroup, FarmDNS, " +
@@ -1400,17 +1401,34 @@ class cSBNameSpace : cSBBase {
     }
 
     [bool] SBNamespaceShouldBeUpdated([cSBNameSpace]$CurrentValues) {
+        $valuesToCheck = @()
+
+        $valuesToCheck += 'ManageUsers'
+
+        if ($null -ne $this.IssuerName) {
+            $valuesToCheck += 'IssuerName'
+        }
+
+        if ($null -ne $this.IssuerUri) {
+            $valuesToCheck += 'IssuerUri'
+        }
+
+        if ($null -ne $this.PrimarySymmetricKey) {
+            $valuesToCheck += 'PrimarySymmetricKey'
+        }
+
+        if ($null -ne $this.SecondarySymmetricKey) {
+            $valuesToCheck += 'SecondarySymmetricKey'
+        }
+
+        if ($null -ne $this.SubscriptionId) {
+            $valuesToCheck += 'SubscriptionId'
+        }
+
         $params = @{
             CurrentValues = $CurrentValues.ToHashtable()
             DesiredValues = $this.ToHashtable()
-            ValuesToCheck = @(
-                'IssuerName',
-                'IssuerUri',
-                'ManageUsers',
-                'PrimarySymmetricKey',
-                'SecondarySymmetricKey',
-                'SubscriptionId'
-            )
+            ValuesToCheck = $valuesToCheck
         }
         return (-not (Test-cSBWSParameterState @params))
     }
