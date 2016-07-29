@@ -582,13 +582,15 @@ class cSBFarm : cSBBase {
             return $false
         }
 
-        $desiredValues = $this.ToHashtable()
-        $desiredValues.AdminApiUserName = $desiredValues.AdminApiCredentials.UserName
-        $desiredValues.TenantApiUserName = $desiredValues.TenantApiCredentials.UserName
+        $currentValuesHt = $currentValues.ToHashtable()
+
+        $desiredValuesHt = $this.ToHashtable()
+        $desiredValuesHt.AdminApiUserName = $desiredValuesHt.AdminApiCredentials.UserName
+        $desiredValuesHt.TenantApiUserName = $desiredValuesHt.TenantApiCredentials.UserName
 
         $params = @{
-            CurrentValues = $currentValues.ToHashtable()
-            DesiredValues = $desiredValues
+            CurrentValues = $currentValuesHt
+            DesiredValues = $desiredValuesHt
             ValuesToCheck = @(
                 "AdminApiUserName"
                 "AdminGroup",
@@ -761,6 +763,10 @@ class cSBFarm : cSBBase {
         $setSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
         $setSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
         $setSBFarmParams.Remove("TcpPort")
+
+        Write-Verbose -Message ("Invoking Stop-SBFarm prior to calling Set-SBFarm. " +
+                                "cSBHost resource should re-start hosts individually.")
+        Stop-SBFarm
 
         Write-Verbose -Message "Invoking Set-SBFarm with configurable params"
         Set-SBFarm @setSBFarmParams
@@ -1184,7 +1190,7 @@ class cSBHost : cSBBase {
         }
 
         Write-Verbose -Message "Checking for ExternalBrokerPort"
-        if ($null -eq $updateSBHostParams.ExternalBrokerPort) {
+        if (0 -eq $updateSBHostParams.ExternalBrokerPort) {
             Write-Verbose -Message "ExternalBrokerPort is absent, removing from Update-SBHost params"
             $updateSBHostParams.Remove("ExternalBrokerPort")
         }
@@ -1401,6 +1407,14 @@ class cSBNameSpace : cSBBase {
     }
 
     [bool] SBNamespaceShouldBeUpdated([cSBNameSpace]$CurrentValues) {
+        $currentValuesHt = $CurrentValues.ToHashtable()
+
+        $currentValuesHt.ManageUsers = $this.FormatManageUsers($currentValuesHt.ManageUsers)
+
+        $desiredValuesHt = $this.ToHashtable()
+
+        $desiredValuesHt.ManageUsers = $this.FormatManageUsers($desiredValuesHt.ManageUsers)
+
         $valuesToCheck = @()
 
         $valuesToCheck += 'ManageUsers'
@@ -1426,11 +1440,25 @@ class cSBNameSpace : cSBBase {
         }
 
         $params = @{
-            CurrentValues = $CurrentValues.ToHashtable()
-            DesiredValues = $this.ToHashtable()
+            CurrentValues = $currentValuesHt
+            DesiredValues = $desiredValuesHt
             ValuesToCheck = $valuesToCheck
         }
         return (-not (Test-cSBWSParameterState @params))
+    }
+
+    [string[]] FormatManageUsers([string[]] $ManageUsers) {
+        $formattedManageUsers = @()
+
+        $ManageUsers | ForEach-Object {
+            $formatAccountNameParams = @{
+                FullAccountNameWithDomain = $_
+                Format                    = 'UserLogonNamePreWindows2000'
+            }
+            $formattedManageUsers += (Format-AccountName @formatAccountNameParams).ToLower()
+        }
+
+        return $formattedManageUsers
     }
 
 

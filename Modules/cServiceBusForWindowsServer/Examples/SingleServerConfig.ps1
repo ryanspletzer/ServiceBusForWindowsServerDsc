@@ -162,7 +162,7 @@
 
 $localInstallCred = (Get-Credential -UserName 'ServiceBusInstall' -Message 'Local Install Credential')
 $domainInstallCred = (Get-Credential -Message 'Domain Install Credential') # Make sure this account has access to your SQL Instance!
-$runAsAccountCred = (Get-Credential -Message 'RunAsAccount Credential in the form samaccountname@DOMAIN without the suffix (e.g. servicebus@CONTOSO)')
+$runAsAccountCred = (Get-Credential -Message 'RunAsAccount Credential in the form DOMAIN\SAMACCOUNTNAME (e.g. CONTOSO\SERVICEBUS)')
 $adminApiCred = (Get-Credential -UserName 'adminUser' -Message 'Admin API Credential')
 $tenantApiCred = (Get-Credential -UserName 'tenantUser' -Message 'Tenant API Credential')
 $certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Message 'SSL Cert Import Passphrase')

@@ -22,10 +22,13 @@ Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusFo
 
 Describe "cServiceBusForWindowsServer.Util" {
 
+    Import-Module -Name ActiveDirectory -WarningAction SilentlyContinue
+
     Context "Validate Test-cSBWSParameterState" {
         It "Returns true for two identical tables" {
             # Arrange
             $desired = @{ Example = "test" }
+
             # Act | Assert
             Test-cSBWSParameterState -CurrentValues $desired -DesiredValues $desired | Should Be $true
         }
@@ -34,7 +37,8 @@ Describe "cServiceBusForWindowsServer.Util" {
             # Arrange
             $current = @{ Example = "something" }
             $desired = @{ Example = "test" }
-            # Act
+
+            # Act | Assert
             Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
 
@@ -42,6 +46,7 @@ Describe "cServiceBusForWindowsServer.Util" {
             # Arrange
             $current = @{ }
             $desired = @{ Example = "test" }
+
             # Act | Assert
             Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
@@ -50,6 +55,7 @@ Describe "cServiceBusForWindowsServer.Util" {
             # Arrange
             $current = @{ Example = "test"; SecondExample = "true" }
             $desired = @{ Example = "test"; SecondExample = "false"  }
+
             # Act | Assert
             Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("Example") | Should Be $true
         }
@@ -58,6 +64,7 @@ Describe "cServiceBusForWindowsServer.Util" {
             # Arrange
             $current = @{ Example = "test"; SecondExample = "true" }
             $desired = @{ Example = "test"; SecondExample = "false"  }
+
             # Act | Assert
             Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("SecondExample") | Should Be $false
         }
@@ -66,6 +73,7 @@ Describe "cServiceBusForWindowsServer.Util" {
             # Arrange
             $current = @{ }
             $desired = @{ Example = "test"; SecondExample = "false"  }
+
             # Act | Assert
             Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
@@ -75,8 +83,10 @@ Describe "cServiceBusForWindowsServer.Util" {
         It "Converts a securestring to plaintext" {
             # Arrange
             $secureString = ConvertTo-SecureString -String "test" -AsPlainText -Force
+
             # Act
             $value = ConvertTo-PlainText -SecureString $secureString
+
             # Assert
             $value | Should Be "test"
         }
@@ -254,6 +264,69 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
 
             # Assert
             $propertyValue | Should BeExactly "SSPI"
+        }
+    }
+
+    Context 'Validate Get-AccountName' {
+        It "returns the account name from an account formatted like CONTOSO\AccountName" {
+            # Arrange
+            $accountName = "CONTOSO\AccountName"
+
+            # Act | Assert
+            Get-AccountName -FullAccountNameWithDomain $accountName | Should BeExactly 'AccountName'
+        }
+
+        It 'returns the account name from an account formatted like AccountName@contoso.com' {
+            # Arrange
+            $accountName = 'AccountName@contoso.com'
+
+            # Act | Assert
+            Get-AccountName -FullAccountNameWithDomain $accountName | Should BeExactly 'AccountName'
+        }
+    }
+
+    Context 'Validate Get-AccountDomainName' {
+        It 'returns the account domain name from an account formatted like CONTOSO\AccountName' {
+            # Arrange
+            $accountName = "CONTOSO\AccountName"
+
+            # Act | Assert
+            Get-AccountDomainName -FullAccountNameWithDomain $accountName | Should BeExactly 'CONTOSO'
+        }
+
+        It 'returns the account domain name from an account formatted like AccountName@contoso.com' {
+            # Arrange
+            $accountName = 'AccountName@contoso.com'
+
+            # Act | Assert
+            Get-AccountDomainName -FullAccountNameWithDomain $accountName | Should BeExactly 'contoso.com'
+        }
+    }
+
+    Context 'Validate Get-FullyQualifiedDomainName' {
+        # Arrange
+        Mock Get-ADDomain {
+            return @{
+                DistinguishedName = 'DC=contoso,DC=com'
+            }
+        }
+
+        $domainName = 'CONTOSO'
+
+        It 'calls the Get-ADDomain cmdlet' {
+            # Act
+            $fullyQualifiedDomainName = Get-FullyQualifiedDomainName -DomainName $domainName
+
+            # Assert
+            Assert-MockCalled -CommandName Get-ADDomain
+        }
+
+        It 'returns contoso.com via the distinguished name of the domain' {
+            # Act
+            $fullyQualifiedDomainName = Get-FullyQualifiedDomainName -DomainName $domainName
+
+            # Assert
+            $fullyQualifiedDomainName | Should BeExactly 'contoso.com'
         }
     }
 }

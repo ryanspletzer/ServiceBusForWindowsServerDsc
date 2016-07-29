@@ -357,4 +357,245 @@ function Compare-SecureStrings {
 }
 
 
+function Get-AccountName {
+    <#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $FullAccountNameWithDomain
+    )
+    process {
+        $AccountName = [string]::Empty
+        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0) {
+            $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
+            if ($array -ne $null -and $array.Length -gt 0) {
+                return $array[1]
+            }
+        } else {
+            $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
+            if ($array -ne $null -and $array.Length -gt 0) {
+                return $array[0]
+            }
+        }
+    }
+}
+
+
+function Get-AccountDomainName {
+    <#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $FullAccountNameWithDomain
+    )
+    process {
+        $AccountName = [string]::Empty
+        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0) {
+            $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
+            if ($array -ne $null -and $array.Length -gt 0) {
+                if ($array.Length -eq 2) {
+                    return $array[0]
+                }
+            }
+        } else {
+            $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
+            if ($array -ne $null -and $array.Length -gt 0) {
+                if ($array.Length -eq 2) {
+                    return $array[1]
+                }
+            }
+        }
+    }
+}
+
+
+function Get-FullyQualifiedDomainName {
+    <#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $DomainName
+    )
+    process {
+        $DN = (Get-ADDomain -Identity $DomainName).DistinguishedName
+        $resultArray = @()
+        $commaSplitArray = $DN.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
+        ForEach ($text in $commaSplitArray) {
+            $equalSignSplitArray = $text.Split('=', [System.StringSplitOptions]::RemoveEmptyEntries)
+            if ($equalSignSplitArray.Length -eq 2 -and
+                [string]::Equals($equalSignSplitArray[0], 'DC', [System.StringComparison]::OrdinalIgnoreCase)) {
+                $resultArray += $equalSignSplitArray[1]
+            }
+        }
+        return ($resultArray -join '.')
+    }
+}
+
+
+function Get-NetBIOSDomainName {
+    <#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $DomainName
+    )
+    process {
+        return (Get-ADDomain -Identity $DomainName).NetBIOSName
+    }
+}
+
+
+function Format-AccountName {
+    <#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $FullAccountNameWithDomain,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('UserLogonName',
+                     'UserLogonNamePreWindows2000')]
+        [string]
+        $Format
+    )
+    process {
+        if ($Format -eq 'UserLogonName') {
+            $stringFormat = '{0}@{1}'
+            $accountName = Get-AccountName -FullAccountNameWithDomain $FullAccountNameWithDomain
+            $domainName = Get-AccountDomainName -FullAccountNameWithDomain $FullAccountNameWithDomain
+            $fullyQualifiedDomainName = Get-FullyQualifiedDomainName -DomainName $domainName
+            return ([string]::Format($stringFormat, $accountName, $fullyQualifiedDomainName))
+        }
+        if ($Format -eq 'UserLogonNamePreWindows2000') {
+            $stringFormat = '{0}\{1}'
+            $accountName = Get-AccountName -FullAccountNameWithDomain $FullAccountNameWithDomain
+            $domainName = Get-AccountDomainName -FullAccountNameWithDomain $FullAccountNameWithDomain
+            $netBIOSDomainName = Get-NetBIOSDomainName -DomainName $domainName
+            return ([string]::Format($stringFormat, $netBIOSDomainName, $accountName))
+        }
+    }
+}
+
+
+function Compare-AccountNames {
+    <#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $ReferenceAccountNameWithDomain,
+
+        [Parameter(Mandatory)]
+        [string]
+        $DifferenceAccountNameWithDomain
+    )
+    process {
+        $reference = (Format-AccountName -FullAccountNameWithDomain $ReferenceAccountNameWithDomain -Format UserLogonNamePreWindows2000).ToLower()
+        $difference = (Format-AccountName -FullAccountNameWithDomain $DifferenceAccountNameWithDomain -Format UserLogonNamePreWindows2000).ToLower()
+        return ($reference -eq $difference)
+    }
+}
+
+
 Export-ModuleMember -Function *

@@ -45,7 +45,10 @@ Describe "cSBFarm" {
 
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
+
         Mock New-SBFarm {}
+        Mock Set-SBFarm {}
+        Mock Stop-SBFarm {}
 
         Context "No farm is found or configured" {
             #Arrange
@@ -210,7 +213,6 @@ Describe "cSBFarm" {
                     DatabaseSizeInMB = 0
                 }
             }
-            Mock Set-SBFarm {}
 
             It "returns current values from the Get method" {
                 # Act | Assert
@@ -220,6 +222,14 @@ Describe "cSBFarm" {
             It "returns false from the Test method" {
                 # Act | Assert
                 $testSBFarm.Test() | Should Be $false
+            }
+
+            It "calls the Stop-SBFarm cmdlet in the Set method" {
+                # Act
+                $testSBFarm.Set()
+
+                # Assert
+                Assert-MockCalled -CommandName Stop-SBFarm
             }
 
             It "calls the Set-SBFarm cmdlet in the Set method" {
