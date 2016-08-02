@@ -9,20 +9,22 @@
 [CmdletBinding()]
 param(
     [string]
-    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
+    $ActiveDirectoryCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ActiveDirectory\1.0.0.0\ActiveDirectory.psm1" -Resolve)
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version latest
 
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
+$Global:CurrentActiveDirectoryStubModule = $ActiveDirectoryCmdletModule
 
 $ModuleName = "cServiceBusForWindowsServer.Util"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\$ModuleName\$ModuleName.psm1")
 
 Describe "cServiceBusForWindowsServer.Util" {
 
-    Import-Module -Name ActiveDirectory -WarningAction SilentlyContinue
+    Remove-Module -Name "ActiveDirectory" -Force -ErrorAction SilentlyContinue
+    Import-Module $Global:CurrentActiveDirectoryStubModule -WarningAction SilentlyContinue
 
     Context "Validate Test-cSBWSParameterState" {
         It "Returns true for two identical tables" {
