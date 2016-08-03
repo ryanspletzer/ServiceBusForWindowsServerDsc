@@ -1,10 +1,7 @@
 [CmdletBinding()]
 param(
     [string]
-    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve),
-
-    [string]
-    $ActiveDirectoryCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ActiveDirectory\1.0.0.0\ActiveDirectory.psm1" -Resolve)
+    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,7 +9,6 @@ Set-StrictMode -Version Latest
 
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
-$Global:CurrentActiveDirectoryStubModule = $ActiveDirectoryCmdletModule
 
 $ModuleName = "cServiceBusForWindowsServer"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\$ModuleName.psm1")
@@ -38,19 +34,9 @@ Describe "cSBNamespace" {
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
 
-        Remove-Module -Name "ActiveDirectory" -Force -ErrorAction SilentlyContinue
-        Import-Module $Global:CurrentActiveDirectoryStubModule -WarningAction SilentlyContinue
-
         Mock New-SBNamespace {}
         Mock Set-SBNamespace {}
         Mock Remove-SBNamespace {}
-        Mock Get-ADDomain {
-            return @{
-                DistinguishedName = 'DC=contoso,DC=com'
-                NetBIOSName = 'CONTOSO'
-            }
-        }
-
 
         Context "No namespace exists for a given name" {
             # Arrange
@@ -136,13 +122,22 @@ Describe "cSBNamespace" {
                     DNSEntry = 'servicebusnamespace.contoso.com'
                     IssuerName = 'oldContosoNamespace'
                     IssuerUri = 'oldContosoNamespace'
-                    ManageUsers = 'BUILTIN\Administrators','oldServiceBusAdmins@contoso.com'
+                    ManageUsers = 'oldservicebusadmins@contoso.com','oldservicebusbackupadmins@contoso.com'
                     Name = "ContosoNamespace"
                     PrimarySymmetricKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
                     SecondarySymmetricKey = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
                     State = "Active"
                     SubscriptionId = "00000000000000000000000000000001"
                 }
+            }
+
+            # Arrange
+            Mock -ModuleName cServiceBusForWindowsServer.Util Get-DistinguishedNameForDomain {
+                return 'DC=contoso,DC=com'
+            }
+
+            Mock -ModuleName cServiceBusForWindowsServer.Util Get-NetBIOSDomainName {
+                return 'CONTOSO'
             }
 
             It "returns object with Ensure = Present from the Get method" {

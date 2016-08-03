@@ -443,6 +443,36 @@ function Get-AccountDomainName {
 }
 
 
+function Get-DistinguishedNameForDomain {
+    <#
+    .SYNOPSIS
+
+    .DESCRIPTION
+
+    .INPUTS
+
+    .OUTPUTS
+
+    .EXAMPLE
+
+    .LINK
+
+    .NOTES
+
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $DomainName
+    )
+    process {
+        return ([adsi]"LDAP://$domainName").distinguishedName
+    }
+}
+
+
 function Get-FullyQualifiedDomainName {
     <#
     .SYNOPSIS
@@ -468,14 +498,18 @@ function Get-FullyQualifiedDomainName {
         $DomainName
     )
     process {
-        $DN = (Get-ADDomain -Identity $DomainName).DistinguishedName
+        $distinguishedName = Get-DistinguishedNameForDomain -DomainName $DomainName
         $resultArray = @()
-        $commaSplitArray = $DN.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
-        ForEach ($text in $commaSplitArray) {
-            $equalSignSplitArray = $text.Split('=', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($equalSignSplitArray.Length -eq 2 -and
-                [string]::Equals($equalSignSplitArray[0], 'DC', [System.StringComparison]::OrdinalIgnoreCase)) {
-                $resultArray += $equalSignSplitArray[1]
+        $componentArray = $distinguishedName.Split(',',
+                                                   [System.StringSplitOptions]::RemoveEmptyEntries)
+        ForEach ($component in $componentArray) {
+            $componentKeyValuePairArray = $component.Split('=',
+                                                           [System.StringSplitOptions]::RemoveEmptyEntries)
+            if ($componentKeyValuePairArray.Length -eq 2 -and
+                [string]::Equals($componentKeyValuePairArray[0],
+                                 'DC',
+                                 [System.StringComparison]::OrdinalIgnoreCase)) {
+                $resultArray += $componentKeyValuePairArray[1]
             }
         }
         return ($resultArray -join '.')
@@ -508,7 +542,7 @@ function Get-NetBIOSDomainName {
         $DomainName
     )
     process {
-        return (Get-ADDomain -Identity $DomainName).NetBIOSName
+        return ([adsi]"LDAP://$domainName").name.ToUpper()
     }
 }
 

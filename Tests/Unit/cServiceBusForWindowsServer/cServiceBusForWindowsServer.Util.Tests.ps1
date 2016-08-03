@@ -8,23 +8,18 @@
 
 [CmdletBinding()]
 param(
-    [string]
-    $ActiveDirectoryCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ActiveDirectory\1.0.0.0\ActiveDirectory.psm1" -Resolve)
+
 )
 
 $ErrorActionPreference = 'Stop'
-Set-StrictMode -Version latest
+Set-StrictMode -Version Latest
 
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
-$Global:CurrentActiveDirectoryStubModule = $ActiveDirectoryCmdletModule
 
 $ModuleName = "cServiceBusForWindowsServer.Util"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\$ModuleName\$ModuleName.psm1")
 
 Describe "cServiceBusForWindowsServer.Util" {
-
-    Remove-Module -Name "ActiveDirectory" -Force -ErrorAction SilentlyContinue
-    Import-Module $Global:CurrentActiveDirectoryStubModule -WarningAction SilentlyContinue
 
     Context "Validate Test-cSBWSParameterState" {
         It "Returns true for two identical tables" {
@@ -307,21 +302,11 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
 
     Context 'Validate Get-FullyQualifiedDomainName' {
         # Arrange
-        Mock Get-ADDomain {
-            return @{
-                DistinguishedName = 'DC=contoso,DC=com'
-            }
+        Mock -ModuleName cServiceBusForWindowsServer.Util Get-DistinguishedNameForDomain {
+            return 'DC=contoso,DC=com'
         }
 
         $domainName = 'CONTOSO'
-
-        It 'calls the Get-ADDomain cmdlet' {
-            # Act
-            $fullyQualifiedDomainName = Get-FullyQualifiedDomainName -DomainName $domainName
-
-            # Assert
-            Assert-MockCalled -CommandName Get-ADDomain
-        }
 
         It 'returns contoso.com via the distinguished name of the domain' {
             # Act
@@ -329,6 +314,123 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
 
             # Assert
             $fullyQualifiedDomainName | Should BeExactly 'contoso.com'
+        }
+    }
+
+    Context 'Validate Format-AccountName' {
+        # Arrange
+        Mock -ModuleName cServiceBusForWindowsServer.Util Get-DistinguishedNameForDomain {
+            return 'DC=contoso,DC=com'
+        }
+
+        Mock -ModuleName cServiceBusForWindowsServer.Util Get-NetBIOSDomainName {
+            return 'CONTOSO'
+        }
+
+        It 'returns a user logon name in UPN format from pre Windows 2000 format' {
+            # Arrange
+            $preWindows2000Account = 'CONTOSO\account'
+
+            # Act
+            $formatAccountNameParams = @{
+                FullAccountNameWithDomain = $preWindows2000Account
+                Format                    = 'UserLogonName'
+            }
+            $formattedAccountName = Format-AccountName @formatAccountNameParams
+
+            # Assert
+            $formattedAccountName | Should BeExactly 'account@contoso.com'
+        }
+
+        It 'returns a user logon name in pre Windows 2000 format from a UPN format' {
+            # Arrange
+            $formatAccountNameParams = @{
+                FullAccountNameWithDomain = 'account@contoso.com'
+                Format                    = 'UserLogonNamePreWindows2000'
+            }
+
+            # Act
+            $formattedAccountName = Format-AccountName @formatAccountNameParams
+
+            # Assert
+            $formattedAccountName | Should BeExactly 'CONTOSO\account'
+        }
+    }
+
+    Context 'Validate Compare-AccountNames' {
+        # Arrange
+        Mock -ModuleName cServiceBusForWindowsServer.Util Get-DistinguishedNameForDomain {
+            return 'DC=contoso,DC=com'
+        }
+
+        Mock -ModuleName cServiceBusForWindowsServer.Util Get-NetBIOSDomainName {
+            return 'CONTOSO'
+        }
+
+        It 'returns true for two equal pre Windows 2000 formatted accounts' {
+            # Arrange
+            $compareAccountNamesParams = @{
+                ReferenceAccountNameWithDomain = 'CONTOSO\account'
+                DifferenceAccountNameWithDomain = 'CONTOSO\account'
+            }
+
+            # Act | Assert
+            Compare-AccountNames @compareAccountNamesParams | Should Be $true
+        }
+
+        It 'returns true for two equal UPN formatted accounts' {
+            # Arrange
+            $compareAccountNamesParams = @{
+                ReferenceAccountNameWithDomain = 'account@contoso.com'
+                DifferenceAccountNameWithDomain = 'account@contoso.com'
+            }
+
+            # Act | Assert
+            Compare-AccountNames @compareAccountNamesParams | Should Be $true
+        }
+
+        It 'returns true for a synonymous pre Windows 2000 formatted account and UPN formatted account' {
+            # Arrange
+            $compareAccountNamesParams = @{
+                ReferenceAccountNameWithDomain = 'CONTOSO\account'
+                DifferenceAccountNameWithDomain = 'account@contoso.com'
+            }
+
+            # Act | Assert
+            Compare-AccountNames @compareAccountNamesParams | Should Be $true
+        }
+
+        It 'returns false for two inequal pre Windows 2000 formatted accounts' {
+            # Arrange
+            $compareAccountNamesParams = @{
+                ReferenceAccountNameWithDomain = 'CONTOSO\account'
+                DifferenceAccountNameWithDomain = 'CONTOSO\account2'
+            }
+
+            # Act | Assert
+            Compare-AccountNames @compareAccountNamesParams | Should Be $false
+        }
+
+        It 'returns false for two inequal UPN formatted accounts' {
+            # Arrange
+            $compareAccountNamesParams = @{
+                ReferenceAccountNameWithDomain = 'account@contoso.com'
+                DifferenceAccountNameWithDomain = 'account2@contoso.com'
+            }
+
+            # Act | Assert
+            Compare-AccountNames @compareAccountNamesParams | Should Be $false
+        }
+
+        It 'returns false for two differently formatted accounts that are not synonymous' {
+            # Arrange
+            $compareAccountNamesParams = @{
+                ReferenceAccountNameWithDomain = 'CONTOSO\account'
+                DifferenceAccountNameWithDomain = 'account2@contoso.com'
+            }
+
+            # Act | Assert
+            Compare-AccountNames @compareAccountNamesParams | Should Be $false
         }
     }
 }
