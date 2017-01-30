@@ -1450,12 +1450,12 @@ class cSBNameSpace : cSBBase {
     [string[]] FormatManageUsers([string[]] $ManageUsers) {
         $formattedManageUsers = @()
 
-        $ManageUsers | ForEach-Object {
+        $formattedManageUsers = $ManageUsers.ForEach{
             $formatAccountNameParams = @{
                 FullAccountNameWithDomain = $_
                 Format                    = 'UserLogonNamePreWindows2000'
             }
-            $formattedManageUsers += (Format-AccountName @formatAccountNameParams).ToLower()
+            (Format-AccountName @formatAccountNameParams).ToLower()
         }
 
         return $formattedManageUsers
