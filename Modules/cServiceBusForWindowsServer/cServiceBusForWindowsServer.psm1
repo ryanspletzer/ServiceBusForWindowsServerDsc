@@ -62,7 +62,7 @@ class cSBBase {
         ForEach ($prop in $props) {
             $dscPropertyAttributesWithNamedArguments = $prop.CustomAttributes |
                 Where-Object {
-                    $_.AttributeType.Name -eq "DscPropertyAttribute" -and $_.NamedArguments -ne $null
+                    ($_.AttributeType.Name -eq "DscPropertyAttribute") -and ($null -ne $_.NamedArguments)
                 }
             $notConfigurables = $dscPropertyAttributesWithNamedArguments |
                 ForEach-Object {
@@ -890,7 +890,7 @@ class cSBHost : cSBBase {
         Write-Verbose -Message "Checking for SBHost."
 
         # TODO: fix for non-domain joined machine
-        $hostName = "$env:COMPUTERNAME.$((Get-WmiObject -Class WIN32_ComputerSystem).Domain)"
+        $hostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
 
         $connectionStringParams = @{
             DataSource         = $this.SBFarmDBConnectionStringDataSource
@@ -1142,7 +1142,7 @@ class cSBHost : cSBBase {
 
         # TODO: fix for non-domain joined machine
         Write-Verbose -Message "Constructing hostname for Remove-SBHost params"
-        $removeSBHostParams.HostName = "$env:COMPUTERNAME.$((Get-WmiObject -Class WIN32_ComputerSystem).Domain)"
+        $removeSBHostParams.HostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
 
         Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
         $sbFarmConnectionStringParams = @{
