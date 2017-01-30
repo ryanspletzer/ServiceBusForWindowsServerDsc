@@ -642,7 +642,7 @@ class cSBFarm : cSBBase {
             Encrypt            = $this.GatewayDBConnectionStringEncrypt
         }
         if ($null -eq $this.GatewayDBConnectionStringDataSource -or
-            [string]::IsNullOrEmpty($this.GatewayDBConnectionStringDataSource)) {
+            [String]::IsNullOrEmpty($this.GatewayDBConnectionStringDataSource)) {
             Write-Verbose -Message ("GatewayDBConnectionStringDataSource not specified, " +
                                     "using SBFarmDBConnectionStringDataSource")
             $gatewayDBConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
@@ -666,7 +666,7 @@ class cSBFarm : cSBBase {
             Encrypt            = $this.MessageContainerDBConnectionStringEncrypt
         }
         if ($null -eq $this.MessageContainerDBConnectionStringDataSource -or
-            [string]::IsNullOrEmpty($this.MessageContainerDBConnectionStringDataSource)) {
+            [String]::IsNullOrEmpty($this.MessageContainerDBConnectionStringDataSource)) {
             Write-Verbose -Message ("MessageContainerDBConnectionStringDataSource not specified, " +
                                     "using SBFarmDBConnectionStringDataSource")
             $messageContainerDBConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
