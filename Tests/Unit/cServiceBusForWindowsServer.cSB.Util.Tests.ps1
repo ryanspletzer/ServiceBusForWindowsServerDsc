@@ -14,7 +14,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
+$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 
 $ModuleName = "cSB.Util"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\$ModuleName\$ModuleName.psm1")

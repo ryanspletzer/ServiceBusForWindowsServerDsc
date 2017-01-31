@@ -1,13 +1,13 @@
 [CmdletBinding()]
 param(
     [string]
-    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
+    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
+$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $DscResourceName = "cSBFarm"
