@@ -102,4 +102,3 @@ class cSBBase {
         return $hashtable
     }
 }
-

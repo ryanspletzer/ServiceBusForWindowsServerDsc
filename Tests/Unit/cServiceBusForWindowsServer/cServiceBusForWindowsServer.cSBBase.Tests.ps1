@@ -1,3 +1,5 @@
+using module ..\..\..\DSCResources\cSBFarm
+
 [CmdletBinding()]
 param(
     [string]
@@ -10,11 +12,11 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$ModuleName = "cServiceBusForWindowsServer"
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\$ModuleName.psm1")
+$DscResourceName = "cSBBase"
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
 
 Describe 'cSBBase' {
-    InModuleScope $ModuleName {
+    InModuleScope -ModuleName $DscResourceName {
         # Arrange
         $testSBFarm = [cSBFarm]::new()
         $adminApiCredentialParams = @{
