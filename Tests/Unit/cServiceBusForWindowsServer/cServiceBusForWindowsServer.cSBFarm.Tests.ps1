@@ -10,12 +10,12 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$ModuleName = "cServiceBusForWindowsServer"
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\$ModuleName.psm1")
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\cServiceBusForWindowsServer.Util\cServiceBusForWindowsServer.Util.psm1")
+$DscResourceName = "cSBFarm"
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cSB.Util\cSB.Util.psm1") -Scope Global -Force
 
 Describe "cSBFarm" {
-    InModuleScope $ModuleName {
+    InModuleScope -Module $DscResourceName {
         # Arrange
         $testSBFarm = [cSBFarm]::new()
         $adminApiCredentialParams = @{
@@ -40,8 +40,6 @@ Describe "cSBFarm" {
             )
         }
         $testSBFarm.TenantApiCredentials = New-Object @tenantApiCredentialParams
-
-        Import-Module (Join-Path ((Resolve-Path $PSScriptRoot\..\..\..).Path) "Modules\cServiceBusForWindowsServer")
 
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue

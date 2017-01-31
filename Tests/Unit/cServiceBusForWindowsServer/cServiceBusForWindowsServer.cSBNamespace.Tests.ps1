@@ -10,12 +10,12 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$ModuleName = "cServiceBusForWindowsServer"
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\$ModuleName.psm1")
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\cServiceBusForWindowsServer.Util\cServiceBusForWindowsServer.Util.psm1")
+$DscResourceName = "cSBNamespace"
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cSB.Util\cSB.Util.psm1") -Scope Global -Force
 
 Describe "cSBNamespace" {
-    InModuleScope $ModuleName {
+    InModuleScope -Module $DscResourceName {
         # Arrange
         $testSBNamespace = [cSBNamespace]::new()
         $testSBNamespace.AddressingScheme = 'Path'
@@ -28,8 +28,6 @@ Describe "cSBNamespace" {
         $testSBNamespace.PrimarySymmetricKey = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
         $testSBNamespace.SecondarySymmetricKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
         $testSBNamespace.SubscriptionId = "00000000000000000000000000000000"
-
-        Import-Module (Join-Path ((Resolve-Path $PSScriptRoot\..\..\..).Path) "Modules\cServiceBusForWindowsServer")
 
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
@@ -132,11 +130,11 @@ Describe "cSBNamespace" {
             }
 
             # Arrange
-            Mock -ModuleName cServiceBusForWindowsServer.Util Get-DistinguishedNameForDomain {
+            Mock -ModuleName cSB.Util Get-DistinguishedNameForDomain {
                 return 'DC=contoso,DC=com'
             }
 
-            Mock -ModuleName cServiceBusForWindowsServer.Util Get-NetBIOSDomainName {
+            Mock -ModuleName cSB.Util Get-NetBIOSDomainName {
                 return 'CONTOSO'
             }
 

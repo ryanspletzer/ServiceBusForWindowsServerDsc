@@ -10,12 +10,12 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$ModuleName = "cServiceBusForWindowsServer"
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\$ModuleName.psm1")
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cServiceBusForWindowsServer\Modules\cServiceBusForWindowsServer.Util\cServiceBusForWindowsServer.Util.psm1")
+$DscResourceName = "cSBHost"
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cSB.Util\cSB.Util.psm1") -Scope Global -Force
 
 Describe "cSBHost" {
-    InModuleScope $ModuleName {
+    InModuleScope -Module $DscResourceName {
         # Arrange
         $testSBHost = [cSBHost]::new()
         $testSBHost.EnableFirewallRules = $true
@@ -32,8 +32,6 @@ Describe "cSBHost" {
         $testSBHost.RunAsPassword = New-Object @runAsPasswordCredentialParams
         $testSBHost.SBFarmDBConnectionStringDataSource = "SQLSERVER.contoso.com"
         $testSBHost.Started = $true
-
-        Import-Module (Join-Path ((Resolve-Path $PSScriptRoot\..\..\..).Path) "Modules\cServiceBusForWindowsServer")
 
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
