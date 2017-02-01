@@ -16,10 +16,10 @@ Set-StrictMode -Version Latest
 
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 
-$ModuleName = "cSB.Util"
+$ModuleName = "SB.Util"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\$ModuleName\$ModuleName.psm1")
 
-Describe "cSB.Util" {
+Describe $ModuleName {
 
     Context "Validate Test-cSBWSParameterState" {
         It "Returns true for two identical tables" {
@@ -302,7 +302,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
 
     Context 'Validate Get-FullyQualifiedDomainName' {
         # Arrange
-        Mock -ModuleName cSB.Util Get-DistinguishedNameForDomain {
+        Mock -ModuleName SB.Util Get-DistinguishedNameForDomain {
             return 'DC=contoso,DC=com'
         }
 
@@ -319,11 +319,11 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
 
     Context 'Validate Format-AccountName' {
         # Arrange
-        Mock -ModuleName cSB.Util Get-DistinguishedNameForDomain {
+        Mock -ModuleName SB.Util Get-DistinguishedNameForDomain {
             return 'DC=contoso,DC=com'
         }
 
-        Mock -ModuleName cSB.Util Get-NetBIOSDomainName {
+        Mock -ModuleName SB.Util Get-NetBIOSDomainName {
             return 'CONTOSO'
         }
 
@@ -359,11 +359,11 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
 
     Context 'Validate Compare-AccountNames' {
         # Arrange
-        Mock -ModuleName cSB.Util Get-DistinguishedNameForDomain {
+        Mock -ModuleName SB.Util Get-DistinguishedNameForDomain {
             return 'DC=contoso,DC=com'
         }
 
-        Mock -ModuleName cSB.Util Get-NetBIOSDomainName {
+        Mock -ModuleName SB.Util Get-NetBIOSDomainName {
             return 'CONTOSO'
         }
 

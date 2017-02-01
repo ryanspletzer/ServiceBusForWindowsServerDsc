@@ -12,7 +12,7 @@ $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $DscResourceName = "cSBNamespace"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cSB.Util\cSB.Util.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
 Describe "cSBNamespace" {
     InModuleScope -Module $DscResourceName {
@@ -130,11 +130,11 @@ Describe "cSBNamespace" {
             }
 
             # Arrange
-            Mock -ModuleName cSB.Util Get-DistinguishedNameForDomain {
+            Mock -ModuleName SB.Util Get-DistinguishedNameForDomain {
                 return 'DC=contoso,DC=com'
             }
 
-            Mock -ModuleName cSB.Util Get-NetBIOSDomainName {
+            Mock -ModuleName SB.Util Get-NetBIOSDomainName {
                 return 'CONTOSO'
             }
 

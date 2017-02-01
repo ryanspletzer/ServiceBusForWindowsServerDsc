@@ -12,7 +12,7 @@ $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $DscResourceName = "cSBHost"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cSB.Util\cSB.Util.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
 Describe "cSBHost" {
     InModuleScope -Module $DscResourceName {
