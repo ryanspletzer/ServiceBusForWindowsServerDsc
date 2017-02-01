@@ -1,11 +1,11 @@
-using module ..\cSBBase
+using module ..\SBBase
 
 
 <#
    This resource adds, removes and updates settings for a Service Bus for Windows Server namespace.
 #>
 [DscResource()]
-class cSBNameSpace : cSBBase {
+class cSBNameSpace : SBBase {
 
     <#
         Specifies the addressing scheme used in the service namespace. The possible values for this parameter are

@@ -1,11 +1,11 @@
-using module ..\cSBBase
+using module ..\SBBase
 
 
 <#
    This resource creates and sets certain settings for a Service Bus for Windows Server farm.
 #>
 [DscResource()]
-class cSBFarm : cSBBase {
+class cSBFarm : SBBase {
 
     <#
         Sets the resource provider credentials. The resource provider is a component that exposes the management API

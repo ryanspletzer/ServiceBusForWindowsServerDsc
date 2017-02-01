@@ -22,7 +22,7 @@ enum AddressingScheme {
 <#
     This is the base Service Bus for Windows Server resource class that provides commonly used methods.
 #>
-class cSBBase {
+class SBBase {
     <#
         Returns the property names and values of the class object as a hashtable.
     #>

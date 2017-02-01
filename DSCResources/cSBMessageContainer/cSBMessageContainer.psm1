@@ -1,10 +1,10 @@
-using module ..\cSBBase
+using module ..\SBBase
 
 <#
    This resource adds and removes a Service Bus for Windows Server message container.
 #>
 [DscResource()]
-class cSBMessageContainer : cSBBase {
+class cSBMessageContainer : SBBase {
 
     <#
         The credential for connecting to the container database. Not required if integrated authentication will be

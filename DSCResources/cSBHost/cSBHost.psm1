@@ -1,10 +1,10 @@
-using module ..\cSBBase
+using module ..\SBBase
 
 <#
    This resource adds, removes, starts, stops and updates settings for Service Bus for a Windows Server host.
 #>
 [DscResource()]
-class cSBHost : cSBBase {
+class cSBHost : SBBase {
 
     <#
         This passphrase is required for certificate auto generation. This parameter is mandatory if you want

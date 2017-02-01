@@ -1,4 +1,4 @@
-using module DSCResources\cSBBase
+using module DSCResources\SBBase
 
 
 # [DscResource()]
