@@ -1,11 +1,11 @@
-using module ..\cSBBase
+using module ..\SBBase
 
 
 <#
    This resource creates and sets certain settings for a Service Bus for Windows Server farm.
 #>
 [DscResource()]
-class cSBFarm : cSBBase {
+class SBFarm : SBBase {
 
     <#
         Sets the resource provider credentials. The resource provider is a component that exposes the management API
@@ -352,8 +352,8 @@ class cSBFarm : cSBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [cSBFarm] Get() {
-        $result = [cSBFarm]::new()
+    [SBFarm] Get() {
+        $result = [SBFarm]::new()
 
         Write-Verbose -Message "Checking for SBFarm."
 
@@ -615,7 +615,7 @@ class cSBFarm : cSBBase {
     [void] SetSBFarm() {
         # TODO: If certain settings are being changed / Set, do a Stop-SBFarm / Start-SBFarm - ???
         Write-Verbose -Message ("The current Service Bus Farm exists, however settings have changed. The " +
-                                "cSBFarm resource only able to detect/set certain changess once a farm has been " +
+                                "SBFarm resource only able to detect/set certain changess once a farm has been " +
                                 "provisioned, including: AdminApiCredentials.UserName, AdminGroup, FarmDNS, " +
                                 "RunAsAccount, TenantApiCredentials.UserName")
         Write-Verbose -Message "Getting configurable properties as hashtable for Set-SBFarm params"
@@ -662,7 +662,7 @@ class cSBFarm : cSBBase {
         $setSBFarmParams.Remove("TcpPort")
 
         Write-Verbose -Message ("Invoking Stop-SBFarm prior to calling Set-SBFarm. " +
-                                "cSBHost resource should re-start hosts individually.")
+                                "SBHost resource should re-start hosts individually.")
         Stop-SBFarm
 
         Write-Verbose -Message "Invoking Set-SBFarm with configurable params"

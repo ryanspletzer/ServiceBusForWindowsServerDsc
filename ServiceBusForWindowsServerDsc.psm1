@@ -1,4 +1,4 @@
-using module DSCResources\cSBBase
+using module DSCResources\SBBase
 
 
 # [DscResource()]
@@ -22,7 +22,7 @@ using module DSCResources\cSBBase
 
 
 # [DscResource()]
-# class cSBHostCEIP {
+# class SBHostCEIP {
 #     [DscProperty(Key)]
 #     [Ensure]
 #     $Ensure
@@ -35,7 +35,7 @@ using module DSCResources\cSBBase
 #         return $true
 #     }
 
-#     [cSBHostCEIP] Get() {
+#     [SBHostCEIP] Get() {
 #         return $this
 #     }
 # }

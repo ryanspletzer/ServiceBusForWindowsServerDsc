@@ -1,10 +1,10 @@
-using module ..\cSBBase
+using module ..\SBBase
 
 <#
    This resource adds, removes, starts, stops and updates settings for Service Bus for a Windows Server host.
 #>
 [DscResource()]
-class cSBHost : cSBBase {
+class SBHost : SBBase {
 
     <#
         This passphrase is required for certificate auto generation. This parameter is mandatory if you want
@@ -110,8 +110,8 @@ class cSBHost : cSBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [cSBHost] Get() {
-        $result = [cSBHost]::new()
+    [SBHost] Get() {
+        $result = [SBHost]::new()
 
         Write-Verbose -Message "Checking for SBHost."
 
@@ -237,19 +237,19 @@ class cSBHost : cSBBase {
         return Test-cSBWSParameterState @params
     }
 
-    [bool] SBHostShouldBeAdded([cSBHost]$CurrentValues) {
+    [bool] SBHostShouldBeAdded([SBHost]$CurrentValues) {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBHostShouldBeRemoved([cSBHost]$CurrentValues) {
+    [bool] SBHostShouldBeRemoved([SBHost]$CurrentValues) {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBHostShouldBeStarted([cSBHost]$CurrentValues) {
+    [bool] SBHostShouldBeStarted([SBHost]$CurrentValues) {
         return (($this.Started -eq $true) -and ($CurrentValues.Started -eq $false))
     }
 
-    [bool] SBHostShouldBeStopped([cSBHost]$CurrentValues) {
+    [bool] SBHostShouldBeStopped([SBHost]$CurrentValues) {
         return (($this.Started -eq $false) -and ($CurrentValues.Started -eq $true))
     }
 
@@ -282,7 +282,7 @@ class cSBHost : cSBBase {
                 Stop-SBHost
             }
             $this.RemoveSBHost()
-            Write-Verbose -Message "Ending cSBHost.Set() after removal"
+            Write-Verbose -Message "Ending SBHost.Set() after removal"
             return
         }
 
@@ -296,7 +296,7 @@ class cSBHost : cSBBase {
             return
         }
 
-        Write-Verbose -Message ("cSBHost can only detect certain changes -- to change certain settings on a host, " +
+        Write-Verbose -Message ("SBHost can only detect certain changes -- to change certain settings on a host, " +
                                 "push a configuration with the host stopped, then push a new config with the host " +
                                 "started and it will explicitly re-update the settings.")
         Write-Verbose -Message "Checking if SBHost should be stopped"

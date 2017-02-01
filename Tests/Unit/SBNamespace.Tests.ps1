@@ -1,23 +1,23 @@
 [CmdletBinding()]
 param(
     [string]
-    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
+    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
+$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$DscResourceName = "cSBNamespace"
+$DscResourceName = "SBNamespace"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cSB.Util\cSB.Util.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
-Describe "cSBNamespace" {
+Describe $DscResourceName {
     InModuleScope -Module $DscResourceName {
         # Arrange
-        $testSBNamespace = [cSBNamespace]::new()
+        $testSBNamespace = [SBNamespace]::new()
         $testSBNamespace.AddressingScheme = 'Path'
         $testSBNamespace.DNSEntry = "servicebusnamespace.contoso.com"
         $testSBNamespace.Ensure = 'Present'
@@ -130,11 +130,11 @@ Describe "cSBNamespace" {
             }
 
             # Arrange
-            Mock -ModuleName cSB.Util Get-DistinguishedNameForDomain {
+            Mock -ModuleName SB.Util Get-DistinguishedNameForDomain {
                 return 'DC=contoso,DC=com'
             }
 
-            Mock -ModuleName cSB.Util Get-NetBIOSDomainName {
+            Mock -ModuleName SB.Util Get-NetBIOSDomainName {
                 return 'CONTOSO'
             }
 

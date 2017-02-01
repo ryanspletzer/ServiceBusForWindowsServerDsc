@@ -1,23 +1,23 @@
 [CmdletBinding()]
 param(
     [string]
-    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "..\Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
+    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..\..).Path
+$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$DscResourceName = "cSBHost"
+$DscResourceName = "SBHost"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\cSB.Util\cSB.Util.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
-Describe "cSBHost" {
+Describe $DscResourceName {
     InModuleScope -Module $DscResourceName {
         # Arrange
-        $testSBHost = [cSBHost]::new()
+        $testSBHost = [SBHost]::new()
         $testSBHost.EnableFirewallRules = $true
         $testSBHost.Ensure = [Ensure]::Present
         $testSBHost.ExternalBrokerPort = 1024

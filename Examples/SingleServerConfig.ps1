@@ -31,7 +31,7 @@
         $CertificateImportPassphraseCredential
     )
 
-    Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, cServiceBusForWindowsServer
+    Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, ServiceBusForWindowsServerDsc
 
     Node $AllNodes.NodeName {
 
@@ -105,7 +105,7 @@
             ReturnCode = 0
         }
 
-        cSBFarm SBFarm {
+        SBFarm SBFarm {
             DependsOn = '[xPfxImport]PfxImport'
             PsDscRunAsCredential = $DomainInstallCredential
             AdminApiCredentials = $AdminApiCredential
@@ -117,8 +117,8 @@
             TenantApiCredentials = $TenantApiCredential
         }
 
-        cSBHost SBHost {
-            DependsOn = '[cSBFarm]SBFarm'
+        SBHost SBHost {
+            DependsOn = '[SBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             EnableFirewallRules = $true
             Ensure = 'Present'
@@ -126,32 +126,32 @@
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
         }
 
-        cSBNamespace ContosoNamespace {
-            DependsOn = '[cSBFarm]SBFarm'
+        SBNamespace ContosoNamespace {
+            DependsOn = '[SBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             Ensure = 'Present'
             Name = $ConfigurationData.NonNodeData.ServiceBus.SBNameSpaces.ContosoNamespace
             ManageUsers = $DomainInstallCredential.UserName
         }
 
-        cSBMessageContainer SBMessageContainer01 {
-            DependsOn = '[cSBHost]SBHost'
+        SBMessageContainer SBMessageContainer01 {
+            DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.1
             Ensure = 'Present'
         }
 
-        cSBMessageContainer SBMessageContainer02 {
-            DependsOn = '[cSBHost]SBHost'
+        SBMessageContainer SBMessageContainer02 {
+            DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.2
             Ensure = 'Present'
         }
 
-        cSBMessageContainer SBMessageContainer03 {
-            DependsOn = '[cSBHost]SBHost'
+        SBMessageContainer SBMessageContainer03 {
+            DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.3
@@ -169,7 +169,7 @@ $certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Me
 
 $SingleServerConfigParams = @{
     OutputPath              = 'C:\Program Files\WindowsPowerShell\Configuration\Schema'
-    ConfigurationData       = ('C:\Program Files\WindowsPowerShell\Modules\cServiceBusForWindowsServer\Examples\' +
+    ConfigurationData       = ('C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\' +
                                'SingleServerConfig.psd1')
     LocalInstallCredential  = $localInstallCred
     DomainInstallCredential = $domainInstallCred

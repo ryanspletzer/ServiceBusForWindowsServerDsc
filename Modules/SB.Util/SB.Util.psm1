@@ -1,5 +1,5 @@
 #
-# cSB.Util.psm1
+# SB.Util.psm1
 #
 # Credit to SharePointDsc Resource module for nested Util approach and ideas for helper cmdlets in this file:
 #
