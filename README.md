@@ -1,43 +1,68 @@
-# cServiceBusForWindowsServer
+# ServiceBusForWindowsServerDsc
 
-The cServiceBusForWindowServer PowerShell module provides class-based DSC resources that run on WFM 5.0 RTM or greater, that can be used to deploy and manage a Service Bus for Windows Server farm.
+TODO: Setup Appveyor and Appveyor Badge
 
-This module is provided AS IS, and is no supported through any standard support program or service.
-The "c" in cServiceBusForWindowsServer stands for community, which means that these resources will be fix forward and monitored by the module owner(s).
+The cServiceBusForWindowServer PowerShell module provides class-based DSC resources that run on WMF 5.0 RTM or 
+greater, that can be used to deploy and manage a Service Bus for Windows Server farm.
+This module's examples leverage the built-in Package resource in the PSDesiredStateConfiguration module in WMF 5.0 
+to install the Service Bus for Windows Server  Web Platform Installer package.
 
-## Installation
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-To install the cServiceBusForWindowsServer module:
+## Contributing
+If you would like to contribute to this repository, please read the DSC Resource Kit [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
 
-Unzip the content under $env:ProgramFiles\WindowsPowerShell\Modules folder.
+## Resources
 
-To confirm installation:
+* **SBFarm** creates and sets certain settings for a Service Bus for Windows Server farm.
+* **SBHost** adds, removes a Service Bus for a Windows Server host, and starts, stops and updates settings for a Service Bus for a Windows Server host.
+* **SBMessageContainer** adds and removes a Service Bus for Windows Server message container.
+* **SBNamespace** adds, removes and updates settings for a Service Bus for Windows Server namespace.
 
-Run Get-DSCResource to see that cServiceBusForWindowsServer is among the DSC Resources listed.
+### SBFarm
 
-## Requirements
+{ Detailed description of resource 1 - Please include any requirements for running this resource (e.g. Must run on Windows Server OS, must have Exchange already installed) }
 
-This module requires the latest version of WMF / PowerShell (v5.0, which ships in Windows 10 or Windows Server 2016 and is available standalone for Windows 7 SP1 / Windows Server 2008 R2+). To easily use PowerShell 5.0 on older operating systems, install WMF 5.0 RTM or later. Please read the installation instructions that are present on both the download page and the release notes for WMF 5.0.
+* {**Property1**: Description of resource 1 property 1}
+* {**Property2**: Description of resource 1 property 2}
+* ...
 
-At the time of development, Service Bus 1.1 with Cumulative Update 1 was the most current version of Service Bus; thus the minimum recommended installable version with this DSC Resource module is Service Bus 1.1 with CU1.
+### SBHost
 
-This module's examples leverage the built-in Package resource in the PSDesiredStateConfiguration module in WMF 5.0. The Package resource is used to install Service Bus and its dependencies via the Web Platform Installer WebpiCmd.exe command line tool.
+{ Detailed description of resource 2 - Please include any requirements for running this resource (e.g. Must run on Windows Server OS, must have Exchange already installed) }
 
-This module's examples also leverage
+* {**Property1**: Description of resource 2 property 1}
+* {**Property2**: Description of resource 2 property 2}
+* ...
 
-## DSC Resources
+### SBMessageContainer
 
-## Tests
+{ Detailed description of resource 2 - Please include any requirements for running this resource (e.g. Must run on Windows Server OS, must have Exchange already installed) }
 
-## Preview Status
+* {**Property1**: Description of resource 2 property 1}
+* {**Property2**: Description of resource 2 property 2}
+* ...
 
-Currently the cServiceBusForWindowsServer module is a work in progress that is not yet feature complete. The team is working towards a feature complete version 1.0.
+### SBNamespace
 
-## Examples
+{ Detailed description of resource 2 - Please include any requirements for running this resource (e.g. Must run on Windows Server OS, must have Exchange already installed) }
 
-Review the "examples" directory in the cServiceBusForWindowsServer module for some general examples of how the overall module can be used.
+* {**Property1**: Description of resource 2 property 1}
+* {**Property2**: Description of resource 2 property 2}
+* ...
 
-## Version History
+## Versions
+
+### Unreleased
+
+* SBAuthorizationRule resource (WIP)
+* SBHostCEIP resource (WIP)
+* SBRuntimeSetting resource (WIP)
+
+### 0.6.0
+
+* Reorg and rename of module to ServiceBusForWindowsServerDsc
 
 ### 0.5.0
 
