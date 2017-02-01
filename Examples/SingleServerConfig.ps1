@@ -105,7 +105,7 @@
             ReturnCode = 0
         }
 
-        cSBFarm SBFarm {
+        SBFarm SBFarm {
             DependsOn = '[xPfxImport]PfxImport'
             PsDscRunAsCredential = $DomainInstallCredential
             AdminApiCredentials = $AdminApiCredential
@@ -118,7 +118,7 @@
         }
 
         cSBHost SBHost {
-            DependsOn = '[cSBFarm]SBFarm'
+            DependsOn = '[SBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             EnableFirewallRules = $true
             Ensure = 'Present'
@@ -127,7 +127,7 @@
         }
 
         cSBNamespace ContosoNamespace {
-            DependsOn = '[cSBFarm]SBFarm'
+            DependsOn = '[SBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             Ensure = 'Present'
             Name = $ConfigurationData.NonNodeData.ServiceBus.SBNameSpaces.ContosoNamespace

@@ -10,14 +10,14 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$DscResourceName = "cSBFarm"
+$DscResourceName = "SBFarm"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
-Describe "cSBFarm" {
+Describe $DscResourceName {
     InModuleScope -Module $DscResourceName {
         # Arrange
-        $testSBFarm = [cSBFarm]::new()
+        $testSBFarm = [SBFarm]::new()
         $adminApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(

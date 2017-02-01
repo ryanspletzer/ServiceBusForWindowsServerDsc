@@ -1,4 +1,4 @@
-using module ..\..\DSCResources\cSBFarm
+using module ..\..\DSCResources\SBFarm
 
 [CmdletBinding()]
 param(
@@ -18,7 +18,7 @@ Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscReso
 Describe 'SBBase' {
     InModuleScope -ModuleName $DscResourceName {
         # Arrange
-        $testSBFarm = [cSBFarm]::new()
+        $testSBFarm = [SBFarm]::new()
         $adminApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
