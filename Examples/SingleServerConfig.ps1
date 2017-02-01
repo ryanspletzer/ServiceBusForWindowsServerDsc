@@ -126,7 +126,7 @@
             SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
         }
 
-        cSBNamespace ContosoNamespace {
+        SBNamespace ContosoNamespace {
             DependsOn = '[SBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             Ensure = 'Present'

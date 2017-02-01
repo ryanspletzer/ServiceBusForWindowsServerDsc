@@ -10,14 +10,14 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$DscResourceName = "cSBNamespace"
+$DscResourceName = "SBNamespace"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
-Describe "cSBNamespace" {
+Describe $DscResourceName {
     InModuleScope -Module $DscResourceName {
         # Arrange
-        $testSBNamespace = [cSBNamespace]::new()
+        $testSBNamespace = [SBNamespace]::new()
         $testSBNamespace.AddressingScheme = 'Path'
         $testSBNamespace.DNSEntry = "servicebusnamespace.contoso.com"
         $testSBNamespace.Ensure = 'Present'

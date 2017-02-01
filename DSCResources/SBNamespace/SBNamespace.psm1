@@ -5,7 +5,7 @@ using module ..\SBBase
    This resource adds, removes and updates settings for a Service Bus for Windows Server namespace.
 #>
 [DscResource()]
-class cSBNameSpace : SBBase {
+class SBNameSpace : SBBase {
 
     <#
         Specifies the addressing scheme used in the service namespace. The possible values for this parameter are
@@ -108,8 +108,8 @@ class cSBNameSpace : SBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [cSBNamespace] Get() {
-        $result = [cSBNamespace]::new()
+    [SBNamespace] Get() {
+        $result = [SBNamespace]::new()
 
         Write-Verbose -Message "Checking for SBNamespace $($this.Name)."
 
@@ -166,15 +166,15 @@ class cSBNameSpace : SBBase {
         return $true
     }
 
-    [bool] SBNamespaceShouldBeCreated([cSBNameSpace]$CurrentValues) {
+    [bool] SBNamespaceShouldBeCreated([SBNameSpace]$CurrentValues) {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBNamespaceShouldBeRemoved([cSBNameSpace]$CurrentValues) {
+    [bool] SBNamespaceShouldBeRemoved([SBNameSpace]$CurrentValues) {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBNamespaceShouldBeUpdated([cSBNameSpace]$CurrentValues) {
+    [bool] SBNamespaceShouldBeUpdated([SBNameSpace]$CurrentValues) {
         $currentValuesHt = $CurrentValues.ToHashtable()
 
         $currentValuesHt.ManageUsers = $this.FormatManageUsers($currentValuesHt.ManageUsers)
