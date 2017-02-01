@@ -2,7 +2,7 @@ using module ..\cSBBase
 
 
 <#
-   This resource adds, removes, updates settings for a Service Bus for Windows Server namespace.
+   This resource adds, removes and updates settings for a Service Bus for Windows Server namespace.
 #>
 [DscResource()]
 class cSBNameSpace : cSBBase {

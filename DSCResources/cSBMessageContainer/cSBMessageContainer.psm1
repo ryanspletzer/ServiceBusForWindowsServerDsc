@@ -1,7 +1,7 @@
 using module ..\cSBBase
 
 <#
-   This resource adds and removes Service Bus for Windows Server message containers.
+   This resource adds and removes a Service Bus for Windows Server message container.
 #>
 [DscResource()]
 class cSBMessageContainer : cSBBase {
