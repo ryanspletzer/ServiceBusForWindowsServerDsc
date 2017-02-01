@@ -10,14 +10,14 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$DscResourceName = "cSBHost"
+$DscResourceName = "SBHost"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
-Describe "cSBHost" {
+Describe $DscResourceName {
     InModuleScope -Module $DscResourceName {
         # Arrange
-        $testSBHost = [cSBHost]::new()
+        $testSBHost = [SBHost]::new()
         $testSBHost.EnableFirewallRules = $true
         $testSBHost.Ensure = [Ensure]::Present
         $testSBHost.ExternalBrokerPort = 1024

@@ -117,7 +117,7 @@
             TenantApiCredentials = $TenantApiCredential
         }
 
-        cSBHost SBHost {
+        SBHost SBHost {
             DependsOn = '[SBFarm]SBFarm'
             PsDscRunAsCredential = $DomainInstallCredential
             EnableFirewallRules = $true
@@ -135,7 +135,7 @@
         }
 
         cSBMessageContainer SBMessageContainer01 {
-            DependsOn = '[cSBHost]SBHost'
+            DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.1
@@ -143,7 +143,7 @@
         }
 
         cSBMessageContainer SBMessageContainer02 {
-            DependsOn = '[cSBHost]SBHost'
+            DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.2
@@ -151,7 +151,7 @@
         }
 
         cSBMessageContainer SBMessageContainer03 {
-            DependsOn = '[cSBHost]SBHost'
+            DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.3

@@ -662,7 +662,7 @@ class SBFarm : SBBase {
         $setSBFarmParams.Remove("TcpPort")
 
         Write-Verbose -Message ("Invoking Stop-SBFarm prior to calling Set-SBFarm. " +
-                                "cSBHost resource should re-start hosts individually.")
+                                "SBHost resource should re-start hosts individually.")
         Stop-SBFarm
 
         Write-Verbose -Message "Invoking Set-SBFarm with configurable params"
