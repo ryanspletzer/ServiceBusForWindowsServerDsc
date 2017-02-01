@@ -134,7 +134,7 @@
             ManageUsers = $DomainInstallCredential.UserName
         }
 
-        cSBMessageContainer SBMessageContainer01 {
+        SBMessageContainer SBMessageContainer01 {
             DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
@@ -142,7 +142,7 @@
             Ensure = 'Present'
         }
 
-        cSBMessageContainer SBMessageContainer02 {
+        SBMessageContainer SBMessageContainer02 {
             DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
@@ -150,7 +150,7 @@
             Ensure = 'Present'
         }
 
-        cSBMessageContainer SBMessageContainer03 {
+        SBMessageContainer SBMessageContainer03 {
             DependsOn = '[SBHost]SBHost'
             PsDscRunAsCredential = $DomainInstallCredential
             ContainerDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource

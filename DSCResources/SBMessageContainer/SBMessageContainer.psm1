@@ -4,7 +4,7 @@ using module ..\SBBase
    This resource adds and removes a Service Bus for Windows Server message container.
 #>
 [DscResource()]
-class cSBMessageContainer : SBBase {
+class SBMessageContainer : SBBase {
 
     <#
         The credential for connecting to the container database. Not required if integrated authentication will be
@@ -145,8 +145,8 @@ class cSBMessageContainer : SBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [cSBMessageContainer] Get() {
-        $result = [cSBMessageContainer]::new()
+    [SBMessageContainer] Get() {
+        $result = [SBMessageContainer]::new()
 
         Write-Verbose -Message "Checking for SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
 
@@ -212,11 +212,11 @@ class cSBMessageContainer : SBBase {
         return $true
     }
 
-    [bool] SBMessageContainerShouldBeCreated([cSBMessageContainer]$CurrentValues) {
+    [bool] SBMessageContainerShouldBeCreated([SBMessageContainer]$CurrentValues) {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBMessageContainerShouldBeRemoved([cSBMessageContainer]$CurrentValues) {
+    [bool] SBMessageContainerShouldBeRemoved([SBMessageContainer]$CurrentValues) {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 

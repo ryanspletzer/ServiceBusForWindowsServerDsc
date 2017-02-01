@@ -10,14 +10,14 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
-$DscResourceName = "cSBMessageContainer"
+$DscResourceName = "SBMessageContainer"
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
 
-Describe "cSBMessageContainer" {
+Describe $DscResourceName {
     InModuleScope -Module $DscResourceName {
         # Arrange
-        $testSBMessageContainer = [cSBMessageContainer]::new()
+        $testSBMessageContainer = [SBMessageContainer]::new()
         $testSBMessageContainer.ContainerDBConnectionStringDataSource = "SQLSERVER.contoso.com"
         $testSBMessageContainer.ContainerDBConnectionStringInitialCatalog = "SBMessageContainer02"
         $testSBMessageContainer.Ensure = 'Present'
