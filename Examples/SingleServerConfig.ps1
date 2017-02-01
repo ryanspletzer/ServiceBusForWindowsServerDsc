@@ -31,7 +31,7 @@
         $CertificateImportPassphraseCredential
     )
 
-    Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, cServiceBusForWindowsServer
+    Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, ServiceBusForWindowsServerDsc
 
     Node $AllNodes.NodeName {
 
@@ -169,7 +169,7 @@ $certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Me
 
 $SingleServerConfigParams = @{
     OutputPath              = 'C:\Program Files\WindowsPowerShell\Configuration\Schema'
-    ConfigurationData       = ('C:\Program Files\WindowsPowerShell\Modules\cServiceBusForWindowsServer\Examples\' +
+    ConfigurationData       = ('C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\' +
                                'SingleServerConfig.psd1')
     LocalInstallCredential  = $localInstallCred
     DomainInstallCredential = $domainInstallCred

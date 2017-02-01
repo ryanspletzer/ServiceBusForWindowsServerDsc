@@ -6,7 +6,7 @@
 # https://github.com/PowerShell/xSharePoint/blob/dev/Tests/xSharePoint.TestHarness.psm1
 #
 
-function Invoke-cServiceBusForWindowsServerTests() {
+function Invoke-ServiceBusForWindowsServerDscTests() {
     param (
         [Parameter(Mandatory=$false)]
         [string]
@@ -16,7 +16,7 @@ function Invoke-cServiceBusForWindowsServerTests() {
     $repoDir = Join-Path -Path $PSScriptRoot -ChildPath "..\" -Resolve
 
     $testCoverageFiles = @()
-    Get-ChildItem -Path "$repoDir\Modules\cServiceBusForWindowsServer\**\*.psm1" -Recurse | ForEach-Object {
+    Get-ChildItem -Path "$repoDir\Modules\ServiceBusForWindowsServerDsc\**\*.psm1" -Recurse | ForEach-Object {
         $testCoverageFiles += $_.FullName
     }
 
@@ -25,7 +25,7 @@ function Invoke-cServiceBusForWindowsServerTests() {
         $testResultSettings.Add("OutputFormat", "NUnitXml")
         $testResultSettings.Add("OutputFile", $testResultsFile)
     }
-    Import-Module -Name "$repoDir\Modules\cServiceBusForWindowsServer\cServiceBusForWindowsServer.psd1"
+    Import-Module -Name "$repoDir\Modules\ServiceBusForWindowsServerDsc\ServiceBusForWindowsServerDsc.psd1"
 
     $results = Invoke-Pester -Script @(
         @{

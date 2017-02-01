@@ -2,7 +2,7 @@
 
 TODO: Setup Appveyor and Appveyor Badge
 
-The cServiceBusForWindowServer PowerShell module provides class-based DSC resources that run on WMF 5.0 RTM or 
+The ServiceBusForWindowServerDsc PowerShell module provides class-based DSC resources that run on WMF 5.0 RTM or 
 greater, that can be used to deploy and manage a Service Bus for Windows Server farm.
 This module's examples leverage the built-in Package resource in the PSDesiredStateConfiguration module in WMF 5.0 
 to install the Service Bus for Windows Server  Web Platform Installer package.
