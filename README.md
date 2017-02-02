@@ -126,8 +126,8 @@ communication.
 * **RunAsPassword**: Specifies the password for the user account under which services are running on the farm. If
 all the machines in a farm share the same service account and the security policy requires the service account
 password to be changed at regular intervals, you must perform specific actions on each machine in the farm to be
-able to continue adding and removing nodes in the farm. See the section titled (Managing Farm Password Changes Using
-Cmdlets)[https://msdn.microsoft.com/en-us/library/dn441427.aspx] for this procedure.
+able to continue adding and removing nodes in the farm. See the section titled [Managing Farm Password Changes Using
+Cmdlets](https://msdn.microsoft.com/en-us/library/dn441427.aspx) for this procedure.
 * **SBFarmDBConnectionStringCredential**: The credential for connecting to the database. Not required if integrated
 authentication will be used.
 * **SBFarmDBConnectionStringDataSource**: Represents the database server used for the farm management database. This
