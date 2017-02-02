@@ -1,7 +1,8 @@
 using module ..\SBBase
 
+
 <#
-   This resource adds and removes a Service Bus for Windows Server message container.
+    SBMessageContainer adds and removes a Service Bus for Windows Server message container.
 #>
 [DscResource()]
 class SBMessageContainer : SBBase {
@@ -25,7 +26,7 @@ class SBMessageContainer : SBBase {
 
     <#
         Represents whether the connection to the database server housing the container database will use SSL
-        or not.
+        or not. Default value is false.
     #>
     [DscProperty()]
     [bool]
@@ -41,8 +42,8 @@ class SBMessageContainer : SBBase {
     <#
         Represents whether authentication to the container database will use integrated Windows authentication
         or SSPI (Security Support Provider Interface) which supports Kerberos, Windows or basic SQL authentication.
-        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). The default
-        value is SSPI.
+        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). Valid values
+        include True, False and SSPI.The default value is SSPI.
     #>
     [DscProperty()]
     [IntegratedSecurity]
@@ -83,15 +84,15 @@ class SBMessageContainer : SBBase {
     <#
         Represents whether authentication to the farm management database will use integrated Windows authentication
         or SSPI (Security Support Provider Interface) which supports Kerberos, Windows or basic SQL authentication.
-        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). The default
-        value is SSPI.
+        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). Valid values
+        include True, False and SSPI.The default value is SSPI.
     #>
     [DscProperty()]
     [IntegratedSecurity]
     $SBFarmDBConnectionStringIntegratedSecurity = [IntegratedSecurity]::SSPI
 
     <#
-        Marks whether the container should be present or absent.
+        Marks whether the container should be Present or Absent.
     #>
     [DscProperty(Key)]
     [Ensure]

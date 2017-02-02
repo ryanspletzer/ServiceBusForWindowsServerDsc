@@ -36,8 +36,7 @@ Describe $DscResourceName {
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
 
-        # TODO: test for non-domain joined machine
-        $hostName = "$env:COMPUTERNAME.$((Get-WmiObject -Class WIN32_ComputerSystem).Domain)"
+        $hostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
 
         Mock Add-SBHost {}
         Mock Remove-SBHost {}

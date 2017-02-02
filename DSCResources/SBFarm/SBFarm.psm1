@@ -2,30 +2,32 @@ using module ..\SBBase
 
 
 <#
-   This resource creates and sets certain settings for a Service Bus for Windows Server farm.
+   SBFarm creates and sets certain settings for a Service Bus for Windows Server farm.
 #>
 [DscResource()]
 class SBFarm : SBBase {
 
     <#
         Sets the resource provider credentials. The resource provider is a component that exposes the management API
-        to the portal. There are two Service Bus management portals; the Admin portal (which provides a set of
-        resource provider APIs for farm administration), and the Tenant portal (which is the Windows Azure Management
-        Portal). Use these credentials when you manually install the server farm and connect to the Admin portal.
+        to the (Azure Pack) portal. There are two Service Bus management portals; the Admin portal (which provides a
+        set of resource provider APIs for farm administration), and the Tenant portal (which is the Windows Azure
+        Management Portal). Use these credentials when you manually install the server farm and connect to the Admin
+        portal.
     #>
     [DscProperty()]
     [pscredential]
     $AdminApiCredentials
 
     <#
-        Respresents the admin group. If not specified the default value will be BUILTIN\Administrators.
+        Respresents the admin group of the farm. If not specified the default value will be BUILTIN\Administrators.
     #>
     [DscProperty()]
     [string]
     $AdminGroup = 'BUILTIN\Administrators'
 
     <#
-        This optional parameter sets the AMQP port. The default 5672.
+        This optional parameter sets the AMQP port. The default 5672. This setting cannot be changed after the farm
+        has been provisioned.
     #>
     [DscProperty()]
     [ValidateRange(1024,65535)]
@@ -33,7 +35,8 @@ class SBFarm : SBBase {
     $AmqpPort = 5672
 
     <#
-        This optional parameter sets the AMQP SSL port. The default is 5671.
+        This optional parameter sets the AMQP SSL port. The default is 5671. This setting cannot be changed after
+        the farm has been provisioned.
     #>
     [DscProperty()]
     [ValidateRange(1024,65535)]
@@ -67,17 +70,18 @@ class SBFarm : SBBase {
     $FarmCertificateThumbprint
 
     <#
-        The DNS prefix that is mapped to all server farm nodes. This cmdlet is used when an administrator registers a
-        server farm. The server farm node value is returned when you call the Get-SBClientConfiguration cmdlet to
-        request a connection string.
+        The DNS prefix (alias) that is mapped to all server farm nodes. This cmdlet is used when an administrator
+        registers a server farm. The server farm node value is returned when you call the Get-SBClientConfiguration
+        cmdlet to request a connection string.
     #>
     [DscProperty()]
     [string]
     $FarmDNS
 
     <#
-        The credential for connecting to the database. Not required if integrated authentication will be used.
-        The default value for this will be the same as that specified for farm management database credentials.
+        The credential for connecting to the Gateway database. Not required if integrated authentication will be
+        used. The default value for this will be the same as that specified for farm management database
+        credentials.
     #>
     [DscProperty()]
     [pscredential]
@@ -93,8 +97,8 @@ class SBFarm : SBBase {
     $GatewayDBConnectionStringDataSource
 
     <#
-        Represents whether the database server housing the gateway database will use SSL or not. The default value
-        for this will be the same as that specified for farm management database server.
+        Represents whether the database server housing the gateway database will use SSL/TLS or not. The default
+        value for this will be the same as that specified for farm management database server.
     #>
     [DscProperty()]
     [bool]
@@ -118,7 +122,7 @@ class SBFarm : SBBase {
 
     <#
         Represents the port that the Service Bus for Windows Server uses for HTTPS communication. The default is
-        9355.
+        9355. This setting cannot be changed after the farm has been provisioned.
     #>
     [DscProperty()]
     [ValidateRange(1024,65535)]
@@ -127,7 +131,8 @@ class SBFarm : SBBase {
 
     <#
         Represents the start of the port range that the Service Bus for Windows Server uses for internal
-        communication purposes. The default is 9000.
+        communication purposes. The default is 9000. This setting cannot be changed after the farm has been
+        provisioned.
     #>
     [DscProperty()]
     [ValidateRange(1024,65535)]
@@ -136,7 +141,7 @@ class SBFarm : SBBase {
 
     <#
         Represents the port that the Service Bus for Windows Server uses for MessageBroker communication. The
-        default is 9356.
+        default is 9356. This setting cannot be changed after the farm has been provisioned.
     #>
     [DscProperty()]
     [ValidateRange(1024,65535)]
@@ -171,7 +176,7 @@ class SBFarm : SBBase {
     $MessageContainerDBConnectionStringEncrypt = $false
 
     <#
-        The name of the initial message container database.
+        The name of the initial message container database. Default value is 'SBMessageContainer01'.
     #>
     [DscProperty()]
     [string]
@@ -189,7 +194,8 @@ class SBFarm : SBBase {
 
     <#
         This optional parameter specifies the Resource Provider port setting. This port is used by the portal to
-        access the Service Bus farm. The default is 9359.
+        access the Service Bus farm. The default is 9359. This setting cannot be changed after the farm has been
+        provisioned.
     #>
     [DscProperty()]
     [ValidateRange(1024,65535)]
@@ -221,14 +227,14 @@ class SBFarm : SBBase {
 
     <#
         Represents whether the connection to the database server housing the farm management database will use SSL
-        or not.
+        or not. Default value is false.
     #>
     [DscProperty()]
     [bool]
     $SBFarmDBConnectionStringEncrypt = $false
 
     <#
-        The name of the farm management database. The default is 'SBManagementDB'.
+        The name of the farm management database. Default value is 'SBManagementDB'.
     #>
     [DscProperty()]
     [string]
@@ -237,15 +243,16 @@ class SBFarm : SBBase {
     <#
         Represents whether authentication to the farm management database will use integrated Windows authentication
         or SSPI (Security Support Provider Interface) which supports Kerberos, Windows or basic SQL authentication.
-        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). The default
-        value is SSPI.
+        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). Valid values
+        include True, False and SSPI. The default value is SSPI.
     #>
     [DscProperty()]
     [IntegratedSecurity]
     $SBFarmDBConnectionStringIntegratedSecurity = [IntegratedSecurity]::SSPI
 
     <#
-        Represents the port that the Service Bus for Windows Server uses for TCP. The default is 9354.
+        Represents the port that the Service Bus for Windows Server uses for TCP. The default is 9354. This setting
+        cannot be changed after the farm has been provisioned.
     #>
     [DscProperty()]
     [ValidateRange(1024,65535)]
@@ -254,10 +261,10 @@ class SBFarm : SBBase {
 
     <#
         Sets the resource provider credentials for the tenant portal. The resource provider is a component that
-        exposes the management API to the portal. There are two Service Bus management portals; the Admin portal
-        (which provides a set of resource provider APIs for farm administration), and the Tenant portal (which is the
-        Windows Azure Management Portal). Use these credentials when you manually install the server farm and connect
-        to the tenant portal.
+        exposes the management API to the (Azure Pack) portal. There are two Service Bus management portals; the
+        Admin portal (which provides a set of resource provider APIs for farm administration), and the Tenant portal
+        (which is the Windows Azure Management Portal). Use these credentials when you manually install the server
+        farm and connect to the tenant portal.
     #>
     [DscProperty()]
     [pscredential]
@@ -292,10 +299,10 @@ class SBFarm : SBBase {
     $LeaseDriverEndpointPort
 
     <#
-        The resource provider credential user name. The resource provider is a component that exposes the management API
-        to the portal. There are two Service Bus management portals; the Admin portal (which provides a set of
-        resource provider APIs for farm administration), and the Tenant portal (which is the Windows Azure Management
-        Portal).
+        The resource provider credential user name. The resource provider is a component that exposes the management
+        API to the portal. There are two Service Bus management portals; the Admin portal (which provides a set of
+        resource provider APIs for farm administration), and the Tenant portal (which is the Windows Azure
+        Management Portal).
     #>
     [DscProperty(NotConfigurable)]
     [string]
@@ -304,8 +311,8 @@ class SBFarm : SBBase {
     <#
         The resource provider credential user name for the tenant portal. The resource provider is a component that
         exposes the management API to the portal. There are two Service Bus management portals; the Admin portal
-        (which provides a set of resource provider APIs for farm administration), and the Tenant portal (which is the
-        Windows Azure Management Portal).
+        (which provides a set of resource provider APIs for farm administration), and the Tenant portal (which is
+        the Windows Azure Management Portal).
     #>
     [DscProperty(NotConfigurable)]
     [string]
@@ -433,13 +440,19 @@ class SBFarm : SBBase {
                 SqlConnectionString = $sbMessageContainer.ConnectionString
             }
             $params.PropertyName = "Data Source"
-            $result.MessageContainerDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionStringDataSource = [string](
+                Get-SqlConnectionStringPropertyValue @params
+            )
             $params.PropertyName = "Encrypt"
             $result.MessageContainerDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
             $params.PropertyName = "Initial Catalog"
-            $result.MessageContainerDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionStringInitialCatalog = [string](
+                Get-SqlConnectionStringPropertyValue @params
+            )
             $params.PropertyName = "Integrated Security"
-            $result.MessageContainerDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
+            $result.MessageContainerDBConnectionStringIntegratedSecurity = [string](
+                Get-SqlConnectionStringPropertyValue @params
+            )
             $result.MessageContainerDBConnectionString = $sbMessageContainer.ConnectionString
         }
 
@@ -613,9 +626,8 @@ class SBFarm : SBBase {
     }
 
     [void] SetSBFarm() {
-        # TODO: If certain settings are being changed / Set, do a Stop-SBFarm / Start-SBFarm - ???
         Write-Verbose -Message ("The current Service Bus Farm exists, however settings have changed. The " +
-                                "SBFarm resource only able to detect/set certain changess once a farm has been " +
+                                "SBFarm resource only able to detect/set certain changes once a farm has been " +
                                 "provisioned, including: AdminApiCredentials.UserName, AdminGroup, FarmDNS, " +
                                 "RunAsAccount, TenantApiCredentials.UserName")
         Write-Verbose -Message "Getting configurable properties as hashtable for Set-SBFarm params"
