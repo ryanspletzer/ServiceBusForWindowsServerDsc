@@ -1,6 +1,6 @@
 # ServiceBusForWindowsServerDsc
 
-Coming Soon: Appveyor
+Coming Soon: AppVeyor
 
 The ServiceBusForWindowServerDsc PowerShell module provides class-based DSC resources that run on WMF 5.0 RTM or
 greater, that can be used to deploy and manage a Service Bus for Windows Server farm.
