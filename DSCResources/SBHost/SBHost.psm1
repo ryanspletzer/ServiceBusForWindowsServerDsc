@@ -1,7 +1,9 @@
 using module ..\SBBase
 
+
 <#
-   This resource adds, removes, starts, stops and updates settings for Service Bus for a Windows Server host.
+   SBHost adds and removes a host from a farm, and starts, stops and updates settings for a Service Bus for
+   Windows Server host.
 #>
 [DscResource()]
 class SBHost : SBBase {
@@ -67,7 +69,7 @@ class SBHost : SBBase {
 
     <#
         Represents whether the connection to the database server housing the farm management database will use SSL
-        or not.
+        or not. Default value is false.
     #>
     [DscProperty()]
     [bool]
@@ -83,22 +85,22 @@ class SBHost : SBBase {
     <#
         Represents whether authentication to the farm management database will use integrated Windows authentication
         or SSPI (Security Support Provider Interface) which supports Kerberos, Windows or basic SQL authentication.
-        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). The default
-        value is SSPI.
+        (i.e. it will fall back to first available auth method from Kerberos -> Windows -> SQL Auth). Valid values
+        include True, False and SSPI. The default value is SSPI.
     #>
     [DscProperty()]
     [IntegratedSecurity]
     $SBFarmDBConnectionStringIntegratedSecurity = [IntegratedSecurity]::SSPI
 
     <#
-        Indicates whether host should be started or stopped. Default is true / started.
+        Indicates whether host should be in started or stopped state. Default is true / started.
     #>
     [DscProperty()]
     [bool]
     $Started = $true
 
     <#
-        Marks whether the host should be present or absent.
+        Marks whether the host should be Present or Absent.
     #>
     [DscProperty(Key)]
     [Ensure]
@@ -115,7 +117,6 @@ class SBHost : SBBase {
 
         Write-Verbose -Message "Checking for SBHost."
 
-        # TODO: fix for non-domain joined machine
         $hostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
 
         $connectionStringParams = @{
@@ -296,9 +297,11 @@ class SBHost : SBBase {
             return
         }
 
-        Write-Verbose -Message ("SBHost can only detect certain changes -- to change certain settings on a host, " +
-                                "push a configuration with the host stopped, then push a new config with the host " +
-                                "started and it will explicitly re-update the settings.")
+        Write-Verbose -Message ("SBHost can only detect certain changes live -- to change certain settings on a " +
+                                "host, push a configuration with the host stopped, then push a new config with " +
+                                "the host push a configuration with the host stopped, then push a new config " +
+                                "with the host started and it will explicitly re-update the settings. Or, simply" +
+                                "stop the host services and push the started DSC config.")
         Write-Verbose -Message "Checking if SBHost should be stopped"
         if ($this.SBHostShouldBeStopped($currentValues)) {
             Write-Verbose -Message "Stopping SBHost"
@@ -366,7 +369,6 @@ class SBHost : SBBase {
         Write-Verbose -Message "Getting configurable properties as hashtable for Remove-SBHost params"
         $removeSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
-        # TODO: fix for non-domain joined machine
         Write-Verbose -Message "Constructing hostname for Remove-SBHost params"
         $removeSBHostParams.HostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
 

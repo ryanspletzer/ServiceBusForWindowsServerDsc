@@ -2,21 +2,21 @@ using module ..\SBBase
 
 
 <#
-   This resource adds, removes and updates settings for a Service Bus for Windows Server namespace.
+   SBNamespace adds, removes and updates settings for a Service Bus for Windows Server namespace.
 #>
 [DscResource()]
 class SBNameSpace : SBBase {
 
     <#
         Specifies the addressing scheme used in the service namespace. The possible values for this parameter are
-        Path (default value), DNSRegistered, Cloud, and PathWithServiceId.
+        Path (default value), DNSRegistered, Cloud, and PathWithServiceId. Default value is Path.
     #>
     [DscProperty()]
     [AddressingScheme]
     $AddressingScheme = [AddressingScheme]::Path
 
     <#
-        Specifies the DNS Entry.
+        Specifies the DNS Entry if DNSRegistered is chosen for AddressingScheme.
     #>
     [DscProperty()]
     [string]
@@ -37,7 +37,7 @@ class SBNameSpace : SBBase {
     $IssuerUri
 
     <#
-        Specifies user or group names that will be managers of the service namespace.
+        Specifies user or group name(s) that will be managers of the service namespace.
     #>
     [DscProperty(Mandatory)]
     [string[]]
@@ -218,7 +218,7 @@ class SBNameSpace : SBBase {
     [string[]] FormatManageUsers([string[]] $ManageUsers) {
         $formattedManageUsers = @()
 
-        $formattedManageUsers = $ManageUsers.ForEach{
+        $formattedManageUsers = $ManageUsers | ForEach-Object{
             $formatAccountNameParams = @{
                 FullAccountNameWithDomain = $_
                 Format                    = 'UserLogonNamePreWindows2000'
