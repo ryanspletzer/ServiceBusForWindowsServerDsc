@@ -73,7 +73,7 @@ PowerShellVersion = '5.0'
 # AliasesToExport = @()
 
 # DSC resources to export from this module
-# DscResourcesToExport = @()
+DscResourcesToExport = 'SBFarm'
 
 # List of all modules packaged with this module
 # ModuleList = @()
