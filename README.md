@@ -18,11 +18,11 @@ If you would like to contribute to this repository, please read the DSC Resource
 
 ## Resources
 
-* **SBFarm** creates and sets certain settings for a Service Bus for Windows Server farm.
-* **SBHost** adds, removes a Service Bus for a Windows Server host, and starts, stops and updates settings for a
+* [**SBFarm**](#SBFarm) creates and sets certain settings for a Service Bus for Windows Server farm.
+* [**SBHost**](#SBHost) adds, removes a Service Bus for a Windows Server host, and starts, stops and updates settings for a
 Service Bus for a Windows Server host.
-* **SBMessageContainer** adds and removes a Service Bus for Windows Server message container.
-* **SBNamespace** adds, removes and updates settings for a Service Bus for Windows Server namespace.
+* [**SBMessageContainer**](#SBMessageContainer) adds and removes a Service Bus for Windows Server message container.
+* [**SBNamespace**](#SBNamespace) adds, removes and updates settings for a Service Bus for Windows Server namespace.
 
 ### SBFarm
 
