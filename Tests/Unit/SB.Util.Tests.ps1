@@ -17,6 +17,7 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 
 $ModuleName = "SB.Util"
+Remove-Module -Name $ModuleName -Force -ErrorAction SilentlyContinue
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\$ModuleName\$ModuleName.psm1")
 
 Describe $ModuleName {

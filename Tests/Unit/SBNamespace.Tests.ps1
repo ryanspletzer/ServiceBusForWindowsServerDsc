@@ -10,9 +10,12 @@ Set-StrictMode -Version Latest
 $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
+Remove-Module -Name "SB.Util" -Force -ErrorAction SilentlyContinue
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
+
 $DscResourceName = "SBNamespace"
+Remove-Module -Name $DscResourceName -Force -ErrorAction SilentlyContinue
 Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCClassResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util") -Scope Global -Force
 
 Describe $DscResourceName {
     InModuleScope -Module $DscResourceName {
