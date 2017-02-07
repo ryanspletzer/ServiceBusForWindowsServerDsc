@@ -235,7 +235,7 @@ class SBHost : SBBase {
                 "SBFarmDBConnectionStringDataSource"
             )
         }
-        return Test-cSBWSParameterState @params
+        return Test-SBParameterState @params
     }
 
     [bool] SBHostShouldBeAdded([SBHost]$CurrentValues) {

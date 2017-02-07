@@ -86,7 +86,7 @@
         File LocalWebpiServiceBusInstallBits {
             PsDscRunAsCredential = $DomainInstallCredential
             CheckSum = 'ModifiedDate'
-            DestinationPath = "C:\WebpiServiceBusInstallBits"
+            DestinationPath = "C:\ServiceBus_1_1_CU1"
             Ensure = 'Present'
             Force = $true
             SourcePath = $ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.Path
@@ -98,9 +98,9 @@
             PsDscRunAsCredential = $LocalInstallCredential
             DependsOn = '[User]LocalSBInstallUser'
             Ensure = 'Present'
-            Arguments = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:C:\WebpiServiceBusInstallBits\feeds\latest\webproductlist.xml"
+            Arguments = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:C:\ServiceBus_1_1_CU1\feeds\latest\webproductlist.xml"
             Name = "Service Bus 1.1"
-            Path = "C:\WebpiServiceBusInstallBits\bin\WebpiCmd.exe"
+            Path = "C:\ServiceBus_1_1_CU1\bin\WebpiCmd-x64.exe"
             ProductId = "F438C511-5A64-433E-97EC-5E5343DA670A"
             ReturnCode = 0
         }

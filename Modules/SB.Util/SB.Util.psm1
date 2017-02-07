@@ -7,7 +7,7 @@
 #
 
 
-function Test-cSBWSObjectHasProperty() {
+function Test-SBObjectHasProperty() {
     [CmdletBinding()]
     [OutputType([bool])]
     param
@@ -24,7 +24,7 @@ function Test-cSBWSObjectHasProperty() {
 }
 
 
-function Test-cSBWSParameterState() {
+function Test-SBParameterState() {
     [CmdletBinding()]
     param
     (

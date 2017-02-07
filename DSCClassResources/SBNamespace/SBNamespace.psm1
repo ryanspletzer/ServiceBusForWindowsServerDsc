@@ -212,7 +212,7 @@ class SBNameSpace : SBBase {
             DesiredValues = $desiredValuesHt
             ValuesToCheck = $valuesToCheck
         }
-        return (-not (Test-cSBWSParameterState @params))
+        return (-not (Test-SBParameterState @params))
     }
 
     [string[]] FormatManageUsers([string[]] $ManageUsers) {

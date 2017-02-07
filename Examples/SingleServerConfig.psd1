@@ -16,7 +16,7 @@
     )
     NonNodeData = @{
         SQLServer = @{
-            DataSource = 'databaseservername'
+            DataSource = 'SQL1'
         }
         ServiceBus = @{
             SBFarm = @{
@@ -48,7 +48,7 @@
             }
         }
         WebpiServiceBusInstallBits = @{
-            Path = '\\resourceserver.contoso.com\WebpiServiceBusInstallBits'
+            Path = '\\resourceserver.contoso.com\ServiceBus_1_1_CU1'
         }
     }
 }
