@@ -4,7 +4,7 @@
 RootModule = 'SBBase.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.0.0'
+ModuleVersion = '0.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -73,37 +73,13 @@ PowerShellVersion = '5.0'
 # AliasesToExport = @()
 
 # DSC resources to export from this module
-# DscResourcesToExport = @()
+# DscResourcesToExport = 'SBBase'
 
 # List of all modules packaged with this module
 # ModuleList = @()
 
 # List of all files packaged with this module
 # FileList = @()
-
-# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-PrivateData = @{
-
-    PSData = @{
-
-        # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
-
-        # A URL to the license for this module.
-        # LicenseUri = ''
-
-        # A URL to the main website for this project.
-        # ProjectUri = ''
-
-        # A URL to an icon representing this module.
-        # IconUri = ''
-
-        # ReleaseNotes of this module
-        # ReleaseNotes = ''
-
-    } # End of PSData hashtable
-
-} # End of PrivateData hashtable
 
 # HelpInfo URI of this module
 # HelpInfoURI = ''

@@ -1,4 +1,4 @@
-using module ..\..\DSCResources\SBFarm
+using module ..\..\DSCClassResources\SBFarm
 
 [CmdletBinding()]
 param(
@@ -13,7 +13,7 @@ $RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
 $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $DscResourceName = "SBBase"
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCClassResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
 
 Describe 'SBBase' {
     InModuleScope -ModuleName $DscResourceName {

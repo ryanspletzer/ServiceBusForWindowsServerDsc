@@ -511,7 +511,7 @@ class SBFarm : SBBase {
                 "TenantApiUserName"
             )
         }
-        return Test-cSBWSParameterState @params
+        return Test-SBParameterState @params
     }
 
     <#

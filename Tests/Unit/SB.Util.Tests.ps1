@@ -21,13 +21,13 @@ Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\$ModuleName\$
 
 Describe $ModuleName {
 
-    Context "Validate Test-cSBWSParameterState" {
+    Context "Validate Test-SBParameterState" {
         It "Returns true for two identical tables" {
             # Arrange
             $desired = @{ Example = "test" }
 
             # Act | Assert
-            Test-cSBWSParameterState -CurrentValues $desired -DesiredValues $desired | Should Be $true
+            Test-SBParameterState -CurrentValues $desired -DesiredValues $desired | Should Be $true
         }
 
         It "Returns false when a value is different" {
@@ -36,7 +36,7 @@ Describe $ModuleName {
             $desired = @{ Example = "test" }
 
             # Act | Assert
-            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
+            Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
 
         It "Returns false when a value is missing" {
@@ -45,7 +45,7 @@ Describe $ModuleName {
             $desired = @{ Example = "test" }
 
             # Act | Assert
-            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
+            Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
 
         It "Returns true when only a specified value matches, but other non-listed values do not" {
@@ -54,7 +54,7 @@ Describe $ModuleName {
             $desired = @{ Example = "test"; SecondExample = "false"  }
 
             # Act | Assert
-            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("Example") | Should Be $true
+            Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("Example") | Should Be $true
         }
 
         It "Returns false when only specified values do not match, but other non-listed values do " {
@@ -63,7 +63,7 @@ Describe $ModuleName {
             $desired = @{ Example = "test"; SecondExample = "false"  }
 
             # Act | Assert
-            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("SecondExample") | Should Be $false
+            Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("SecondExample") | Should Be $false
         }
 
         It "Returns false when an empty array is used in the current values" {
@@ -72,7 +72,7 @@ Describe $ModuleName {
             $desired = @{ Example = "test"; SecondExample = "false"  }
 
             # Act | Assert
-            Test-cSBWSParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
+            Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
         }
     }
 
