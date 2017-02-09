@@ -58,7 +58,9 @@ PowerShellVersion = '5.0'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-# NestedModules = @()
+NestedModules = @(
+    '..\..\Modules\SB.Util\SB.Util.psd1'
+)
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 # FunctionsToExport = @()
@@ -73,7 +75,7 @@ PowerShellVersion = '5.0'
 # AliasesToExport = @()
 
 # DSC resources to export from this module
-# DscResourcesToExport = ''
+DscResourcesToExport = 'SBAuthorizationRule'
 
 # List of all modules packaged with this module
 # ModuleList = @()

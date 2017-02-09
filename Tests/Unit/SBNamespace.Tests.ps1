@@ -39,7 +39,7 @@ Describe $DscResourceName {
         Mock Set-SBNamespace {}
         Mock Remove-SBNamespace {}
 
-        Context "No namespace exists for a given name" {
+        Context "No namespace exists for a given name and should be created" {
             # Arrange
             Mock Get-SBNamespace {
                 throw ("Namespace $($this.Name) does not exist.")

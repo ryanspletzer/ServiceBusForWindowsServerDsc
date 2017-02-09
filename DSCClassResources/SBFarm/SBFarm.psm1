@@ -2,7 +2,7 @@ using module ..\SBBase
 
 
 <#
-   SBFarm creates and sets certain settings for a Service Bus for Windows Server farm.
+   SBFarm creates a new farm and sets certain settings for a Service Bus for Windows Server farm.
 #>
 [DscResource()]
 class SBFarm : SBBase {

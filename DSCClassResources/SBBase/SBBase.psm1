@@ -20,7 +20,7 @@ enum AddressingScheme {
 
 
 <#
-    This is the base Service Bus for Windows Server resource class that provides commonly used methods.
+    SBBase is the base Service Bus for Windows Server resource class that provides commonly used methods.
 #>
 class SBBase {
     <#

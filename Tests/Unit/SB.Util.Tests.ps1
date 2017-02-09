@@ -1,7 +1,5 @@
-#
-# xServiceBusForWindowsServer.Util.Tests.ps1
-#
-# Credit to SharePointDsc Resource module for nested Util approach and ideas for tests in this file:
+# Credit to SharePointDsc Resource module for nested Util approach and Test-SBParameterState and ideas for tests in
+# this file:
 #
 # https://github.com/PowerShell/SharePointDsc/blob/dev/Modules/SharePointDsc/Modules/SharePointDsc.Util/SharePointDsc.Util.psm1
 #

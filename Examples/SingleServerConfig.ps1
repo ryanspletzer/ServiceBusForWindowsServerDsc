@@ -157,6 +157,13 @@
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.3
             Ensure = 'Present'
         }
+
+        SBAuthorizationRule ContosoNamespaceRule {
+            DependsOn = '[SBNamespace]ContosoNamespace'
+            Name = 'ContosoNamespaceRule'
+            NamespaceName = 'ContosoNamespace'
+            Ensure = 'Present'
+        }
     }
 }
 
