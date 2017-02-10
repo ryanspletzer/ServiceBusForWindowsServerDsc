@@ -14,6 +14,3 @@ Configuration PushMetaConfig {
         }
     }
 }
-
-PushMetaConfig -OutputPath 'C:\Program Files\WindowsPowerShell\Configuration\Schema'
-Set-DscLocalConfigurationManager -Path 'C:\Program Files\WindowsPowerShell\Configuration\Schema' -Force -Verbose

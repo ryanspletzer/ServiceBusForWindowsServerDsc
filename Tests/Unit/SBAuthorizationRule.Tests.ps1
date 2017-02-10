@@ -123,7 +123,7 @@ Describe $DscResourceName {
                 }
             }
 
-            $testSBAuthorizationRule.Rights = [AccessRight[]]('Listen','Send','Manage')
+            $testSBAuthorizationRule.Rights = [string[]]('Listen','Send','Manage')
 
             It "returns object with Ensure = Present from the Get method" {
                 # Act

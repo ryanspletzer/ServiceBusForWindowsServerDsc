@@ -1,10 +1,5 @@
 using Module ..\SBBase
 
-enum AccessRight {
-    Manage
-    Send
-    Listen
-}
 
 <#
     SBAuthorizationRule adds, removes and updates settings for a Service Bus for Windows Server Authorization Rule.
@@ -39,7 +34,8 @@ class SBAuthorizationRule : SBBase {
         manage, send and listen. If not specified, defaults to full rights (Listen, Send, and Manage).
     #>
     [DscProperty()]
-    [AccessRight[]]
+    [ValidateSet('Listen','Send','Manage')]
+    [string[]]
     $Rights
 
     <#
@@ -107,7 +103,7 @@ class SBAuthorizationRule : SBBase {
             )
         }
         $result.PrimaryKey = New-Object @primaryKeyCredentialParams
-        $result.Rights = [AccessRight[]]$sbAuthorizationRule.Rights.ForEach({$_.ToString()})
+        $result.Rights = [string[]]$sbAuthorizationRule.Rights.ForEach({$_})
         $secondaryKeyCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
             ArgumentList = @(
@@ -147,7 +143,7 @@ class SBAuthorizationRule : SBBase {
     }
 
     [bool] SBAuthorizationRuleShouldBeUpdated([SBAuthorizationRule]$CurrentValues) {
-        $currentRights = [AccessRight[]]$CurrentValues.Rights.ForEach({$_})
+        $currentRights = $CurrentValues.Rights
         $desiredRights = $this.Rights
 
         ForEach($desiredRight in $desiredRights) {
