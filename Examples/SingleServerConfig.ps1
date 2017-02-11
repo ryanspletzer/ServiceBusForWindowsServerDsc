@@ -1,32 +1,32 @@
 ﻿Configuration SingleServerConfig {
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
         $LocalInstallCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).LocalInstallUser.UserName -Message "Credentials for Local Install User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
         $DomainInstallCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).DomainInstallUser.UserName -Message "Credentials for Domain Install User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
         $RunAsAccountCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).RunAsAccount.UserName -Message "Credentials for Service Bus Service Account"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
         $AdminApiCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).AdminApiUser.UserName -Message "Credentials for Admin Api User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
-        $AdminApiCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).TenantApiUser.UserName -Message "Credentials for Tenant Api User"),
+        $TenantApiCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).TenantApiUser.UserName -Message "Credentials for Tenant Api User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
         $CertificateImportPassphraseCredential = (Get-Credential -UserName "SslCert" -Message "Certificate Import Passphrase")
     )
