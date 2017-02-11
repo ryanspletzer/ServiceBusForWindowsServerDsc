@@ -28,7 +28,7 @@
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $CertificateImportPassphraseCredential = (Get-Credential -UserName "SslCert" -Message "Certificate Import Passphrase")
+        $CertificateImportPassphraseCredential = (Get-Credential -UserName "PfxImportPasshrase" -Message "Pfx Certificate Import Passphrase")
     )
 
     Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, ServiceBusForWindowsServerDsc
