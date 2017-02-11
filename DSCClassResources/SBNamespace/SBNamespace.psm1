@@ -238,21 +238,21 @@ class SBNameSpace : SBBase {
         Write-Verbose -Message "Retrieving current SBNamespace values for namespace $($this.Name)"
         $currentValues = $this.Get()
 
-        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be created"
+        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be created."
         if ($this.SBNamespaceShouldBeCreated($currentValues)) {
             Write-Verbose -Message "Creating SBNamespace with Name $($this.Name)"
             $this.NewSBNamespace()
             return
         }
 
-        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be removed"
+        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be removed."
         if ($this.SBNamespaceShouldBeRemoved($currentValues)) {
             Write-Verbose -Message "Removing SBNamespace with Name $($this.Name)"
             $this.RemoveSBNamespace()
             return
         }
 
-        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be udpated"
+        Write-Verbose -Message "Checking if SBNamespace $($this.Name) should be updated."
         if ($this.SBNamespaceShouldBeUpdated($currentValues)) {
             Write-Verbose -Message "Updating SBNamespace with Name $($this.Name)"
             $this.SetSBNamespace()

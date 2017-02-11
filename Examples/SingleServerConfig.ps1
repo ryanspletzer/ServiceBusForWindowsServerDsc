@@ -1,34 +1,34 @@
 ﻿Configuration SingleServerConfig {
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
-        $LocalInstallCredential,
+        $LocalInstallCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).LocalInstallUser.UserName -Message "Credentials for Local Install User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
-        $DomainInstallCredential,
+        $DomainInstallCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).DomainInstallUser.UserName -Message "Credentials for Domain Install User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
-        $RunAsAccountCredential,
+        $RunAsAccountCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).RunAsAccount.UserName -Message "Credentials for Service Bus Service Account"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
-        $AdminApiCredential,
+        $AdminApiCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).AdminApiUser.UserName -Message "Credentials for Admin Api User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
-        $TenantApiCredential,
+        $TenantApiCredential = (Get-Credential -UserName $ConfigurationData.AllNodes.Where({$true}).TenantApiUser.UserName -Message "Credentials for Tenant Api User"),
 
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter()]
+        [ValidateNotNull()]
         [pscredential]
-        $CertificateImportPassphraseCredential
+        $CertificateImportPassphraseCredential = (Get-Credential -UserName "SslCert" -Message "Certificate Import Passphrase")
     )
 
     Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, ServiceBusForWindowsServerDsc
@@ -67,9 +67,9 @@
 
         User LocalSBInstallUser {
             UserName = $LocalInstallCredential.UserName
-            Description = "Local user account used to install Service Bus bits from Web Platform Installer"
+            Description = $ConfigurationData.AllNodes.LocalInstallUser.Description
             Ensure = 'Present'
-            FullName = "Service Bus Local Install Account"
+            FullName = $ConfigurationData.AllNodes.LocalInstallUser.FullName
             Password = $LocalInstallCredential
             PasswordChangeNotAllowed = $true
             PasswordNeverExpires = $true
@@ -80,13 +80,13 @@
             Credential = $DomainInstallCredential
             GroupName = 'Administrators'
             Ensure = 'Present'
-            MembersToInclude = 'ServiceBusInstall',$DomainInstallCredential.UserName
+            MembersToInclude = $LocalInstallCredential.UserName,$DomainInstallCredential.UserName
         }
 
         File LocalWebpiServiceBusInstallBits {
             PsDscRunAsCredential = $DomainInstallCredential
             CheckSum = 'ModifiedDate'
-            DestinationPath = "C:\ServiceBus_1_1_CU1"
+            DestinationPath = $ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath
             Ensure = 'Present'
             Force = $true
             SourcePath = $ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.Path
@@ -98,9 +98,9 @@
             PsDscRunAsCredential = $LocalInstallCredential
             DependsOn = '[User]LocalSBInstallUser'
             Ensure = 'Present'
-            Arguments = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:C:\ServiceBus_1_1_CU1\feeds\latest\webproductlist.xml"
+            Arguments = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:$($ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath)\feeds\latest\webproductlist.xml"
             Name = "Service Bus 1.1"
-            Path = "C:\ServiceBus_1_1_CU1\bin\WebpiCmd-x64.exe"
+            Path = "$($ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath)\bin\WebpiCmd-x64.exe"
             ProductId = "F438C511-5A64-433E-97EC-5E5343DA670A"
             ReturnCode = 0
         }
@@ -157,26 +157,14 @@
             ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.3
             Ensure = 'Present'
         }
+
+        SBAuthorizationRule ContosoNamespaceRule {
+            DependsOn = '[SBNamespace]ContosoNamespace'
+            PsDscRunAsCredential = $DomainInstallCredential
+            Name = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Name
+            NamespaceName = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.NamespaceName
+            Rights = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Rights
+            Ensure = 'Present'
+        }
     }
 }
-
-$localInstallCred = (Get-Credential -UserName 'ServiceBusInstall' -Message 'Local Install Credential')
-$domainInstallCred = (Get-Credential -Message 'Domain Install Credential') # Make sure this account has access to your SQL Instance!
-$runAsAccountCred = (Get-Credential -Message 'RunAsAccount Credential in the form DOMAIN\SAMACCOUNTNAME (e.g. CONTOSO\SERVICEBUS)')
-$adminApiCred = (Get-Credential -UserName 'adminUser' -Message 'Admin API Credential')
-$tenantApiCred = (Get-Credential -UserName 'tenantUser' -Message 'Tenant API Credential')
-$certificateImportPassphraseCredential = (Get-Credential -UserName 'SSLCert' -Message 'SSL Cert Import Passphrase')
-
-$SingleServerConfigParams = @{
-    OutputPath              = 'C:\Program Files\WindowsPowerShell\Configuration\Schema'
-    ConfigurationData       = ('C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\' +
-                               'SingleServerConfig.psd1')
-    LocalInstallCredential  = $localInstallCred
-    DomainInstallCredential = $domainInstallCred
-    RunAsAccountCredential  = $runAsAccountCred
-    AdminApiCredential      = $adminApiCred
-    TenantApiCredential     = $tenantApiCred
-    CertificateImportPassphraseCredential = $certificateImportPassphraseCredential
-}
-SingleServerConfig @SingleServerConfigParams
-Start-DscConfiguration -Path 'C:\Program Files\WindowsPowerShell\Configuration\Schema' -Wait -Verbose -Force
