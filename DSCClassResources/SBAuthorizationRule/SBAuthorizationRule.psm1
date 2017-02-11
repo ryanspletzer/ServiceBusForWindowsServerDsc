@@ -163,10 +163,10 @@ class SBAuthorizationRule : SBBase {
         if ($null -ne $this.PrimaryKey) {
             $compareSecureStringsParams = @{
                 ReferenceSecureString  = $this.PrimaryKey.Password
-                DifferenceSecureString = $this.PrimaryKey.Password
+                DifferenceSecureString = $CurrentValues.PrimaryKey.Password
             }
             $primaryKeyTestResult = Compare-SecureStrings @compareSecureStringsParams
-            if ($primaryKeyTestResult = $false) {
+            if ($primaryKeyTestResult -eq $false) {
                 return $true
             }
         }
@@ -174,10 +174,10 @@ class SBAuthorizationRule : SBBase {
         if ($null -ne $this.SecondaryKey) {
             $compareSecureStringsParams = @{
                 ReferenceSecureString  = $this.SecondaryKey.Password
-                DifferenceSecureString = $this.SecondaryKey.Password
+                DifferenceSecureString = $CurrentValues.SecondaryKey.Password
             }
             $secondaryKeyTestResult = Compare-SecureStrings @compareSecureStringsParams
-            if ($secondaryKeyTestResult = $false) {
+            if ($secondaryKeyTestResult -eq $false) {
                 return $true
             }
         }
@@ -211,7 +211,7 @@ class SBAuthorizationRule : SBBase {
         Write-Verbose -Message ("Checking if SBAuthorizationRule $($this.Name) on namespace " +
                                 "$($this.NamespaceName) should be updated.")
         if ($this.SBAuthorizationRuleShouldBeUpdated($currentValues)) {
-            Write-Verbose -Message ("Updating SBAuthorizationRule with Name $($this.Name) on namespace" +
+            Write-Verbose -Message ("Updating SBAuthorizationRule with Name $($this.Name) on namespace " +
                                     "$($this.NamespaceName).")
             $this.SetSBAuthorizationRule()
             return
@@ -279,7 +279,7 @@ class SBAuthorizationRule : SBBase {
             Write-Verbose -Message "SecondaryKey is absent, removing from Set-SBAuthorizationRule params"
             $setSBAuthorizationRuleParams.Remove("SecondaryKey")
         } else {
-            $setSBAuthorizationRuleParams.Secondary = ConvertTo-PlainText -SecureString $this.SecondaryKey.Password
+            $setSBAuthorizationRuleParams.SecondaryKey = ConvertTo-PlainText -SecureString $this.SecondaryKey.Password
         }
 
         Write-Verbose -Message "Removing unnecessary parameters from Set-SBAuthorizationRule params"
