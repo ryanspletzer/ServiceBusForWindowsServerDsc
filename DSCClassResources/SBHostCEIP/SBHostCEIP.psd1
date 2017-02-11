@@ -73,7 +73,7 @@ PowerShellVersion = '5.0'
 # AliasesToExport = @()
 
 # DSC resources to export from this module
-# DscResourcesToExport = ''
+DscResourcesToExport = 'SBHostCEIP'
 
 # List of all modules packaged with this module
 # ModuleList = @()
