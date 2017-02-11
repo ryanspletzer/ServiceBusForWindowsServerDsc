@@ -166,5 +166,11 @@
             Rights = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Rights
             Ensure = 'Present'
         }
+
+        SBHostCEIP CEIP {
+            DependsOn = '[SBHost]ContosoSBHost'
+            PsDscRunAsCredential = $DomainInstallCredential
+            Ensure = 'Present'
+        }
     }
 }
