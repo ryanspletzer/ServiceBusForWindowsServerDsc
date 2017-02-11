@@ -4,7 +4,7 @@
 RootModule = 'SBBase.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.8'
+ModuleVersion = '0.9.0.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

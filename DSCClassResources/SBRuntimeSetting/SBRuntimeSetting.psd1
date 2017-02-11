@@ -4,7 +4,7 @@
 RootModule = 'SBRuntimeSetting.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.0.0'
+ModuleVersion = '0.9.0.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -73,7 +73,7 @@ PowerShellVersion = '5.0'
 # AliasesToExport = @()
 
 # DSC resources to export from this module
-# DscResourcesToExport = ''
+DscResourcesToExport = 'SBRuntimeSetting'
 
 # List of all modules packaged with this module
 # ModuleList = @()
