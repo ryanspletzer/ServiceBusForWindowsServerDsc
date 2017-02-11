@@ -42,7 +42,7 @@ Describe $DscResourceName {
                 # Act
                 $currentValues = $testSBAuthorizationRule.Get()
 
-                # Arrange
+                # Assert
                 $currentValues.Ensure | Should BeExactly 'Absent'
             }
 

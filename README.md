@@ -25,6 +25,7 @@ settings for a Service Bus for a Windows Server host.
 * [**SBNamespace**](#sbnamespace) adds, removes and updates settings for a Service Bus for Windows Server namespace.
 * [**SBAuthorizationRule**](#sbauthorizationrule) adds, removes and updates settings for a Service Bus for Windows
 Server authorization rule.
+* [**SBHostCEIP**](#sbhostceip) enables or disables Customer Experience Improvement Program telemetry.
 
 ### SBFarm
 
@@ -215,7 +216,10 @@ key. You can explicitly set this parameter if you want to reinstall a farm while
 
 ### SBHostCEIP
 
-WIP
+**SBHostCEIP** enables or disables Customer Experience Improvement Program telemetry.
+
+* **Ensure**: Marks whether the Customer Experience Improvement Program telemetry should be Present (enabled) or
+Absent (disabled).
 
 ### SBRuntimeSetting
 
@@ -225,8 +229,11 @@ WIP
 
 ### Unreleased
 
-* SBHostCEIP resource (WIP)
 * SBRuntimeSetting resource (WIP)
+
+### 0.8.0
+
+* Added SBHostCEIP resource
 
 ### 0.7.0
 

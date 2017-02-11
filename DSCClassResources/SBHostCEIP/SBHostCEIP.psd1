@@ -4,7 +4,7 @@
 RootModule = 'SBHostCEIP.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.7'
+ModuleVersion = '0.8'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -73,7 +73,7 @@ PowerShellVersion = '5.0'
 # AliasesToExport = @()
 
 # DSC resources to export from this module
-# DscResourcesToExport = ''
+DscResourcesToExport = 'SBHostCEIP'
 
 # List of all modules packaged with this module
 # ModuleList = @()

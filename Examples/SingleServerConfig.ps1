@@ -28,7 +28,7 @@
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $CertificateImportPassphraseCredential = (Get-Credential -UserName "SslCert" -Message "Certificate Import Passphrase")
+        $CertificateImportPassphraseCredential = (Get-Credential -UserName "PfxImportPasshrase" -Message "Pfx Certificate Import Passphrase")
     )
 
     Import-DscResource -Module xCertificate, PSDesiredStateConfiguration, ServiceBusForWindowsServerDsc
@@ -164,6 +164,12 @@
             Name = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Name
             NamespaceName = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.NamespaceName
             Rights = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Rights
+            Ensure = 'Present'
+        }
+
+        SBHostCEIP CEIP {
+            DependsOn = '[SBHost]ContosoSBHost'
+            PsDscRunAsCredential = $DomainInstallCredential
             Ensure = 'Present'
         }
     }
