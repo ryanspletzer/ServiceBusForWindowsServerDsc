@@ -26,6 +26,7 @@ settings for a Service Bus for a Windows Server host.
 * [**SBAuthorizationRule**](#sbauthorizationrule) adds, removes and updates settings for a Service Bus for Windows
 Server authorization rule.
 * [**SBHostCEIP**](#sbhostceip) enables or disables Customer Experience Improvement Program telemetry.
+* [**SBRuntimeSetting**](#sbruntimesetting) modifies a Service Bus for Windows Server runtime setting.
 
 ### SBFarm
 
@@ -223,13 +224,52 @@ Absent (disabled).
 
 ### SBRuntimeSetting
 
-WIP
+**SBRuntimeSetting** modifies a Service Bus for Windows Server runtime setting.
+
+* **Name**: The name of the Service Bus for Windows Server configuration parameter. The valid setting names that can
+be changed are:
+
+    * **DefaultMaximumQueueSizeInMegabytes**: Defines the default maximum queue size in megabytes. Default value is
+    '8796093022207'. Min value is '1'. Max value is '8796093022207'.
+    * **DefaultMaximumTopicSizeInMegabytes**: Defines the default maximum topic size in megabytes. Default value is
+    '8796093022207'. Min value is '1'. Max value is '8796093022207'.
+    * **MaximumNumberOfConnectionsPerEntity**: Defines the maximum number of connections per entity. Use this
+    setting if you have concerns that a single application may abuse the service and cause a denial of service.
+    Default value is '2147483647'. Min value is '1'. Max value is '2147483647'.
+    * **MaximumNumberOfCorrelationFiltersPerTopic**: Defines the maximum number of correlation filters per topic.
+    Default value is '100000'. Min value is '1'. Max value is '2147483647'.
+    * **MaximumNumberOfQueuesPerNamespace**: Defines the maximum number of queues per service namespace. Default
+    value is '2147483647'. Min value is '1'. Max value is '2147483647'.
+    * **MaximumNumberOfSqlFiltersPerTopic**: Defines the maximum number of SQL filters per topic. Default value is
+    '2000'. Min value is '1'. Max value is '2147483647'.
+    * **MaximumNumberOfSubscriptionsPerTopic**: Defines the maximum number of subscriptions per topic. Default value
+    is '2000'. Min value is '1'. Max value is '2147483647'.
+    * **MaximumNumberOfTopicsPerNamespace**: Defines the maximum number of topics per namespace. Default value is
+    '2147483647'. Min value is '1'. Max value is '2147483647'.
+    * **MaximumQueueSizeInMegabytes**: Defines the maximum queue size choices in megabytes. Default value is
+    '1024;2048;3072;4096;5120;6144;7168;8192;9216;10240;8796093022207'. Min value choice is '1'. Max value choice
+    is '8796093022207'.
+    * **MaximumTopicSizeInMegabytes**: Defines the maximum topic size choices in megabytes. Default value is
+    '1024;2048;3072;4096;5120;6144;7168;8192;9216;10240;8796093022207'. Min value choice is '1'. Max value choice
+    is '8796093022207'.
+    * **MessageCacheSizePerEntity**: Defines the message cache size per entity. Default value is '1048576000'. Min
+    value is '1'. Max value is '9223372036854775807'.
+    * **IncludeExceptionDetails**: Indicates whether to include exception details. Default value is 'false'.
+    * **DebugMode**: Indicates whether debug mode is enabled. Default value is 'False'.
+
+* **Value**: The value to change for the given setting. Depending on the setting type, the value should be of the
+same type. For example, if the setting is an integer type then the value is expected to be a string that represents
+an integer range from 1 to long.MaxValue (inclusive) although this varies by setting (see Name above for details).
 
 ## Versions
 
 ### Unreleased
 
-* SBRuntimeSetting resource (WIP)
+* Road to 1.0: Refactoring and more testing tasks to come. See Issues list for more details.
+
+### 0.9.0
+
+* Added SBRuntimeSetting resource
 
 ### 0.8.0
 

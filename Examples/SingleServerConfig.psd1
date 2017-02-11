@@ -38,6 +38,12 @@
             SBFarm = @{
                 FarmDNS = 'servicebus.contoso.com'
             }
+            SBRuntimeSetting = @{
+                DefaultMaximumQueueSizeInMegabytes = @{
+                    Name  = 'DefaultMaximumQueueSizeInMegabytes'
+                    Value = '10240'
+                }
+            }
             SBNamespaces = @{
                 ContosoNamespace = 'ContosoNamespace'
             }
