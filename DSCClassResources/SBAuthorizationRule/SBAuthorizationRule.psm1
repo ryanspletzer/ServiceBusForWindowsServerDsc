@@ -2,7 +2,7 @@ using Module ..\SBBase
 
 
 <#
-    SBAuthorizationRule adds, removes and updates settings for a Service Bus for Windows Server Authorization Rule.
+    SBAuthorizationRule adds, removes and updates settings for a Service Bus for Windows Server authorization rule.
 #>
 [DscResource()]
 class SBAuthorizationRule : SBBase {
@@ -15,7 +15,7 @@ class SBAuthorizationRule : SBBase {
     $Name
 
     <#
-        The namespace scope of the newly-created authorization rule.
+        The namespace scope of the authorization rule.
     #>
     [DscProperty(Key)]
     [string]

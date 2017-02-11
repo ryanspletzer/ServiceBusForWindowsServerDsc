@@ -19,10 +19,12 @@ If you would like to contribute to this repository, please read the DSC Resource
 ## Resources
 
 * [**SBFarm**](#sbfarm) creates a new farm and sets certain settings for a Service Bus for Windows Server farm.
-* [**SBHost**](#sbhost) adds, removes a Service Bus for a Windows Server host, and starts, stops and updates settings for a
-Service Bus for a Windows Server host.
+* [**SBHost**](#sbhost) adds, removes a Service Bus for a Windows Server host, and starts, stops and updates
+settings for a Service Bus for a Windows Server host.
 * [**SBMessageContainer**](#sbmessagecontainer) adds and removes a Service Bus for Windows Server message container.
 * [**SBNamespace**](#sbnamespace) adds, removes and updates settings for a Service Bus for Windows Server namespace.
+* [**SBAuthorizationRule**](#sbauthorizationrule) adds, removes and updates settings for a Service Bus for Windows
+Server authorization rule.
 
 ### SBFarm
 
@@ -196,7 +198,20 @@ parameter is useful if an administrator creates a namespace on behalf of a user.
 
 ### SBAuthorizationRule
 
-WIP
+**SBAuthorizationRule** adds, removes and updates settings for a Service Bus for Windows Server authorization rule.
+
+* **Name**: The name of the authorization rule.
+* **NamespaceName**: The namespace scope of the authorization rule.
+* **PrimaryKey**: The key that will be used by this authorization rule. If not provided, Service Bus generates a
+key. You can explicitly set this parameter if you want to reinstall a farm while keeping the client untouched.
+* **Rights**: The comma separated list of access rights enabled with this authorization rule. Access rights include
+Manage, Send and Listen. If not specified, defaults to full rights (Listen, Send, and Manage).
+* **SecondaryKey**: The key which will be used by this authorization rule. If not provided, Service Bus generates a
+key. You can explicitly set this parameter if you want to reinstall a farm while keeping the client untouched.
+* **Name**: Specifies the name for the new Service Bus for Windows Server service namespace.
+* **PrimarySymmetricKey**: Specifies the primary key to be used in this service namespace.
+* **SecondarySymmetricKey**: Specifies the secondary key to be used in this service namespace.
+* **Ensure**: Marks whether the authorization rule should be Present or Absent.
 
 ### SBHostCEIP
 
