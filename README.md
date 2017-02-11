@@ -225,9 +225,12 @@ WIP
 
 ### Unreleased
 
-* SBAuthorizationRule resource (WIP)
 * SBHostCEIP resource (WIP)
 * SBRuntimeSetting resource (WIP)
+
+### 0.7.0
+
+* Added SBAuthorizationRule resource
 
 ### 0.6.0
 
