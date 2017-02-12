@@ -37,26 +37,24 @@ Kit
 * [**SBFarm**](#sbfarm) creates a new farm and sets certain settings for a
   Service Bus for Windows Server farm.
 * [**SBHost**](#sbhost) adds, removes a Service Bus for a Windows Server host,
-and starts, stops and updates
+  and starts, stops and updates
 settings for a Service Bus for a Windows Server host.
 * [**SBMessageContainer**](#sbmessagecontainer) adds and removes a Service Bus
-for Windows Server message container.
+  for Windows Server message container.
 * [**SBNamespace**](#sbnamespace) adds, removes and updates settings for a
-Service Bus for Windows Server namespace.
+  Service Bus for Windows Server namespace.
 * [**SBAuthorizationRule**](#sbauthorizationrule) adds, removes and updates
-settings for a Service Bus for Windows
-Server authorization rule.
+  settings for a Service Bus for Windows Server authorization rule.
 * [**SBHostCEIP**](#sbhostceip) enables or disables Customer Experience
-Improvement Program telemetry.
+  Improvement Program telemetry.
 * [**SBRuntimeSetting**](#sbruntimesetting) modifies a Service Bus for Windows
-Server runtime setting.
+  Server runtime setting.
 
 ### SBFarm
 
 **SBFarm** creates a new Service Bus for Windows Server farm and sets certain
-settings farm level settings. Note:
-Due to the nature of the product, some settings are not modifiable after a farm
-is created.
+settings farm level settings. Note: Due to the nature of the product, some
+settings are not modifiable after a farm is created.
 
 * **AdminApiCredentials**: Sets the resource provider credentials. The resource
 provider is a component that exposes the management API to the (Azure Pack)
