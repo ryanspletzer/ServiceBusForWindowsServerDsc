@@ -4,7 +4,7 @@
 https://ci.appveyor.com/api/projects/status/vbumg651tfp6o7os/branch/dev?svg=true
 )](
 https://ci.appveyor.com/project/ryanspletzer/servicebusforwindowsserverdsc\
-/branch/dev
+branch/dev
 )
 
 The ServiceBusForWindowServerDsc PowerShell module provides class-based DSC
@@ -25,6 +25,7 @@ contact
 questions or comments.
 
 ## Contributing
+
 If you would like to contribute to this repository, please read the DSC Resource
 Kit
 [contributing guidelines](
@@ -34,7 +35,7 @@ Kit
 ## Resources
 
 * [**SBFarm**](#sbfarm) creates a new farm and sets certain settings for a
-Service Bus for Windows Server farm.
+  Service Bus for Windows Server farm.
 * [**SBHost**](#sbhost) adds, removes a Service Bus for a Windows Server host,
 and starts, stops and updates
 settings for a Service Bus for a Windows Server host.
