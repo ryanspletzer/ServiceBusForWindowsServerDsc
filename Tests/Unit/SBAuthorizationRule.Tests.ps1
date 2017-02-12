@@ -65,12 +65,12 @@ Describe $DscResourceName {
             $createdTime = [datetime]::Now
             Mock Get-SBAuthorizationRule {
                 return @{
-                    KeyName = "Test"
-                    PrimaryKey = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
-                    SecondaryKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
-                    Rights = 'Listen','Send','Manage'
-                    CreatedTime = $createdTime
-                    ModifiedTime = $createdTime
+                    KeyName          = "Test"
+                    PrimaryKey       = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
+                    SecondaryKey     = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
+                    Rights           = 'Listen','Send','Manage'
+                    CreatedTime      = $createdTime
+                    ModifiedTime     = $createdTime
                     ConnectionString = ("Endpoint=sb://servicebus.contoso.com/TestNamespace;" +
                                         "StsEndpoint=https://servicebus.contoso.com:9355/TestNamespace;" +
                                         "RuntimePort=9354;ManagementPort=9355;SharedAccessKeyName=Test;" +
@@ -110,12 +110,12 @@ Describe $DscResourceName {
             $createdTime = [datetime]::Now
             Mock Get-SBAuthorizationRule {
                 return @{
-                    KeyName = "Test"
-                    PrimaryKey = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
-                    SecondaryKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
-                    Rights = 'Listen','Send'
-                    CreatedTime = $createdTime
-                    ModifiedTime = $createdTime
+                    KeyName          = "Test"
+                    PrimaryKey       = "hG8ShCxVH2TdeasdfZaeULV+kxRLyah6xxYnRE/QDsM="
+                    SecondaryKey     = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
+                    Rights           = 'Listen','Send'
+                    CreatedTime      = $createdTime
+                    ModifiedTime     = $createdTime
                     ConnectionString = ("Endpoint=sb://servicebus.contoso.com/TestNamespace;" +
                                         "StsEndpoint=https://servicebus.contoso.com:9355/TestNamespace;" +
                                         "RuntimePort=9354;ManagementPort=9355;SharedAccessKeyName=Test;" +

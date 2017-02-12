@@ -26,7 +26,7 @@ class SBAuthorizationRule : SBBase {
         explicitly set this parameter if you want to reinstall a farm while keeping the client untouched.
     #>
     [DscProperty()]
-    [pscredential]
+    [string]
     $PrimaryKey
 
     <#
@@ -43,7 +43,7 @@ class SBAuthorizationRule : SBBase {
         explicitly set this parameter if you want to reinstall a farm while keeping the client untouched.
     #>
     [DscProperty()]
-    [pscredential]
+    [string]
     $SecondaryKey
 
     <#
@@ -95,23 +95,9 @@ class SBAuthorizationRule : SBBase {
         $result.ModifiedTime = $sbAuthorizationRule.ModifiedTime
         $result.Name = $sbAuthorizationRule.KeyName
         $result.NamespaceName = $this.NamespaceName
-        $primaryKeyCredentialParams = @{
-            TypeName     = 'System.Management.Automation.PSCredential'
-            ArgumentList = @(
-                "PrimaryKey",
-                (ConvertTo-SecureString -String $sbAuthorizationRule.PrimaryKey -AsPlainText -Force)
-            )
-        }
-        $result.PrimaryKey = New-Object @primaryKeyCredentialParams
+        $result.PrimaryKey = $sbAuthorizationRule.PrimaryKey
         $result.Rights = [string[]]$sbAuthorizationRule.Rights.ForEach({$_})
-        $secondaryKeyCredentialParams = @{
-            TypeName     = 'System.Management.Automation.PSCredential'
-            ArgumentList = @(
-                "SecondaryKey",
-                (ConvertTo-SecureString -String $sbAuthorizationRule.SecondaryKey -AsPlainText -Force)
-            )
-        }
-        $result.SecondaryKey = New-Object @secondaryKeyCredentialParams
+        $result.SecondaryKey = $sbAuthorizationRule.SecondaryKey
 
         return $result
     }
@@ -161,22 +147,14 @@ class SBAuthorizationRule : SBBase {
         }
 
         if ($null -ne $this.PrimaryKey) {
-            $compareSecureStringsParams = @{
-                ReferenceSecureString  = $this.PrimaryKey.Password
-                DifferenceSecureString = $CurrentValues.PrimaryKey.Password
-            }
-            $primaryKeyTestResult = Compare-SecureStrings @compareSecureStringsParams
+            $primaryKeyTestResult = $this.PrimaryKey -eq $CurrentValues.PrimaryKey
             if ($primaryKeyTestResult -eq $false) {
                 return $true
             }
         }
 
         if ($null -ne $this.SecondaryKey) {
-            $compareSecureStringsParams = @{
-                ReferenceSecureString  = $this.SecondaryKey.Password
-                DifferenceSecureString = $CurrentValues.SecondaryKey.Password
-            }
-            $secondaryKeyTestResult = Compare-SecureStrings @compareSecureStringsParams
+            $secondaryKeyTestResult = $this.SecondaryKey -eq $CurrentValues.SecondaryKey
             if ($secondaryKeyTestResult -eq $false) {
                 return $true
             }
@@ -226,8 +204,6 @@ class SBAuthorizationRule : SBBase {
         if ($null -eq $this.PrimaryKey) {
             Write-Verbose -Message "PrimaryKey is absent, removing from New-SBAuthorizationRule params"
             $newSBAuthorizationRuleParams.Remove("PrimaryKey")
-        } else {
-            $newSBAuthorizationRuleParams.PrimaryKey = ConvertTo-PlainText -SecureString $this.PrimaryKey.Password
         }
 
         Write-Verbose -Message "Checking for Rights"
@@ -240,8 +216,6 @@ class SBAuthorizationRule : SBBase {
         if ($null -eq $this.SecondaryKey) {
             Write-Verbose -Message "SecondaryKey is absent, removing from New-SBAuthorizationRule params"
             $newSBAuthorizationRuleParams.Remove("SecondaryKey")
-        } else {
-            $newSBAuthorizationRuleParams.Secondary = ConvertTo-PlainText -SecureString $this.SecondaryKey.Password
         }
 
         Write-Verbose -Message "Removing unnecessary parameters from New-SBAuthorizationRule params"
@@ -264,8 +238,6 @@ class SBAuthorizationRule : SBBase {
         if ($null -eq $this.PrimaryKey) {
             Write-Verbose -Message "PrimaryKey is absent, removing from Set-SBAuthorizationRule params"
             $setSBAuthorizationRuleParams.Remove("PrimaryKey")
-        } else {
-            $setSBAuthorizationRuleParams.PrimaryKey = ConvertTo-PlainText -SecureString $this.PrimaryKey.Password
         }
 
         Write-Verbose -Message "Checking for Rights"
@@ -278,8 +250,6 @@ class SBAuthorizationRule : SBBase {
         if ($null -eq $this.SecondaryKey) {
             Write-Verbose -Message "SecondaryKey is absent, removing from Set-SBAuthorizationRule params"
             $setSBAuthorizationRuleParams.Remove("SecondaryKey")
-        } else {
-            $setSBAuthorizationRuleParams.SecondaryKey = ConvertTo-PlainText -SecureString $this.SecondaryKey.Password
         }
 
         Write-Verbose -Message "Removing unnecessary parameters from Set-SBAuthorizationRule params"
