@@ -67,14 +67,14 @@ PowerShellVersion = '5.0'
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
     'Modules\SB.Util\SB.Util.psd1'
-    'DSCClassResources\SBBase\SBBase.psd1',
-    'DSCClassResources\SBFarm\SBFarm.psd1'
-    'DSCClassResources\SBHost\SBHost.psd1',
-    'DSCClassResources\SBMessageContainer\SBMessageContainer.psd1',
-    'DSCClassResources\SBNamespace\SBNamespace.psd1',
-    'DSCClassResources\SBAuthorizationRule\SBAuthorizationRule.psd1',
-    'DSCClassResources\SBHostCEIP\SBHostCEIP.psd1',
-    'DSCClassResources\SBRuntimeSetting\SBRuntimeSetting.psd1'
+    'DSCResources\SBBase\SBBase.psd1',
+    'DSCResources\SBFarm\SBFarm.psd1'
+    'DSCResources\SBHost\SBHost.psd1',
+    'DSCResources\SBMessageContainer\SBMessageContainer.psd1',
+    'DSCResources\SBNamespace\SBNamespace.psd1',
+    'DSCResources\SBAuthorizationRule\SBAuthorizationRule.psd1',
+    'DSCResources\SBHostCEIP\SBHostCEIP.psd1',
+    'DSCResources\SBRuntimeSetting\SBRuntimeSetting.psd1'
 )
 
 # Functions to export from this module

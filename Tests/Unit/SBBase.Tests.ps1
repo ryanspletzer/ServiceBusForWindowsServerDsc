@@ -1,4 +1,4 @@
-using module ..\..\DSCClassResources\SBFarm
+using module ..\..\DSCResources\SBFarm
 
 [CmdletBinding()]
 param(
@@ -14,7 +14,7 @@ $Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
 
 $DscResourceName = "SBBase"
 Remove-Module -Name $DscResourceName -Force -ErrorAction SilentlyContinue
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCClassResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
+Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
 
 Describe 'SBBase' {
     InModuleScope -ModuleName $DscResourceName {
