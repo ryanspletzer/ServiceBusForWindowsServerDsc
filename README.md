@@ -368,6 +368,8 @@ Windows Server authorization rule.
 
 * Road to 1.0: Refactoring and more testing tasks to come. See Issues list for
   more details.
+* Added [DSCResources.Tests](https://github.com/PowerShell/DscResource.Tests)
+  to AppVeyor build
 
 ### 0.9.0
 
