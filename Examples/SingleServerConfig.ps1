@@ -1,4 +1,4 @@
-﻿Configuration SingleServerConfig {
+﻿Configuration Example {
     param (
         [Parameter()]
         [ValidateNotNull()]
