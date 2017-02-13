@@ -62,7 +62,7 @@
         }
         Certificates = @{
             Root = @{
-                Path       = 'C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\Resources\root.cer'
+                Path       = 'C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\Certs\root.cer'
                 Thumbprint = '2E5D900A6080DBA3127ABD125BC1D03E27FA9906'
             }
             <#
@@ -72,7 +72,7 @@
             }
             #>
             Pfx = @{
-                Path       = 'C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\Resources\servicebus.contoso.com.pfx'
+                Path       = 'C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\Certs\servicebus.contoso.com.pfx'
                 Thumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
             }
         }
