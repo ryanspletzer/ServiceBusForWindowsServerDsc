@@ -39,13 +39,25 @@ Describe $DscResourceName {
         Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
         Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
 
-        $hostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
-
         Mock Add-SBHost {}
         Mock Remove-SBHost {}
         Mock Start-SBHost {}
         Mock Stop-SBHost {}
         Mock Update-SBHost {}
+        Mock Get-CimInstance {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory)]
+                [string]
+                $ClassName
+            )
+            return @{
+                Domain = 'contoso.com'
+            }
+        }
+        $env:COMPUTERNAME = "servicebus03"
+
+        $hostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
 
         Context "Current host is not joined to farm and should be joined and started" {
             #Arrange
