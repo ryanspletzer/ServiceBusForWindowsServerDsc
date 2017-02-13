@@ -1,19 +1,3 @@
-<#
-    .SYNOPSIS
-        Template for creating DSC Resource Unit Tests
-    .DESCRIPTION
-        To Use:
-        1. Copy to \Tests\Unit\ folder and rename <ResourceName>.tests.ps1 (e.g. MSFT_xFirewall.tests.ps1)
-        2. Customize TODO sections.
-        3. Delete all template comments (TODOs, etc.)
-
-    .NOTES
-        There are multiple methods for writing unit tests. This template provides a few examples
-        which you are welcome to follow but depending on your resource, you may want to
-        design it differently. Read through our TestsGuidelines.md file for an intro on how to
-        write unit tests for DSC resources: https://github.com/PowerShell/DscResources/blob/master/TestsGuidelines.md
-#>
-
 #region HEADER
 
 # Unit Test Template Version: 1.2.0
