@@ -4,33 +4,33 @@
             NodeName                    = '*'
             PSDscAllowPlainTextPassword = $true #NOTE: Encrypt with certs when you do this for real!!!
             PSDscAllowDomainUser        = $true
-            LocalInstallAccount = @{
-                UserName    = 'ServiceBusInstall'
-                Description = 'Local user account used to install Service Bus bits from Web Platform Installer'
-                FullName    = 'Service Bus Local Install Account'
-            }
-            DomainInstallAccount = @{
-                UserName    = 'CORP\SBInstall'
-                Description = 'Domain Install Credential for Service Bus For Windows Server'
-                FullName    = 'Domain Install Credential'
-            }
-            RunAsAccount = @{
-                UserName    = "CORP\SBService"
-                Description = "Service account for Service Bus for Windows Server"
-                FullName    = "Service Bus Service Account"
-            }
-            AdminApiAccount = @{
-                UserName = "adminUser"
-            }
-            TenantApiAccount = @{
-                UserName = "tenantUser"
-            }
         }
         @{
             NodeName = 'localhost'
         }
     )
     NonNodeData = @{
+        LocalInstallAccount = @{
+            UserName    = 'ServiceBusInstall'
+            Description = 'Local user account used to install Service Bus bits from Web Platform Installer'
+            FullName    = 'Service Bus Local Install Account'
+        }
+        DomainInstallAccount = @{
+            UserName    = 'CORP\SBInstall'
+            Description = 'Domain Install Credential for Service Bus For Windows Server'
+            FullName    = 'Domain Install Credential'
+        }
+        RunAsAccount = @{
+            UserName    = "CORP\SBService"
+            Description = "Service account for Service Bus for Windows Server"
+            FullName    = "Service Bus Service Account"
+        }
+        AdminApiAccount = @{
+            UserName = "adminUser"
+        }
+        TenantApiAccount = @{
+            UserName = "tenantUser"
+        }
         SQLServer = @{
             DataSource = 'SQL1'
         }
@@ -88,27 +88,27 @@ Configuration Example {
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $LocalInstallAccount = (Get-Credential -UserName $ConfigData.LocalInstallAccount.UserName -Message "Credentials for Local Install Account"),
+        $LocalInstallAccount = (Get-Credential -UserName $ConfigData.NonNodeData.LocalInstallAccount.UserName -Message "Credentials for Local Install Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $DomainInstallAccount = (Get-Credential -UserName $ConfigData.DomainInstallAccount.UserName -Message "Credentials for Domain Install Account"),
+        $DomainInstallAccount = (Get-Credential -UserName $ConfigData.NonNodeData.DomainInstallAccount.UserName -Message "Credentials for Domain Install Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $RunAsAccount = (Get-Credential -UserName $ConfigData.RunAsAccount.UserName -Message "Credentials for Service Bus Service Account"),
+        $RunAsAccount = (Get-Credential -UserName $ConfigData.NonNodeData.RunAsAccount.UserName -Message "Credentials for Service Bus Service Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $AdminApiAccount = (Get-Credential -UserName $ConfigData.AdminApiAccount.UserName -Message "Credentials for Admin Api Account"),
+        $AdminApiAccount = (Get-Credential -UserName $ConfigData.NonNodeData.AdminApiAccount.UserName -Message "Credentials for Admin Api Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $TenantApiAccount = (Get-Credential -UserName $ConfigData.TenantApiAccount.UserName -Message "Credentials for Tenant Api Account"),
+        $TenantApiAccount = (Get-Credential -UserName $ConfigData.NonNodeData.TenantApiAccount.UserName -Message "Credentials for Tenant Api Account"),
 
         [Parameter()]
         [ValidateNotNull()]
@@ -154,9 +154,9 @@ Configuration Example {
 
         User LocalSBInstallUser {
             UserName                 = $LocalInstallAccount.UserName
-            Description              = $ConfigData.AllNodes.LocalInstallUser.Description
+            Description              = $ConfigData.NonNodeData.LocalInstallAccount.Description
             Ensure                   = 'Present'
-            FullName                 = $ConfigData.AllNodes.LocalInstallUser.FullName
+            FullName                 = $ConfigData.NonNodeData.LocalInstallAccount.FullName
             Password                 = $LocalInstallAccount
             PasswordChangeNotAllowed = $true
             PasswordNeverExpires     = $true
