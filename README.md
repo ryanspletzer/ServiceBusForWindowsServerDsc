@@ -3,7 +3,8 @@
 [![Build status](
 https://ci.appveyor.com/api/projects/status/vbumg651tfp6o7os/branch/dev?svg=true
 )](
-https://ci.appveyor.com/project/ryanspletzer/servicebusforwindowsserverdsc/branch/dev
+https://ci.appveyor.com/project/ryanspletzer/servicebusforwindowsserverdsc\
+branch/dev
 )
 
 The ServiceBusForWindowServerDsc PowerShell module provides class-based DSC
@@ -114,8 +115,8 @@ settings are not modifiable after a farm is created.
   cannot be changed after the farm has been provisioned.
 * **MessageContainerDBConnectionStringCredential**: The credential for
   connecting to the message container database. Not required if integrated
-  authentication will be used. The default value for this will be the same as that
-  specified for farm management database credentials.
+  authentication will be used. The default value for this will be the same as
+  that specified for farm management database credentials.
 * **MessageContainerDBConnectionStringDataSource**: The database server used for
   the message container database. This is used in the
   MessageContainerDBConnectionString when creating the farm. This can optionally
@@ -245,9 +246,9 @@ container.
 * **SBFarmDBConnectionStringIntegratedSecurity**: Represents whether
   authentication to the farm management database will use integrated Windows
   authentication or SSPI (Security Support Provider Interface) which supports
-  Kerberos, Windows or basic SQL authentication. (i.e. it will fall back to first
-  available auth method from Kerberos -> Windows -> SQL Auth). Valid values
-  include True, False and SSPI.The default value is SSPI.
+  Kerberos, Windows or basic SQL authentication. (i.e. it will fall back to
+  first available auth method from Kerberos -> Windows -> SQL Auth). Valid
+  values include True, False and SSPI.The default value is SSPI.
 * **Ensure**: Marks whether the container should be Present or Absent.
 
 ### SBNamespace
@@ -271,8 +272,8 @@ Server namespace.
 * **SecondarySymmetricKey**: Specifies the secondary key to be used in this
   service namespace.
 * **SubscriptionId**: An optional parameter that associates a namespace with a
-  subscription. For example, this parameter is useful if an administrator creates
-  a namespace on behalf of a user.
+  subscription. For example, this parameter is useful if an administrator
+  creates a namespace on behalf of a user.
 * **Ensure**: Marks whether the namespace should be Present or Absent.
 * **ForceRemoval**: If Ensure is Absent and the namespace is present, setting
   this property to true will add the -Force to Remove-SBNamespace call. Default
@@ -292,8 +293,8 @@ Windows Server authorization rule.
   authorization rule. Access rights include Manage, Send and Listen. If not
   specified, defaults to full rights (Listen, Send, and Manage).
 * **SecondaryKey**: The key which will be used by this authorization rule. If
-  not provided, Service Bus generates a key. You can explicitly set this parameter
-  if you want to reinstall a farm while keeping the client untouched.
+  not provided, Service Bus generates a key. You can explicitly set this
+  parameter if you want to reinstall a farm while keeping the client untouched.
 * **Name**: Specifies the name for the new Service Bus for Windows Server
   service namespace.
 * **PrimarySymmetricKey**: Specifies the primary key to be used in this service

@@ -62,7 +62,6 @@ try
         Mock Set-SBFarm {}
         Mock Stop-SBFarm {}
 
-
         Describe 'SBFarm' {
             Context "No farm is found or configured" {
                 #Arrange
