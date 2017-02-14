@@ -1,23 +1,39 @@
 using module ..\..\DSCResources\SBFarm
 
-[CmdletBinding()]
-param(
-    [string]
-    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
-)
+#region HEADER
 
-$ErrorActionPreference = 'Stop'
-Set-StrictMode -Version Latest
+# Unit Test Template Version: 1.2.0
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+{
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+}
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
-$Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
-$DscResourceName = "SBBase"
-Remove-Module -Name $DscResourceName -Force -ErrorAction SilentlyContinue
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
+$TestEnvironment = Initialize-TestEnvironment `
+    -DSCModuleName 'ServiceBusForWindowsServerDsc' `
+    -DSCResourceName 'SBBase' `
+    -TestType Unit
 
-Describe 'SBBase' {
-    InModuleScope -ModuleName $DscResourceName {
+#endregion HEADER
+
+function Invoke-TestSetup {
+    $serviceBusCmdletModule = Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve
+    Import-Module -Name $serviceBusCmdletModule -Scope 'Global' -Force
+}
+
+function Invoke-TestCleanup {
+    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+}
+
+# Begin Testing
+try
+{
+    Invoke-TestSetup
+
+    InModuleScope 'SBBase' {
         # Arrange
         $testSBFarm = [SBFarm]::new()
         $adminApiCredentialParams = @{
@@ -42,58 +58,64 @@ Describe 'SBBase' {
         }
         $testSBFarm.TenantApiCredentials = New-Object @tenantApiCredentialParams
 
-        Context 'Base methods' {
-            It 'ToHashtable() returns class properties as a hashtable' {
-                # Arrange
-                $ht = $testSBFarm.ToHashtable()
+        Describe 'SBBase' {
+            Context 'Base methods' {
+                It 'ToHashtable() returns class properties as a hashtable' {
+                    # Arrange
+                    $ht = $testSBFarm.ToHashtable()
 
-                $propertyCount = 0
+                    $propertyCount = 0
 
-                # Act
-                Get-Member -InputObject $testSBFarm |
-                    Where-Object MemberType -eq 'Property' |
-                    ForEach-Object {
-                        # Assert
-                        $ht[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
-                        $propertyCount += 1
-                    }
+                    # Act
+                    Get-Member -InputObject $testSBFarm |
+                        Where-Object MemberType -eq 'Property' |
+                        ForEach-Object {
+                            # Assert
+                            $ht[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
+                            $propertyCount += 1
+                        }
 
-                # Assert
-                $ht.Keys.Count | Should BeExactly $propertyCount
-            }
+                    # Assert
+                    $ht.Keys.Count | Should BeExactly $propertyCount
+                }
 
-            It 'GetProperty() returns property value' {
-                # Act | Assert
-                $testSBFarm.GetProperty('RunAsAccount') | Should BeExactly 'servicebus@contoso'
-            }
+                It 'GetProperty() returns property value' {
+                    # Act | Assert
+                    $testSBFarm.GetProperty('RunAsAccount') | Should BeExactly 'servicebus@contoso'
+                }
 
-            It 'SetProperty() sets property value' {
-                # Act
-                $testSBFarm.SetProperty('RunAsAccount','servicebus2@contoso.com')
-                $value = [string]$testSBFarm.RunAsAccount
+                It 'SetProperty() sets property value' {
+                    # Act
+                    $testSBFarm.SetProperty('RunAsAccount','servicebus2@contoso.com')
+                    $value = [string]$testSBFarm.RunAsAccount
 
-                # Assert
-                $value | Should BeExactly 'servicebus2@contoso.com'
+                    # Assert
+                    $value | Should BeExactly 'servicebus2@contoso.com'
 
-                # Cleanup
-                $testSBFarm.RunAsAccount = 'servicebus@contoso.com'
-            }
+                    # Cleanup
+                    $testSBFarm.RunAsAccount = 'servicebus@contoso.com'
+                }
 
-            It 'GetDscNotConfigurablePropertiesAsHashtable() returns not configurable properties as a hashtable' {
-                # Act
-                $ht = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
+                It 'GetDscNotConfigurablePropertiesAsHashtable() returns not configurable properties as a hashtable' {
+                    # Act
+                    $ht = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
 
-                # Assert
-                $ht.Count | Should BeExactly 9
-            }
+                    # Assert
+                    $ht.Count | Should BeExactly 9
+                }
 
-            It 'GetDscConfigurablePropertiesAsHashtable() returns configurable properties as a hashtable' {
-                # Act
-                $ht = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
+                It 'GetDscConfigurablePropertiesAsHashtable() returns configurable properties as a hashtable' {
+                    # Act
+                    $ht = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
 
-                # Assert
-                $ht.Count | Should BeExactly 30
+                    # Assert
+                    $ht.Count | Should BeExactly 30
+                }
             }
         }
     }
+}
+finally
+{
+    Invoke-TestCleanup
 }

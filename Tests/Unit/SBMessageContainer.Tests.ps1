@@ -1,134 +1,151 @@
-[CmdletBinding()]
-param(
-    [string]
-    $ServiceBusCmdletModule = (Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve)
-)
+#region HEADER
 
-$ErrorActionPreference = 'Stop'
-Set-StrictMode -Version Latest
+# Unit Test Template Version: 1.2.0
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+{
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+}
 
-$RepoRoot = (Resolve-Path -Path $PSScriptRoot\..\..).Path
-$Global:CurrentServiceBusStubModule = $ServiceBusCmdletModule
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
-Remove-Module -Name "SB.Util" -Force -ErrorAction SilentlyContinue
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope Global -Force
+$TestEnvironment = Initialize-TestEnvironment `
+    -DSCModuleName 'ServiceBusForWindowsServerDsc' `
+    -DSCResourceName 'SBMessageContainer' `
+    -TestType Unit
 
-$DscResourceName = "SBMessageContainer"
-Remove-Module -Name $DscResourceName -Force -ErrorAction SilentlyContinue
-Import-Module -Name (Join-Path -Path $RepoRoot -ChildPath "DSCResources\$DscResourceName\$DscResourceName.psm1") -Scope Global -Force
+#endregion HEADER
 
-Describe $DscResourceName {
-    InModuleScope -Module $DscResourceName {
+function Invoke-TestSetup {
+    $serviceBusCmdletModule = Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve
+    Import-Module -Name $serviceBusCmdletModule -Scope 'Global' -Force
+    Import-Module -Name (Join-Path -Path $moduleRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope 'Global' -Force
+}
+
+function Invoke-TestCleanup {
+    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+}
+
+# Begin Testing
+try
+{
+    Invoke-TestSetup
+
+    InModuleScope 'SBMessageContainer' {
         # Arrange
         $testSBMessageContainer = [SBMessageContainer]::new()
         $testSBMessageContainer.ContainerDBConnectionStringDataSource = "SQLSERVER.contoso.com"
         $testSBMessageContainer.ContainerDBConnectionStringInitialCatalog = "SBMessageContainer02"
         $testSBMessageContainer.Ensure = 'Present'
 
-        Remove-Module -Name "Microsoft.ServiceBus.Commands" -Force -ErrorAction SilentlyContinue
-        Import-Module $Global:CurrentServiceBusStubModule -WarningAction SilentlyContinue
-
         Mock New-SBMessageContainer {}
         Mock Remove-SBMessageContainer {}
 
-        Context "No container exists for a given database name" {
-            # Arrange
-            Mock Get-SBMessageContainer {
-                return $null
-            }
-
-            It "returns object with Ensure = Absent from the Get method" {
-                # Act
-                $currentValues = $testSBMessageContainer.Get()
-
+        Describe 'SBMessageContainer' {
+            Context "No container exists for a given database name" {
                 # Arrange
-                $currentValues.Ensure | Should BeExactly 'Absent'
+                Mock Get-SBMessageContainer {
+                    return $null
+                }
+
+                It "returns object with Ensure = Absent from the Get method" {
+                    # Act
+                    $currentValues = $testSBMessageContainer.Get()
+
+                    # Arrange
+                    $currentValues.Ensure | Should BeExactly 'Absent'
+                }
+
+                It "returns false from the Test method" {
+                    # Act | Assert
+                    $testSBMessageContainer.Test() | Should Be $false
+                }
+
+                It "calls the New-SBMessageContainer cmdlet in the Set method" {
+                    # Act
+                    $testSBMessageContainer.Set()
+
+                    # Assert
+                    Assert-MockCalled -CommandName New-SBMessageContainer
+                }
             }
 
-            It "returns false from the Test method" {
-                # Act | Assert
-                $testSBMessageContainer.Test() | Should Be $false
+            Context "Container exists for a given database name and should be removed" {
+                # Arrange
+                Mock Get-SBMessageContainer {
+                    return @(
+                        @{
+                            Id = 1
+                            Status = 'Active'
+                            Host = 'servicebus01.contoso.com'
+                            DatabaseServer = 'SQLSERVER.contoso.com'
+                            DatabaseName = 'SBMessageContainer01'
+                            ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer01;Integrated Security=True;Encrypt=False'
+                            EntitiesCount = 0
+                            DatabaseSizeInMB = 6.25
+                        },
+                        @{
+                            Id = 2
+                            Status = 'Active'
+                            Host = 'servicebus02.contoso.com'
+                            DatabaseServer = 'SQLSERVER.contoso.com'
+                            DatabaseName = 'SBMessageContainer02'
+                            ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer02;Integrated Security=True;Encrypt=False'
+                            EntitiesCount = 0
+                            DatabaseSizeInMB = 6.25
+                        },
+                        @{
+                            Id = 3
+                            Status = 'Active'
+                            Host = 'servicebus03.contoso.com'
+                            DatabaseServer = 'SQLSERVER.contoso.com'
+                            DatabaseName = 'SBMessageContainer03'
+                            ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer03;Integrated Security=True;Encrypt=False'
+                            EntitiesCount = 0
+                            DatabaseSizeInMB = 6.25
+                        }
+                    )
+                }
+
+                $testSBMessageContainer.Ensure = 'Absent'
+
+                It "returns object with Ensure = Present from the Get method" {
+                    # Act
+                    $currentValues = $testSBMessageContainer.Get()
+
+                    # Assert
+                    $currentValues.Ensure | Should Be 'Present'
+                }
+
+                It "returns false from the Test method" {
+                    # Act | Assert
+                    $testSBMessageContainer.Test() | Should Be $false
+                }
+
+                It "calls Get-SBMessageContainer cmdlet in the Set method to retreive Id" {
+                    # Act
+                    $testSBMessageContainer.Set()
+
+                    # Assert
+                    Assert-MockCalled -CommandName Get-SBMessageContainer
+                }
+
+                It "calls the Remove-SBMessageContainer cmdlet in the Set method" {
+                    # Act
+                    $testSBMessageContainer.Set()
+
+                    # Assert
+                    Assert-MockCalled -CommandName Remove-SBMessageContainer
+                }
+
+                # Cleanup
+                $testSBMessageContainer.Ensure = 'Present'
             }
-
-            It "calls the New-SBMessageContainer cmdlet in the Set method" {
-                # Act
-                $testSBMessageContainer.Set()
-
-                # Assert
-                Assert-MockCalled -CommandName New-SBMessageContainer
-            }
-        }
-
-        Context "Container exists for a given database name and should be removed" {
-            # Arrange
-            Mock Get-SBMessageContainer {
-                return @(
-                    @{
-                        Id = 1
-                        Status = 'Active'
-                        Host = 'servicebus01.contoso.com'
-                        DatabaseServer = 'SQLSERVER.contoso.com'
-                        DatabaseName = 'SBMessageContainer01'
-                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer01;Integrated Security=True;Encrypt=False'
-                        EntitiesCount = 0
-                        DatabaseSizeInMB = 6.25
-                    },
-                    @{
-                        Id = 2
-                        Status = 'Active'
-                        Host = 'servicebus02.contoso.com'
-                        DatabaseServer = 'SQLSERVER.contoso.com'
-                        DatabaseName = 'SBMessageContainer02'
-                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer02;Integrated Security=True;Encrypt=False'
-                        EntitiesCount = 0
-                        DatabaseSizeInMB = 6.25
-                    },
-                    @{
-                        Id = 3
-                        Status = 'Active'
-                        Host = 'servicebus03.contoso.com'
-                        DatabaseServer = 'SQLSERVER.contoso.com'
-                        DatabaseName = 'SBMessageContainer03'
-                        ConnectionString = 'Data Source=SQLSERVER.contoso.com;Initial Catalog=SBMessageContainer03;Integrated Security=True;Encrypt=False'
-                        EntitiesCount = 0
-                        DatabaseSizeInMB = 6.25
-                    }
-                )
-            }
-
-            $testSBMessageContainer.Ensure = 'Absent'
-
-            It "returns object with Ensure = Present from the Get method" {
-                # Act
-                $currentValues = $testSBMessageContainer.Get()
-
-                # Assert
-                $currentValues.Ensure | Should Be 'Present'
-            }
-
-            It "returns false from the Test method" {
-                # Act | Assert
-                $testSBMessageContainer.Test() | Should Be $false
-            }
-
-            It "calls Get-SBMessageContainer cmdlet in the Set method to retreive Id" {
-                # Act
-                $testSBMessageContainer.Set()
-
-                # Assert
-                Assert-MockCalled -CommandName Get-SBMessageContainer
-            }
-
-            It "calls the Remove-SBMessageContainer cmdlet in the Set method" {
-                # Act
-                $testSBMessageContainer.Set()
-
-                # Assert
-                Assert-MockCalled -CommandName Remove-SBMessageContainer
-            }
-
-            # Cleanup
-            $testSBMessageContainer.Ensure = 'Present'
         }
     }
+}
+finally
+{
+    Invoke-TestCleanup
 }
