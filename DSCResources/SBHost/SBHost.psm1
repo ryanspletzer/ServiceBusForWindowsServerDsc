@@ -231,9 +231,7 @@ class SBHost : SBBase {
         $params = @{
             CurrentValues = $currentValues.ToHashtable()
             DesiredValues = $this.ToHashtable()
-            ValuesToCheck = @(
-                "SBFarmDBConnectionStringDataSource"
-            )
+            ValuesToCheck = @( "SBFarmDBConnectionStringDataSource" )
         }
         return Test-SBParameterState @params
     }

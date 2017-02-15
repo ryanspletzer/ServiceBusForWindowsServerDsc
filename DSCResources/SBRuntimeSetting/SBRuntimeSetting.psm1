@@ -112,10 +112,7 @@ class SBRuntimeSetting : SBBase {
     [void] Set() {
         Write-Verbose -Message "Validating SBRuntimeSetting $($this.Name) for value $($this.Value)."
 
-        if ($this.Name -in @(
-            'IncludeExceptionDetails',
-            'DebugMode'
-        )) {
+        if ($this.Name -in @( 'IncludeExceptionDetails', 'DebugMode')) {
             $result = $null
             if (![Boolean]::TryParse($this.Value, [ref]$result)) {
                 throw "String setting for $($this.Name) is not a boolean value."
@@ -134,10 +131,7 @@ class SBRuntimeSetting : SBBase {
                 return
             }
 
-            if ($this.Name -in @(
-                'DefaultMaximumQueueSizeInMegabytes',
-                'DefaultMaximumTopicSizeInMegabytes'
-            )) {
+            if ($this.Name -in @( 'DefaultMaximumQueueSizeInMegabytes', 'DefaultMaximumTopicSizeInMegabytes')) {
                 if (($int64Result -lt 1) -or
                     ($int64Result -gt 8796093022207)) {
                     throw "String setting for $($this.Name) not between 1 and 8796093022207."
@@ -145,9 +139,7 @@ class SBRuntimeSetting : SBBase {
                 }
             }
 
-            if ($this.Name -in @(
-                'MessageCacheSizePerEntity'
-            )) {
+            if ($this.Name -in @( 'MessageCacheSizePerEntity' )) {
                 if ($int64Result -lt 1) {
                     throw "String setting for $($this.Name) not between 1 and 9223372036854775807."
                     return
@@ -155,10 +147,7 @@ class SBRuntimeSetting : SBBase {
             }
         }
 
-        if ($this.Name -in @(
-            'MaximumQueueSizeInMegabytes',
-            'MaximumTopicSizeInMegabytes'
-        )) {
+        if ($this.Name -in @( 'MaximumQueueSizeInMegabytes', 'MaximumTopicSizeInMegabytes' )) {
             $stringArray = $this.Value.Split(';')
             ForEach ($string in $stringArray) {
                 $int64Result = $null

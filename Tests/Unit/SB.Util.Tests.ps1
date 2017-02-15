@@ -83,7 +83,7 @@ try
                     $desired = @{ Example = "test"; SecondExample = "false"  }
 
                     # Act | Assert
-                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("Example") | Should Be $true
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @( "Example" ) | Should Be $true
                 }
 
                 It "Returns false when only specified values do not match, but other non-listed values do " {
@@ -92,7 +92,7 @@ try
                     $desired = @{ Example = "test"; SecondExample = "false"  }
 
                     # Act | Assert
-                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @("SecondExample") | Should Be $false
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @( "SecondExample" ) | Should Be $false
                 }
 
                 It "Returns false when an empty array is used in the current values" {

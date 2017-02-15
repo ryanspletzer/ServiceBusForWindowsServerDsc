@@ -37,10 +37,7 @@ try
         $testSBFarm = [SBFarm]::new()
         $adminApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
-            ArgumentList = @(
-                "adminUser",
-                (ConvertTo-SecureString -String "password" -AsPlainText -Force)
-            )
+            ArgumentList = @( "adminUser", (ConvertTo-SecureString -String "password" -AsPlainText -Force) )
         }
         $testSBFarm.AdminApiCredentials = New-Object @adminApiCredentialParams
         $testSBFarm.AdminGroup = 'BUILTIN\Administrators'
@@ -51,10 +48,7 @@ try
         $testSBFarm.SBFarmDBConnectionStringDataSource = 'SQLSERVER.contoso.com'
         $tenantApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
-            ArgumentList = @(
-                "tenantUser",
-                (ConvertTo-SecureString -String "password" -AsPlainText -Force)
-            )
+            ArgumentList = @( "tenantUser", (ConvertTo-SecureString -String "password" -AsPlainText -Force) )
         }
         $testSBFarm.TenantApiCredentials = New-Object @tenantApiCredentialParams
 
