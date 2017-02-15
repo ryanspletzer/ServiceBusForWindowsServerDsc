@@ -1,5 +1,5 @@
-$ConfigData = @{
-     AllNodes   = @(
+$ConfigurationData = @{
+     AllNodes = @(
         @{
             NodeName                    = '*'
             PSDscAllowPlainTextPassword = $true #NOTE: Encrypt with certs when you do this for real!!!
@@ -83,32 +83,34 @@ $ConfigData = @{
     }
 }
 
-Configuration Example {
-    param (
+Configuration Example
+{
+    param
+    (
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $LocalInstallAccount = (Get-Credential -UserName $ConfigData.NonNodeData.LocalInstallAccount.UserName -Message "Credentials for Local Install Account"),
+        $LocalInstallAccount = (Get-Credential -UserName $ConfigurationData.NonNodeData.LocalInstallAccount.UserName -Message "Credentials for Local Install Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $DomainInstallAccount = (Get-Credential -UserName $ConfigData.NonNodeData.DomainInstallAccount.UserName -Message "Credentials for Domain Install Account"),
+        $DomainInstallAccount = (Get-Credential -UserName $ConfigurationData.NonNodeData.DomainInstallAccount.UserName -Message "Credentials for Domain Install Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $RunAsAccount = (Get-Credential -UserName $ConfigData.NonNodeData.RunAsAccount.UserName -Message "Credentials for Service Bus Service Account"),
+        $RunAsAccount = (Get-Credential -UserName $ConfigurationData.NonNodeData.RunAsAccount.UserName -Message "Credentials for Service Bus Service Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $AdminApiAccount = (Get-Credential -UserName $ConfigData.NonNodeData.AdminApiAccount.UserName -Message "Credentials for Admin Api Account"),
+        $AdminApiAccount = (Get-Credential -UserName $ConfigurationData.NonNodeData.AdminApiAccount.UserName -Message "Credentials for Admin Api Account"),
 
         [Parameter()]
         [ValidateNotNull()]
         [pscredential]
-        $TenantApiAccount = (Get-Credential -UserName $ConfigData.NonNodeData.TenantApiAccount.UserName -Message "Credentials for Tenant Api Account"),
+        $TenantApiAccount = (Get-Credential -UserName $ConfigurationData.NonNodeData.TenantApiAccount.UserName -Message "Credentials for Tenant Api Account"),
 
         [Parameter()]
         [ValidateNotNull()]
@@ -120,12 +122,14 @@ Configuration Example {
     Import-DscResource -Module xCertificate
     Import-DscResource -Module ServiceBusForWindowsServerDsc
 
-    Node 'localhost' {
+    Node 'localhost'
+    {
 
         # Utilize xCertificate module to install example's sample certs, or certs of your own.
-        xCertificateImport RootCertificateImport {
-            Thumbprint = $ConfigData.NonNodeData.Certificates.Root.Thumbprint
-            Path       = $ConfigData.NonNodeData.Certificates.Root.Path
+        xCertificateImport RootCertificateImport
+        {
+            Thumbprint = $ConfigurationData.NonNodeData.Certificates.Root.Thumbprint
+            Path       = $ConfigurationData.NonNodeData.Certificates.Root.Path
             Location   = 'LocalMachine'
             Store      = 'Root'
             Ensure     = 'Present'
@@ -133,7 +137,8 @@ Configuration Example {
 
         # Only necessary if you need to import an intermediate because of lack of OCSP.
         <#
-        xCertificateImport IntermediateCertificateImport {
+        xCertificateImport IntermediateCertificateImport
+        {
             Thumbprint = $ConfigurationData.NonNodeData.Certificates.Intermediate.Thumbprint
             Path       = $ConfigurationData.NonNodeData.Certificates.Intermediate.Path
             Location   = 'LocalMachine'
@@ -142,9 +147,10 @@ Configuration Example {
         }
         #>
 
-        xPfxImport PfxImport {
-            Thumbprint = $ConfigData.NonNodeData.Certificates.Pfx.Thumbprint
-            Path       = $ConfigData.NonNodeData.Certificates.Pfx.Path
+        xPfxImport PfxImport
+        {
+            Thumbprint = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
+            Path       = $ConfigurationData.NonNodeData.Certificates.Pfx.Path
             Location   = 'LocalMachine'
             Store      = 'My'
             Exportable = $false
@@ -152,17 +158,19 @@ Configuration Example {
             Ensure     = 'Present'
         }
 
-        User LocalSBInstallUser {
+        User LocalSBInstallUser
+        {
             UserName                 = $LocalInstallAccount.UserName
-            Description              = $ConfigData.NonNodeData.LocalInstallAccount.Description
+            Description              = $ConfigurationData.NonNodeData.LocalInstallAccount.Description
             Ensure                   = 'Present'
-            FullName                 = $ConfigData.NonNodeData.LocalInstallAccount.FullName
+            FullName                 = $ConfigurationData.NonNodeData.LocalInstallAccount.FullName
             Password                 = $LocalInstallAccount
             PasswordChangeNotAllowed = $true
             PasswordNeverExpires     = $true
         }
 
-        Group AddDomainCredToAdministrators {
+        Group AddDomainCredToAdministrators
+        {
             DependsOn        = '[User]LocalSBInstallUser'
             Credential       = $DomainInstallAccount
             GroupName        = 'Administrators'
@@ -170,101 +178,112 @@ Configuration Example {
             MembersToInclude = $LocalInstallAccount.UserName,$DomainInstallAccount.UserName
         }
 
-        File LocalWebpiServiceBusInstallBits {
+        File LocalWebpiServiceBusInstallBits
+        {
             PsDscRunAsCredential = $DomainInstallAccount
             CheckSum             = 'ModifiedDate'
-            DestinationPath      = $ConfigData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath
+            DestinationPath      = $ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath
             Ensure               = 'Present'
             Force                = $true
-            SourcePath           = $ConfigData.NonNodeData.WebpiServiceBusInstallBits.Path
+            SourcePath           = $ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.Path
             Recurse              = $true
             Type                 = 'Directory'
         }
 
-        Package ServiceBus1_1_CU1Installation {
+        Package ServiceBus1_1_CU1Installation
+        {
             PsDscRunAsCredential = $LocalInstallAccount
             DependsOn            = '[User]LocalSBInstallUser'
             Ensure               = 'Present'
-            Arguments            = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:$($ConfigData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath)\feeds\latest\webproductlist.xml"
+            Arguments            = "/Install /Products:ServiceBus_1_1_CU1 /AcceptEULA /xml:$($ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath)\feeds\latest\webproductlist.xml"
             Name                 = "Service Bus 1.1"
-            Path                 = "$($ConfigData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath)\bin\WebpiCmd-x64.exe"
+            Path                 = "$($ConfigurationData.NonNodeData.WebpiServiceBusInstallBits.DestinationPath)\bin\WebpiCmd-x64.exe"
             ProductId            = "F438C511-5A64-433E-97EC-5E5343DA670A"
             ReturnCode           = 0
         }
 
-        SBFarm ContosoSBFarm {
+        SBFarm ContosoSBFarm
+        {
             DependsOn                          = '[xPfxImport]PfxImport'
             PsDscRunAsCredential               = $DomainInstallAccount
             AdminApiCredentials                = $AdminApiAccount
-            EncryptionCertificateThumbprint    = $ConfigData.NonNodeData.Certificates.Pfx.Thumbprint
-            FarmCertificateThumbprint          = $ConfigData.NonNodeData.Certificates.Pfx.Thumbprint
-            FarmDNS                            = $ConfigData.NonNodeData.ServiceBus.SBFarm.FarmDNS
+            EncryptionCertificateThumbprint    = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
+            FarmCertificateThumbprint          = $ConfigurationData.NonNodeData.Certificates.Pfx.Thumbprint
+            FarmDNS                            = $ConfigurationData.NonNodeData.ServiceBus.SBFarm.FarmDNS
             RunAsAccount                       = $RunAsAccount.UserName
-            SBFarmDBConnectionStringDataSource = $ConfigData.NonNodeData.SQLServer.DataSource
+            SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
             TenantApiCredentials               = $TenantApiAccount
         }
 
-        SBHost ContosoSBHost {
+        SBHost ContosoSBHost
+        {
             DependsOn                          = '[SBFarm]ContosoSBFarm'
             PsDscRunAsCredential               = $DomainInstallAccount
             EnableFirewallRules                = $true
             Ensure                             = 'Present'
             RunAsPassword                      = $RunAsAccount
-            SBFarmDBConnectionStringDataSource = $ConfigData.NonNodeData.SQLServer.DataSource
+            SBFarmDBConnectionStringDataSource = $ConfigurationData.NonNodeData.SQLServer.DataSource
         }
 
-        SBNamespace ContosoNamespace {
+        SBNamespace ContosoNamespace
+        {
             DependsOn            = '[SBFarm]ContosoSBFarm'
             PsDscRunAsCredential = $DomainInstallAccount
             Ensure               = 'Present'
-            Name                 = $ConfigData.NonNodeData.ServiceBus.SBNameSpaces.ContosoNamespace
+            Name                 = $ConfigurationData.NonNodeData.ServiceBus.SBNameSpaces.ContosoNamespace
             ManageUsers          = $DomainInstallAccount.UserName
         }
 
-        SBMessageContainer SBMessageContainer01 {
+        SBMessageContainer SBMessageContainer01
+        {
             DependsOn                                 = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential                      = $DomainInstallAccount
-            ContainerDBConnectionStringDataSource     = $ConfigData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigData.NonNodeData.ServiceBus.SBMessageContainers.1
+            ContainerDBConnectionStringDataSource     = $ConfigurationData.NonNodeData.SQLServer.DataSource
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.1
             Ensure                                    = 'Present'
         }
 
-        SBMessageContainer SBMessageContainer02 {
+        SBMessageContainer SBMessageContainer02
+        {
             DependsOn                                 = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential                      = $DomainInstallAccount
-            ContainerDBConnectionStringDataSource     = $ConfigData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigData.NonNodeData.ServiceBus.SBMessageContainers.2
+            ContainerDBConnectionStringDataSource     = $ConfigurationData.NonNodeData.SQLServer.DataSource
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.2
             Ensure = 'Present'
         }
 
-        SBMessageContainer SBMessageContainer03 {
+        SBMessageContainer SBMessageContainer03
+        {
             DependsOn                                 = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential                      = $DomainInstallAccount
-            ContainerDBConnectionStringDataSource     = $ConfigData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigData.NonNodeData.ServiceBus.SBMessageContainers.3
+            ContainerDBConnectionStringDataSource     = $ConfigurationData.NonNodeData.SQLServer.DataSource
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.3
             Ensure = 'Present'
         }
 
-        SBAuthorizationRule ContosoNamespaceRule {
+        SBAuthorizationRule ContosoNamespaceRule
+        {
             DependsOn            = '[SBNamespace]ContosoNamespace'
             PsDscRunAsCredential = $DomainInstallAccount
-            Name                 = $ConfigData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Name
-            NamespaceName        = $ConfigData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.NamespaceName
-            Rights               = $ConfigData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Rights
+            Name                 = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Name
+            NamespaceName        = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.NamespaceName
+            Rights               = $ConfigurationData.NonNodeData.ServiceBus.SBAuthorizationRules.ContosoNamespaceRule.Rights
             Ensure               = 'Present'
         }
 
-        SBHostCEIP CEIP {
+        SBHostCEIP CEIP
+        {
             DependsOn            = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential = $DomainInstallAccount
             Ensure               = 'Present'
         }
 
-        SBRuntimeSetting DefaultMaximumQueueSizeInMegabytes {
+        SBRuntimeSetting DefaultMaximumQueueSizeInMegabytes
+        {
             DependsOn            = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential = $DomainInstallAccount
-            Name                 = $ConfigData.NonNodeData.ServiceBus.SBRuntimeSetting.DefaultMaximumQueueSizeInMegabytes.Name
-            Value                = $ConfigData.NonNodeData.ServiceBus.SBRuntimeSetting.DefaultMaximumQueueSizeInMegabytes.Value
+            Name                 = $ConfigurationData.NonNodeData.ServiceBus.SBRuntimeSetting.DefaultMaximumQueueSizeInMegabytes.Name
+            Value                = $ConfigurationData.NonNodeData.ServiceBus.SBRuntimeSetting.DefaultMaximumQueueSizeInMegabytes.Value
         }
     }
 }

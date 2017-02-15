@@ -4,7 +4,8 @@ using Module ..\SBBase
     SBAuthorizationRule adds, removes and updates settings for a Service Bus for Windows Server authorization rule.
 #>
 [DscResource()]
-class SBAuthorizationRule : SBBase {
+class SBAuthorizationRule : SBBase
+{
 
     <#
         The name of the authorization rule.
@@ -66,7 +67,8 @@ class SBAuthorizationRule : SBBase {
     [datetime]
     $ModifiedTime
 
-    [SBAuthorizationRule] Get() {
+    [SBAuthorizationRule] Get()
+    {
         $result = [SBAuthorizationRule]::new()
 
         Write-Verbose -Message "Checking for SBAuthorizationRule $($this.Name) on namespace $($this.NamespaceName)."
@@ -75,16 +77,20 @@ class SBAuthorizationRule : SBBase {
                                 "$($this.NamespaceName).")
 
         $sbAuthorizationRule = $null
-        try {
+        try
+        {
             $sbAuthorizationRule = Get-SBAuthorizationRule -Name $this.Name -NamespaceName $this.NamespaceName
             Write-Verbose -Message ("Successfully retrieved SBAuthorizationRule $($this.Name) on namespace " +
                                     "$($this.NamespaceName).")
-        } catch {
+        }
+        catch
+        {
             Write-Verbose -Message ("Unable to detect SBAuthorizationRule $($this.Name) on namespace " +
                                     "$($this.NamespaceName).")
         }
 
-        if ($null -eq $sbAuthorizationRule) {
+        if ($null -eq $sbAuthorizationRule)
+        {
             $result.Ensure = [Ensure]::Absent
             return $result
         }
@@ -101,60 +107,75 @@ class SBAuthorizationRule : SBBase {
         return $result
     }
 
-    [bool] Test() {
+    [bool] Test()
+    {
         $currentValues = $this.Get()
 
-        if ($this.SBAuthorizationRuleShouldBeCreated($currentValues)) {
+        if ($this.SBAuthorizationRuleShouldBeCreated($currentValues))
+        {
             return $false
         }
 
-        if ($this.SBAuthorizationRuleShouldBeRemoved($currentValues)) {
+        if ($this.SBAuthorizationRuleShouldBeRemoved($currentValues))
+        {
             return $false
         }
 
-        if ($this.SBAuthorizationRuleShouldBeUpdated($currentValues)) {
+        if ($this.SBAuthorizationRuleShouldBeUpdated($currentValues))
+        {
             return $false
         }
 
         return $true
     }
 
-    [bool] SBAuthorizationRuleShouldBeCreated([SBAuthorizationRule]$CurrentValues) {
+    [bool] SBAuthorizationRuleShouldBeCreated([SBAuthorizationRule]$CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBAuthorizationRuleShouldBeRemoved([SBAuthorizationRule]$CurrentValues) {
+    [bool] SBAuthorizationRuleShouldBeRemoved([SBAuthorizationRule]$CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBAuthorizationRuleShouldBeUpdated([SBAuthorizationRule]$CurrentValues) {
+    [bool] SBAuthorizationRuleShouldBeUpdated([SBAuthorizationRule]$CurrentValues)
+    {
         $currentRights = $CurrentValues.Rights
         $desiredRights = $this.Rights
 
-        ForEach($desiredRight in $desiredRights) {
-            if ($desiredRight -notin $currentRights) {
+        ForEach ($desiredRight in $desiredRights)
+        {
+            if ($desiredRight -notin $currentRights)
+            {
                 # Too few rights assigned
                 return $true
             }
         }
 
-        ForEach($currentRight in $currentRights) {
-            if ($currentRight -notin $desiredRights) {
+        ForEach ($currentRight in $currentRights)
+        {
+            if ($currentRight -notin $desiredRights)
+            {
                 # Too many rights assigned
                 return $true
             }
         }
 
-        if ($null -ne $this.PrimaryKey) {
+        if ($null -ne $this.PrimaryKey)
+        {
             $primaryKeyTestResult = $this.PrimaryKey -eq $CurrentValues.PrimaryKey
-            if ($primaryKeyTestResult -eq $false) {
+            if ($primaryKeyTestResult -eq $false)
+            {
                 return $true
             }
         }
 
-        if ($null -ne $this.SecondaryKey) {
+        if ($null -ne $this.SecondaryKey)
+        {
             $secondaryKeyTestResult = $this.SecondaryKey -eq $CurrentValues.SecondaryKey
-            if ($secondaryKeyTestResult -eq $false) {
+            if ($secondaryKeyTestResult -eq $false)
+            {
                 return $true
             }
         }
@@ -162,14 +183,16 @@ class SBAuthorizationRule : SBBase {
         return $false
     }
 
-    [void] Set() {
+    [void] Set()
+    {
         Write-Verbose -Message ("Retrieving current SBAuthorizationRule values for $($this.Name) on namespace " +
                                 "$($this.NamespaceName).")
         $currentValues = $this.Get()
 
         Write-Verbose -Message ("Checking if SBAuthorizationRule $($this.Name) on namespace " +
                                 "$($this.NamespaceName) should be created.")
-        if ($this.SBAuthorizationRuleShouldBeCreated($currentValues)) {
+        if ($this.SBAuthorizationRuleShouldBeCreated($currentValues))
+        {
             Write-Verbose -Message ("Creating SBAuthorizationRule with Name $($this.Name) on namespace " +
                                     "$($this.NamespaceName)")
             $this.NewSBAuthorizationRule()
@@ -178,7 +201,8 @@ class SBAuthorizationRule : SBBase {
 
         Write-Verbose -Message ("Checking if SBAuthorizationRule $($this.Name) on namespace " +
                                 "$($this.NamespaceName) should be removed.")
-        if ($this.SBAuthorizationRuleShouldBeRemoved($currentValues)) {
+        if ($this.SBAuthorizationRuleShouldBeRemoved($currentValues))
+        {
             Write-Verbose -Message ("Removing SBAuthorizationRule with Name $($this.Name) on namespace " +
                                     "$($this.NamespaceName).")
             $this.RemoveSBAuthorizationRule()
@@ -187,7 +211,8 @@ class SBAuthorizationRule : SBBase {
 
         Write-Verbose -Message ("Checking if SBAuthorizationRule $($this.Name) on namespace " +
                                 "$($this.NamespaceName) should be updated.")
-        if ($this.SBAuthorizationRuleShouldBeUpdated($currentValues)) {
+        if ($this.SBAuthorizationRuleShouldBeUpdated($currentValues))
+        {
             Write-Verbose -Message ("Updating SBAuthorizationRule with Name $($this.Name) on namespace " +
                                     "$($this.NamespaceName).")
             $this.SetSBAuthorizationRule()
@@ -195,24 +220,28 @@ class SBAuthorizationRule : SBBase {
         }
     }
 
-    [void] NewSBAuthorizationRule() {
+    [void] NewSBAuthorizationRule()
+    {
         Write-Verbose -Message "Getting configurable properties as hashtable for New-SBAuthorizationRule params"
         $newSBAuthorizationRuleParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for PrimaryKey"
-        if ($null -eq $this.PrimaryKey) {
+        if ($null -eq $this.PrimaryKey)
+        {
             Write-Verbose -Message "PrimaryKey is absent, removing from New-SBAuthorizationRule params"
             $newSBAuthorizationRuleParams.Remove("PrimaryKey")
         }
 
         Write-Verbose -Message "Checking for Rights"
-        if ($null -eq $this.Rights) {
+        if ($null -eq $this.Rights)
+        {
             Write-Verbose -Message "Rights is absent, removing from New-SBAuthorizationRule params"
             $newSBAuthorizationRuleParams.Remove("Rights")
         }
 
         Write-Verbose -Message "Checking for SecondaryKey"
-        if ($null -eq $this.SecondaryKey) {
+        if ($null -eq $this.SecondaryKey)
+        {
             Write-Verbose -Message "SecondaryKey is absent, removing from New-SBAuthorizationRule params"
             $newSBAuthorizationRuleParams.Remove("SecondaryKey")
         }
@@ -224,29 +253,34 @@ class SBAuthorizationRule : SBBase {
         New-SBAuthorizationRule @newSBAuthorizationRuleParams
     }
 
-    [void] RemoveSBAuthorizationRule() {
+    [void] RemoveSBAuthorizationRule()
+    {
         Write-Verbose -Message "Invoking Remove-SBAuthorizationRule with configurable params"
         Remove-SBAuthorizationRule -Name $this.Name -NamespaceName $this.NamespaceName
     }
 
-    [void] SetSBAuthorizationRule() {
+    [void] SetSBAuthorizationRule()
+    {
         Write-Verbose -Message "Getting configurable properties as hashtable for Set-SBAuthorizationRule params"
         $setSBAuthorizationRuleParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for PrimaryKey"
-        if ($null -eq $this.PrimaryKey) {
+        if ($null -eq $this.PrimaryKey)
+        {
             Write-Verbose -Message "PrimaryKey is absent, removing from Set-SBAuthorizationRule params"
             $setSBAuthorizationRuleParams.Remove("PrimaryKey")
         }
 
         Write-Verbose -Message "Checking for Rights"
-        if ($null -eq $this.Rights) {
+        if ($null -eq $this.Rights)
+        {
             Write-Verbose -Message "Rights is absent, removing from Set-SBAuthorizationRule params"
             $setSBAuthorizationRuleParams.Remove("Rights")
         }
 
         Write-Verbose -Message "Checking for SecondaryKey"
-        if ($null -eq $this.SecondaryKey) {
+        if ($null -eq $this.SecondaryKey)
+        {
             Write-Verbose -Message "SecondaryKey is absent, removing from Set-SBAuthorizationRule params"
             $setSBAuthorizationRuleParams.Remove("SecondaryKey")
         }

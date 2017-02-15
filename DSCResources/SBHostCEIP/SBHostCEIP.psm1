@@ -4,7 +4,8 @@ using module ..\SBBase
     SBHostCEIP enables or disables Customer Experience Improvement Program telemetry.
 #>
 [DscResource()]
-class SBHostCEIP : SBBase {
+class SBHostCEIP : SBBase
+{
 
     <#
         Marks whether the Customer Experience Improvement Program telemetry should be Present (enabled) or Absent
@@ -14,7 +15,8 @@ class SBHostCEIP : SBBase {
     [Ensure]
     $Ensure
 
-    [SBHostCEIP] Get() {
+    [SBHostCEIP] Get()
+    {
         $result = [SBHostCEIP]::new()
 
         Write-Verbose -Message "Checking for SBHostCEIP status."
@@ -43,29 +45,35 @@ class SBHostCEIP : SBBase {
         return $result
     }
 
-    [bool] Test() {
+    [bool] Test()
+    {
         $currentValues = $this.Get()
 
-        if ($this.SBHostCEIPShouldBeEnabled($currentValues)) {
+        if ($this.SBHostCEIPShouldBeEnabled($currentValues))
+        {
             return $false
         }
 
-        if ($this.SBHostCEIPShouldBeDisabled($currentValues)) {
+        if ($this.SBHostCEIPShouldBeDisabled($currentValues))
+        {
             return $false
         }
 
         return $true
     }
 
-    [bool] SBHostCEIPShouldBeEnabled([SBHostCEIP]$CurrentValues) {
+    [bool] SBHostCEIPShouldBeEnabled([SBHostCEIP]$CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBHostCEIPShouldBeDisabled([SBHostCEIP]$CurrentValues) {
+    [bool] SBHostCEIPShouldBeDisabled([SBHostCEIP]$CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [void] Set() {
+    [void] Set()
+    {
         Write-Verbose -Message "Retrieving current SBHostCEIP status."
         $currentValues = $this.Get()
 

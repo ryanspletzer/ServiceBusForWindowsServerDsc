@@ -4,7 +4,8 @@ using module ..\SBBase
    SBFarm creates a new farm and sets certain settings for a Service Bus for Windows Server farm.
 #>
 [DscResource()]
-class SBFarm : SBBase {
+class SBFarm : SBBase
+{
 
     <#
         Sets the resource provider credentials. The resource provider is a component that exposes the management API
@@ -344,7 +345,8 @@ class SBFarm : SBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [SBFarm] Get() {
+    [SBFarm] Get()
+    {
         $result = [SBFarm]::new()
 
         Write-Verbose -Message "Checking for SBFarm."
@@ -360,23 +362,30 @@ class SBFarm : SBBase {
         $connectionString = New-SqlConnectionString @connectionStringParams
         Write-Verbose -Message "Trying to get SBFarm."
         $sbFarm = $null
-        try {
+        try
+        {
             $sbFarm = Get-SBFarm -SBFarmDBConnectionString $connectionString
             Write-Verbose -Message "Successfully retrieved SBFarm."
-        } catch {
+        }
+        catch
+        {
             Write-Verbose -Message "Unable to detect SBFarm."
         }
 
-        if ($null -eq $sbFarm) {
+        if ($null -eq $sbFarm)
+        {
             return $null
         }
 
         Write-Verbose -Message "Trying to get default SBMessageContainer."
         $sbMessageContainer = $null
-        try {
+        try
+        {
             $sbMessageContainer = Get-SBMessageContainer -Id 1
             Write-Verbose -Message "Successfully retrieved default SBMessageContainer."
-        } catch {
+        }
+        catch
+        {
             Write-Verbose -Message "Unable to detect initial SBMessageContainer."
         }
 
@@ -414,7 +423,8 @@ class SBFarm : SBBase {
         $result.MessageBrokerPort = $sbFarm.MessageBrokerPort
 
         $result.MessageContainerDBConnectionStringCredential = $this.MessageContainerDatabaseCredential
-        if ($null -ne $sbMessageContainer) {
+        if ($null -ne $sbMessageContainer)
+        {
             $params = @{
                 SqlConnectionString = $sbMessageContainer.ConnectionString
             }
@@ -464,10 +474,12 @@ class SBFarm : SBBase {
         It should return True or False, showing whether the resource
         is in a desired state.
     #>
-    [bool] Test() {
+    [bool] Test()
+    {
         $currentValues = $this.Get()
 
-        if ($null -eq $currentValues) {
+        if ($null -eq $currentValues)
+        {
             return $false
         }
 
@@ -497,26 +509,34 @@ class SBFarm : SBBase {
         This method is equivalent of the Set-TargetResource script function.
         It sets the resource to the desired state.
     #>
-    [void] Set() {
+    [void] Set()
+    {
         Write-Verbose -Message "Checking whether to make new SBFarm or set existing SBFarm"
-        if ($null -eq $this.Get()) {
+        if ($null -eq $this.Get())
+        {
             Write-Verbose -Message "No farm detected, new SBFarm will be created"
             $this.NewSBFarm()
-        } else {
+        }
+        else
+        {
             Write-Verbose -Message "Farm detected, settable SBFarm settings will be set"
             $this.SetSBFarm()
         }
     }
 
-    [void] NewSBFarm() {
+    [void] NewSBFarm()
+    {
         Write-Verbose -Message "Getting configurable properties as hashtable for New-SBFarm params"
         $newSBFarmParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
-        if ($null -eq $this.CertificateAutoGenerationKey) {
+        if ($null -eq $this.CertificateAutoGenerationKey)
+        {
             Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from New-SBFarm params"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
-        } else {
+        }
+        else
+        {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
             $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
@@ -531,12 +551,14 @@ class SBFarm : SBBase {
             Encrypt            = $this.GatewayDBConnectionStringEncrypt
         }
         if ($null -eq $this.GatewayDBConnectionStringDataSource -or
-            [String]::IsNullOrEmpty($this.GatewayDBConnectionStringDataSource)) {
+            [String]::IsNullOrEmpty($this.GatewayDBConnectionStringDataSource))
+        {
             Write-Verbose -Message ("GatewayDBConnectionStringDataSource not specified, " +
                                     "using SBFarmDBConnectionStringDataSource")
             $gatewayDBConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
         }
-        if ($null -eq $this.GatewayDBConnectionStringCredential) {
+        if ($null -eq $this.GatewayDBConnectionStringCredential)
+        {
             Write-Verbose -Message ("GatewayDBConnectionStringCredential not specified, " +
                                     "using SBFarmDBConnectionStringCredential")
             $gatewayDBConnectionStringParams.Credential = $this.SBFarmDBConnectionStringCredential
@@ -555,12 +577,14 @@ class SBFarm : SBBase {
             Encrypt            = $this.MessageContainerDBConnectionStringEncrypt
         }
         if ($null -eq $this.MessageContainerDBConnectionStringDataSource -or
-            [String]::IsNullOrEmpty($this.MessageContainerDBConnectionStringDataSource)) {
+            [String]::IsNullOrEmpty($this.MessageContainerDBConnectionStringDataSource))
+        {
             Write-Verbose -Message ("MessageContainerDBConnectionStringDataSource not specified, " +
                                     "using SBFarmDBConnectionStringDataSource")
             $messageContainerDBConnectionStringParams.DataSource = $this.SBFarmDBConnectionStringDataSource
         }
-        if ($null -eq $this.MessageContainerDBConnectionStringCredential) {
+        if ($null -eq $this.MessageContainerDBConnectionStringCredential)
+        {
             Write-Verbose -Message ("MessageContainerDBConnectionStringCredential not specified, " +
                                     "using SBFarmDBConnectionStringCredential")
             $messageContainerDBConnectionStringParams.Credential = $this.SBFarmDBConnectionStringCredential
@@ -604,7 +628,8 @@ class SBFarm : SBBase {
         New-SBFarm @newSBFarmParams
     }
 
-    [void] SetSBFarm() {
+    [void] SetSBFarm()
+    {
         Write-Verbose -Message ("The current Service Bus Farm exists, however settings have changed. The " +
                                 "SBFarm resource only able to detect/set certain changes once a farm has been " +
                                 "provisioned, including: AdminApiCredentials.UserName, AdminGroup, FarmDNS, " +

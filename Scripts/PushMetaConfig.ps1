@@ -1,7 +1,10 @@
 [DscLocalConfigurationManager()]
-Configuration PushMetaConfig {
-    Node localhost {
-        Settings {
+Configuration PushMetaConfig
+{
+    Node 'localhost'
+    {
+        Settings
+        {
             ActionAfterReboot = 'StopConfiguration'
             ConfigurationModeFrequencyMins = 15
             RebootNodeIfNeeded = $True

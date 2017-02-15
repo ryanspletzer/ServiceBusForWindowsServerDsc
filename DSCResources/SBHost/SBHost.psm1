@@ -5,7 +5,8 @@ using module ..\SBBase
    Windows Server host.
 #>
 [DscResource()]
-class SBHost : SBBase {
+class SBHost : SBBase
+{
 
     <#
         This passphrase is required for certificate auto generation. This parameter is mandatory if you want
@@ -111,7 +112,8 @@ class SBHost : SBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [SBHost] Get() {
+    [SBHost] Get()
+    {
         $result = [SBHost]::new()
 
         Write-Verbose -Message "Checking for SBHost."
@@ -129,24 +131,29 @@ class SBHost : SBBase {
         $connectionString = New-SqlConnectionString @connectionStringParams
         Write-Verbose -Message "Trying to get SBFarm to check hosts list."
         $sbFarm = $null
-        try {
+        try
+        {
             $sbFarm = Get-SBFarm -SBFarmDBConnectionString $connectionString
             Write-Verbose -Message "Successfully retrieved SBFarm."
-        } catch {
+        }
+        catch
+        {
             Write-Verbose -Message "Unable to detect SBFarm."
         }
 
-        if ($null -eq $sbFarm) {
+        if ($null -eq $sbFarm)
+        {
             return $null
         }
 
         Write-Verbose -Message ("Checking SBFarm.Hosts for presence of $hostName")
         $existingHost = $sbFarm.Hosts |
-                            Where-Object {
+                            Where-Object{
                                 $_.Name -eq "$hostName"
                             }
 
-        if ($null -eq $existingHost) {
+        if ($null -eq $existingHost)
+        {
             Write-Verbose -Message "Host is not present in SBFarm.Hosts."
             $result.Ensure = [Ensure]::Absent
             $result.Started = $false
@@ -155,13 +162,16 @@ class SBHost : SBBase {
 
         Write-Verbose -Message "Trying to get SBFarmStatus of current host."
         $sbFarmStatus = $null
-        try {
+        try
+        {
             $sbFarmStatus = Get-SBFarmStatus |
-                                Where-Object {
+                                Where-Object{
                                     $_.HostName -eq "$hostName"
                                 }
             Write-Verbose -Message "Successfully retrieved SBFarmStatus."
-        } catch {
+        }
+        catch
+        {
             Write-Verbose -Message "Unable to retrieve SBFarmStatus."
         }
 
@@ -185,14 +195,18 @@ class SBHost : SBBase {
         $params.PropertyName = "Integrated Security"
         $result.SBFarmDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
 
-        if ($null -ne $sbFarmStatus) {
+        if ($null -ne $sbFarmStatus)
+        {
             $sbFarmStatus |
-                ForEach-Object {
-                    if ($_.Status -ne "Running") {
+                ForEach-Object{
+                    if ($_.Status -ne "Running")
+                    {
                         $result.Started = $false
                     }
                 }
-        } else {
+        }
+        else
+        {
             $result.Started = $false
         }
 
@@ -204,26 +218,32 @@ class SBHost : SBBase {
         It should return True or False, showing whether the resource
         is in a desired state.
     #>
-    [bool] Test() {
+    [bool] Test()
+    {
         $currentValues = $this.Get()
 
-        if ($null -eq $currentValues) {
+        if ($null -eq $currentValues)
+        {
             return $false
         }
 
-        if ($this.SBHostShouldBeAdded($currentValues)) {
+        if ($this.SBHostShouldBeAdded($currentValues))
+        {
             return $false
         }
 
-        if ($this.SBHostShouldBeRemoved($currentValues)) {
+        if ($this.SBHostShouldBeRemoved($currentValues))
+        {
             return $false
         }
 
-        if ($this.SBHostShouldBeStarted($currentValues)) {
+        if ($this.SBHostShouldBeStarted($currentValues))
+        {
             return $false
         }
 
-        if ($this.SBHostShouldBeStopped($currentValues)) {
+        if ($this.SBHostShouldBeStopped($currentValues))
+        {
             return $false
         }
 
@@ -235,19 +255,23 @@ class SBHost : SBBase {
         return Test-SBParameterState @params
     }
 
-    [bool] SBHostShouldBeAdded([SBHost]$CurrentValues) {
+    [bool] SBHostShouldBeAdded([SBHost]$CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBHostShouldBeRemoved([SBHost]$CurrentValues) {
+    [bool] SBHostShouldBeRemoved([SBHost]$CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBHostShouldBeStarted([SBHost]$CurrentValues) {
+    [bool] SBHostShouldBeStarted([SBHost]$CurrentValues)
+    {
         return (($this.Started -eq $true) -and ($CurrentValues.Started -eq $false))
     }
 
-    [bool] SBHostShouldBeStopped([SBHost]$CurrentValues) {
+    [bool] SBHostShouldBeStopped([SBHost]$CurrentValues)
+    {
         return (($this.Started -eq $false) -and ($CurrentValues.Started -eq $true))
     }
 
@@ -255,16 +279,19 @@ class SBHost : SBBase {
         This method is equivalent of the Set-TargetResource script function.
         It sets the resource to the desired state.
     #>
-    [void] Set() {
+    [void] Set()
+    {
         Write-Verbose -Message "Retrieving current SBHost values"
         $currentValues = $this.Get()
 
         Write-Verbose -Message "Checking if SBHost should be added to the farm"
-        if ($this.SBHostShouldBeAdded($currentValues)) {
+        if ($this.SBHostShouldBeAdded($currentValues))
+        {
             Write-Verbose -Message "SBHost will be added to the farm"
             $this.AddSBHost()
             Write-Verbose -Message "Checking if SBHost should be started"
-            if ($this.Started -eq $true) {
+            if ($this.Started -eq $true)
+            {
                 Write-Verbose -Message "Starting SBHost"
                 Start-SBHost
             }
@@ -272,10 +299,12 @@ class SBHost : SBBase {
         }
 
         Write-Verbose -Message "Checking if SBHost should be removed from the farm"
-        if ($this.SBHostShouldBeRemoved($currentValues)) {
+        if ($this.SBHostShouldBeRemoved($currentValues))
+        {
             Write-Verbose -Message "SBHost will be removed from the farm"
             Write-Verbose -Message "Checking if SBHost should be stopped prior to removing"
-            if ($currentValues.Started -eq $true) {
+            if ($currentValues.Started -eq $true)
+            {
                 Write-Verbose -Message "Stopping SBHost"
                 Stop-SBHost
             }
@@ -285,7 +314,8 @@ class SBHost : SBBase {
         }
 
         Write-Verbose -Message "Checking if SBHost should be started"
-        if ($this.SBHostShouldBeStarted($currentValues)) {
+        if ($this.SBHostShouldBeStarted($currentValues))
+        {
             Write-Verbose -Message "SBHost will be started"
             Write-Verbose -Message "Updating SBHost prior to starting"
             $this.UpdateSBHost()
@@ -300,7 +330,8 @@ class SBHost : SBBase {
                                 "with the host started and it will explicitly re-update the settings. Or, simply" +
                                 "stop the host services and push the started DSC config.")
         Write-Verbose -Message "Checking if SBHost should be stopped"
-        if ($this.SBHostShouldBeStopped($currentValues)) {
+        if ($this.SBHostShouldBeStopped($currentValues))
+        {
             Write-Verbose -Message "Stopping SBHost"
             Stop-SBHost
             return
@@ -312,22 +343,27 @@ class SBHost : SBBase {
         $addSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
-        if ($null -eq $this.CertificateAutoGenerationKey) {
+        if ($null -eq $this.CertificateAutoGenerationKey)
+        {
             Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from Add-SBHost params"
             $addSBHostParams.Remove("CertificateAutoGenerationKey")
-        } else {
+        }
+        else
+        {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $addSBHostParams.Remove("CertificateAutoGenerationKey")
             $addSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
 
         Write-Verbose -Message "Checking for ExternalBrokerPort"
-        if (0 -eq $addSBHostParams.ExternalBrokerPort) {
+        if (0 -eq $addSBHostParams.ExternalBrokerPort)
+        {
             Write-Verbose -Message "ExternalBrokerPort is absent, removing from Add-SBHost params"
             $addSBHostParams.Remove("ExternalBrokerPort")
         }
         Write-Verbose -Message "Checking for ExternalBrokerUrl"
-        if ($null -eq $addSBHostParams.ExternalBrokerUrl) {
+        if ($null -eq $addSBHostParams.ExternalBrokerUrl)
+        {
             Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Add-SBHost params"
             $addSBHostParams.Remove("ExternalBrokerUrl")
         }
@@ -362,7 +398,8 @@ class SBHost : SBBase {
         Add-SBHost @addSBHostParams
     }
 
-    [void] RemoveSBHost() {
+    [void] RemoveSBHost()
+    {
         Write-Verbose -Message "Getting configurable properties as hashtable for Remove-SBHost params"
         $removeSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
@@ -400,27 +437,33 @@ class SBHost : SBBase {
         Remove-SBHost @removeSBHostParams
     }
 
-    [void] UpdateSBHost() {
+    [void] UpdateSBHost()
+    {
         Write-Verbose -Message "Getting configurable properties as hashtable for Update-SBHost params"
         $updateSBHostParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for CertificateAutoGenerationKey"
-        if ($null -eq $this.CertificateAutoGenerationKey) {
+        if ($null -eq $this.CertificateAutoGenerationKey)
+        {
             Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from Update-SBHost params"
             $updateSBHostParams.Remove("CertificateAutoGenerationKey")
-        } else {
+        }
+        else
+        {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $updateSBHostParams.Remove("CertificateAutoGenerationKey")
             $updateSBHostParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
 
         Write-Verbose -Message "Checking for ExternalBrokerPort"
-        if (0 -eq $updateSBHostParams.ExternalBrokerPort) {
+        if (0 -eq $updateSBHostParams.ExternalBrokerPort)
+        {
             Write-Verbose -Message "ExternalBrokerPort is absent, removing from Update-SBHost params"
             $updateSBHostParams.Remove("ExternalBrokerPort")
         }
         Write-Verbose -Message "Checking for ExternalBrokerUrl"
-        if ($null -eq $updateSBHostParams.ExternalBrokerUrl) {
+        if ($null -eq $updateSBHostParams.ExternalBrokerUrl)
+        {
             Write-Verbose -Message "ExternalBrokerUrl is absent, removing from Update-SBHost params"
             $updateSBHostParams.Remove("ExternalBrokerUrl")
         }

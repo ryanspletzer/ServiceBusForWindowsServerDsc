@@ -63,7 +63,7 @@ try
                     # Act
                     Get-Member -InputObject $testSBFarm |
                         Where-Object MemberType -eq 'Property' |
-                        ForEach-Object {
+                        ForEach-Object{
                             # Assert
                             $hashtable[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
                             $propertyCount += 1

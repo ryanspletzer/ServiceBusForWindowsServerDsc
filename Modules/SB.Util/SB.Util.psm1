@@ -1,20 +1,29 @@
-function Test-SBObjectHasProperty() {
+function Test-SBObjectHasProperty()
+{
     [CmdletBinding()]
     [OutputType([bool])]
     param
     (
-        [parameter(Mandatory = $true,Position=1)]  [Object] $Object,
-        [parameter(Mandatory = $true,Position=2)]  [String] $PropertyName
+        [parameter(Mandatory = $true,Position=1)]
+        [Object]
+        $Object,
+
+        [parameter(Mandatory = $true,Position=2)]
+        [String]
+        $PropertyName
     )
-    if (([bool]($Object.PSobject.Properties.name -contains $PropertyName)) -eq $true) {
-        if ($null -ne $Object.$PropertyName) {
+    if (([bool]($Object.PSobject.Properties.name -contains $PropertyName)) -eq $true)
+    {
+        if ($null -ne $Object.$PropertyName)
+        {
             return $true
         }
     }
     return $false
 }
 
-function Test-SBParameterState() {
+function Test-SBParameterState()
+{
     [CmdletBinding()]
     param
     (
@@ -172,7 +181,8 @@ function Test-SBParameterState() {
     return $returnValue
 }
 
-function ConvertTo-PlainText {
+function ConvertTo-PlainText
+{
     <#
     .SYNOPSIS
 
@@ -191,18 +201,21 @@ function ConvertTo-PlainText {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [securestring]
         $SecureString
     )
-    process {
+    process
+    {
         $BTSR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
         return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BTSR)
     }
 }
 
-function New-SqlConnectionString {
+function New-SqlConnectionString
+{
     <#
     .SYNOPSIS
 
@@ -220,7 +233,8 @@ function New-SqlConnectionString {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $DataSource,
@@ -241,33 +255,39 @@ function New-SqlConnectionString {
         [switch]
         $Encrypt
     )
-    process {
+    process
+    {
         $sqlConnectionStringBuilder = New-Object -TypeName System.Data.Common.DbConnectionStringBuilder
         $sqlConnectionStringBuilder["Data Source"] = $DataSource
         $sqlConnectionStringBuilder["Initial Catalog"] = $InitialCatalog
         $sqlConnectionStringBuilder["Integrated Security"] = 'False'
-        switch ($IntegratedSecurity) {
+        switch ($IntegratedSecurity)
+        {
             'True' { $sqlConnectionStringBuilder["Integrated Security"] = 'True' }
             'False' { $sqlConnectionStringBuilder["Integrated Security"] = 'False' }
             'SSPI' { $sqlConnectionStringBuilder['Integrated Security'] = 'SSPI' }
         }
-        if ($Credential) {
+        if ($Credential)
+        {
             $sqlConnectionStringBuilder.UserID = $Credential.UserName
             $sqlConnectionStringBuilder.Password = (ConvertTo-PlainText -SecureString $Credential.Password)
         }
         $sqlConnectionStringBuilder.Encrypt = $false
-        if ($Encrypt.IsPresent) {
+        if ($Encrypt.IsPresent)
+        {
             $sqlConnectionStringBuilder.Encrypt = $true
         }
         $connectionString = $sqlConnectionStringBuilder.ConnectionString
-        if ($IntegratedSecurity -eq 'SSPI') {
+        if ($IntegratedSecurity -eq 'SSPI')
+        {
             $connectionString = $connectionString.Replace('Integrated Security=True','Integrated Security=SSPI')
         }
         return $sqlConnectionStringBuilder.ConnectionString.Replace("UserID","User Id")
     }
 }
 
-function Get-SqlConnectionStringPropertyValue {
+function Get-SqlConnectionStringPropertyValue
+{
     <#
     .SYNOPSIS
 
@@ -285,7 +305,8 @@ function Get-SqlConnectionStringPropertyValue {
     #>
     [CmdletBinding()]
     [OutputType([object])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $SqlConnectionString,
@@ -294,21 +315,24 @@ function Get-SqlConnectionStringPropertyValue {
         [string]
         $PropertyName
     )
-    process {
+    process
+    {
         $params = @{
             TypeName     = 'System.Data.SqlClient.SqlConnectionStringBuilder'
             ArgumentList = $SqlConnectionString
         }
         $sqlConnectionStringBuilder = New-Object @params
         if ($PropertyName -eq 'Integrated Security' -and
-            $SqlConnectionString.Contains('Integrated Security=SSPI')) {
+            $SqlConnectionString.Contains('Integrated Security=SSPI'))
+        {
             return 'SSPI'
         }
         return $sqlConnectionStringBuilder[$PropertyName]
     }
 }
 
-function Compare-SecureStrings {
+function Compare-SecureStrings
+{
     <#
     .SYNOPSIS
 
@@ -327,7 +351,8 @@ function Compare-SecureStrings {
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [securestring]
         $ReferenceSecureString,
@@ -336,13 +361,15 @@ function Compare-SecureStrings {
         [securestring]
         $DifferenceSecureString
     )
-    process {
+    process
+    {
         return ((ConvertTo-PlainText -SecureString $ReferenceSecureString) -eq
                 (ConvertTo-PlainText -SecureString $DifferenceSecureString))
     }
 }
 
-function Get-AccountName {
+function Get-AccountName
+{
     <#
     .SYNOPSIS
 
@@ -361,28 +388,36 @@ function Get-AccountName {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $FullAccountNameWithDomain
     )
-    process {
+    process
+    {
         $AccountName = [string]::Empty
-        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0) {
+        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0)
+        {
             $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
                 return $array[1]
             }
-        } else {
+        }
+        else
+        {
             $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
                 return $array[0]
             }
         }
     }
 }
 
-function Get-AccountDomainName {
+function Get-AccountDomainName
+{
     <#
     .SYNOPSIS
 
@@ -401,24 +436,33 @@ function Get-AccountDomainName {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $FullAccountNameWithDomain
     )
-    process {
+    process
+    {
         $AccountName = [string]::Empty
-        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0) {
+        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0)
+        {
             $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
-                if ($array.Length -eq 2) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
+                if ($array.Length -eq 2)
+                {
                     return $array[0]
                 }
             }
-        } else {
+        }
+        else
+        {
             $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
-                if ($array.Length -eq 2) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
+                if ($array.Length -eq 2)
+                {
                     return $array[1]
                 }
             }
@@ -426,7 +470,8 @@ function Get-AccountDomainName {
     }
 }
 
-function Get-DistinguishedNameForDomain {
+function Get-DistinguishedNameForDomain
+{
     <#
     .SYNOPSIS
 
@@ -445,17 +490,20 @@ function Get-DistinguishedNameForDomain {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $DomainName
     )
-    process {
+    process
+    {
         return ([adsi]"LDAP://$domainName").distinguishedName
     }
 }
 
-function Get-FullyQualifiedDomainName {
+function Get-FullyQualifiedDomainName
+{
     <#
     .SYNOPSIS
 
@@ -474,23 +522,27 @@ function Get-FullyQualifiedDomainName {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $DomainName
     )
-    process {
+    process
+    {
         $distinguishedName = Get-DistinguishedNameForDomain -DomainName $DomainName
         $resultArray = @()
         $componentArray = $distinguishedName.Split(',',
                                                    [System.StringSplitOptions]::RemoveEmptyEntries)
-        ForEach ($component in $componentArray) {
+        ForEach ($component in $componentArray)
+        {
             $componentKeyValuePairArray = $component.Split('=',
                                                            [System.StringSplitOptions]::RemoveEmptyEntries)
             if ($componentKeyValuePairArray.Length -eq 2 -and
                 [string]::Equals($componentKeyValuePairArray[0],
                                  'DC',
-                                 [System.StringComparison]::OrdinalIgnoreCase)) {
+                                 [System.StringComparison]::OrdinalIgnoreCase))
+            {
                 $resultArray += $componentKeyValuePairArray[1]
             }
         }
@@ -498,7 +550,8 @@ function Get-FullyQualifiedDomainName {
     }
 }
 
-function Get-NetBIOSDomainName {
+function Get-NetBIOSDomainName
+{
     <#
     .SYNOPSIS
 
@@ -517,17 +570,20 @@ function Get-NetBIOSDomainName {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $DomainName
     )
-    process {
+    process
+    {
         return ([adsi]"LDAP://$domainName").name.ToUpper()
     }
 }
 
-function Format-AccountName {
+function Format-AccountName
+{
     <#
     .SYNOPSIS
 
@@ -546,7 +602,8 @@ function Format-AccountName {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $FullAccountNameWithDomain,
@@ -557,15 +614,18 @@ function Format-AccountName {
         [string]
         $Format
     )
-    process {
-        if ($Format -eq 'UserLogonName') {
+    process
+    {
+        if ($Format -eq 'UserLogonName')
+        {
             $stringFormat = '{0}@{1}'
             $accountName = Get-AccountName -FullAccountNameWithDomain $FullAccountNameWithDomain
             $domainName = Get-AccountDomainName -FullAccountNameWithDomain $FullAccountNameWithDomain
             $fullyQualifiedDomainName = Get-FullyQualifiedDomainName -DomainName $domainName
             return ([string]::Format($stringFormat, $accountName, $fullyQualifiedDomainName))
         }
-        if ($Format -eq 'UserLogonNamePreWindows2000') {
+        if ($Format -eq 'UserLogonNamePreWindows2000')
+        {
             $stringFormat = '{0}\{1}'
             $accountName = Get-AccountName -FullAccountNameWithDomain $FullAccountNameWithDomain
             $domainName = Get-AccountDomainName -FullAccountNameWithDomain $FullAccountNameWithDomain
@@ -575,7 +635,8 @@ function Format-AccountName {
     }
 }
 
-function Compare-AccountNames {
+function Compare-AccountNames
+{
     <#
     .SYNOPSIS
 
@@ -594,7 +655,8 @@ function Compare-AccountNames {
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         [string]
         $ReferenceAccountNameWithDomain,
@@ -603,7 +665,8 @@ function Compare-AccountNames {
         [string]
         $DifferenceAccountNameWithDomain
     )
-    process {
+    process
+    {
         $reference = (Format-AccountName -FullAccountNameWithDomain $ReferenceAccountNameWithDomain -Format UserLogonNamePreWindows2000).ToLower()
         $difference = (Format-AccountName -FullAccountNameWithDomain $DifferenceAccountNameWithDomain -Format UserLogonNamePreWindows2000).ToLower()
         return ($reference -eq $difference)
