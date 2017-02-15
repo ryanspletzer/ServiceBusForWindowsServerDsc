@@ -22,7 +22,7 @@ CompanyName = ''
 Copyright = '(c) 2017 Ryan Spletzer. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'This DSC Module allows you to configure a Service Bus for Windows Server farm.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.0'
