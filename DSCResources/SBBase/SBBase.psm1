@@ -42,7 +42,7 @@ class SBBase
     <#
         Allows for getting properties on the class object by name.
     #>
-    [object] GetProperty([object]$name)
+    [object] GetProperty([object] $name)
     {
         $type = $this.GetType()
         $propertyInfo = $type.GetProperty($name)
@@ -52,7 +52,7 @@ class SBBase
     <#
         Allows for setting properties on the class object by name.
     #>
-    [void] SetProperty([object]$name, [object]$value)
+    [void] SetProperty([object] $name, [object] $value)
     {
         $type = $this.GetType()
         $propertyInfo = $type.GetProperty($name)

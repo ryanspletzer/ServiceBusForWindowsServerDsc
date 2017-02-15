@@ -8,7 +8,7 @@ function GetBuiltInAdministratorsName()
         [WellKnownSidType]::BuiltinAdministratorsSid,
         $null
     )
-    $nTAccount = [NTAccount]$securityIdentifier.Translate(
+    $nTAccount = [NTAccount] $securityIdentifier.Translate(
                      [System.Type]::GetType("System.Security.Principal.NTAccount")
                  )
     return $nTAccount.ToString()
@@ -1116,7 +1116,7 @@ function Set-SBNamespace()
         [ValidateNotNullOrEmpty()]
         [ValidateScript({
             $guid = [Guid]::NewGuid()
-            ([Guid]::TryParse($_, ([REF]$guid)))
+            ([Guid]::TryParse($_, ([REF] $guid)))
         })]
         [Alias("subscription")]
         [string]

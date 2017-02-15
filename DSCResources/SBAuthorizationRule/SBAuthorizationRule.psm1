@@ -101,7 +101,7 @@ class SBAuthorizationRule : SBBase
         $result.Name = $sbAuthorizationRule.KeyName
         $result.NamespaceName = $this.NamespaceName
         $result.PrimaryKey = $sbAuthorizationRule.PrimaryKey
-        $result.Rights = [string[]]$sbAuthorizationRule.Rights.ForEach({$_})
+        $result.Rights = [string[]] $sbAuthorizationRule.Rights.ForEach({$_})
         $result.SecondaryKey = $sbAuthorizationRule.SecondaryKey
 
         return $result
@@ -129,17 +129,17 @@ class SBAuthorizationRule : SBBase
         return $true
     }
 
-    [bool] SBAuthorizationRuleShouldBeCreated([SBAuthorizationRule]$CurrentValues)
+    [bool] SBAuthorizationRuleShouldBeCreated([SBAuthorizationRule] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBAuthorizationRuleShouldBeRemoved([SBAuthorizationRule]$CurrentValues)
+    [bool] SBAuthorizationRuleShouldBeRemoved([SBAuthorizationRule] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBAuthorizationRuleShouldBeUpdated([SBAuthorizationRule]$CurrentValues)
+    [bool] SBAuthorizationRuleShouldBeUpdated([SBAuthorizationRule] $CurrentValues)
     {
         $currentRights = $CurrentValues.Rights
         $desiredRights = $this.Rights

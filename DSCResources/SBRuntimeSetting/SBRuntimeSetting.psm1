@@ -113,7 +113,7 @@ class SBRuntimeSetting : SBBase
         return $true
     }
 
-    [bool] SBRuntimeSettingShouldBeUpdated([SBRuntimeSetting]$Current)
+    [bool] SBRuntimeSettingShouldBeUpdated([SBRuntimeSetting] $Current)
     {
         return ($Current.Value -ne $this.Value)
     }
@@ -125,7 +125,7 @@ class SBRuntimeSetting : SBBase
         if ($this.Name -in @( 'IncludeExceptionDetails', 'DebugMode' ))
         {
             $result = $null
-            if (![Boolean]::TryParse($this.Value, [ref]$result))
+            if (![Boolean]::TryParse($this.Value, [ref] $result))
             {
                 throw "String setting for $($this.Name) is not a boolean value."
                 return
@@ -139,7 +139,7 @@ class SBRuntimeSetting : SBBase
                 'MessageCacheSizePerEntity'
             ))
         {
-            if (![Int64]::TryParse($this.Value, [ref]$int64Result))
+            if (![Int64]::TryParse($this.Value, [ref] $int64Result))
             {
                 throw "String setting for $($this.Name) is not an Int64 value."
                 return
@@ -171,7 +171,7 @@ class SBRuntimeSetting : SBBase
             ForEach ($string in $stringArray)
             {
                 $int64Result = $null
-                if (![Int64]::TryParse($this.Value, [ref]$int64Result))
+                if (![Int64]::TryParse($this.Value, [ref] $int64Result))
                 {
                     throw ("String setting for $($this.Name) must be an enumerable set of Int64 values separated " +
                            "by semicolon characters. $($this.Value) is an invalid value.")

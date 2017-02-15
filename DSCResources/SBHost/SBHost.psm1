@@ -255,22 +255,22 @@ class SBHost : SBBase
         return Test-SBParameterState @params
     }
 
-    [bool] SBHostShouldBeAdded([SBHost]$CurrentValues)
+    [bool] SBHostShouldBeAdded([SBHost] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBHostShouldBeRemoved([SBHost]$CurrentValues)
+    [bool] SBHostShouldBeRemoved([SBHost] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBHostShouldBeStarted([SBHost]$CurrentValues)
+    [bool] SBHostShouldBeStarted([SBHost] $CurrentValues)
     {
         return (($this.Started -eq $true) -and ($CurrentValues.Started -eq $false))
     }
 
-    [bool] SBHostShouldBeStopped([SBHost]$CurrentValues)
+    [bool] SBHostShouldBeStopped([SBHost] $CurrentValues)
     {
         return (($this.Started -eq $false) -and ($CurrentValues.Started -eq $true))
     }
