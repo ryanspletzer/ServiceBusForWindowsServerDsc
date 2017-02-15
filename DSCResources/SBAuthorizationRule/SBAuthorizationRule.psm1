@@ -1,6 +1,5 @@
 using Module ..\SBBase
 
-
 <#
     SBAuthorizationRule adds, removes and updates settings for a Service Bus for Windows Server authorization rule.
 #>

@@ -62,7 +62,7 @@ try
             Context 'Base methods' {
                 It 'ToHashtable() returns class properties as a hashtable' {
                     # Arrange
-                    $ht = $testSBFarm.ToHashtable()
+                    $hashtable = $testSBFarm.ToHashtable()
 
                     $propertyCount = 0
 
@@ -71,12 +71,12 @@ try
                         Where-Object MemberType -eq 'Property' |
                         ForEach-Object {
                             # Assert
-                            $ht[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
+                            $hashtable[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
                             $propertyCount += 1
                         }
 
                     # Assert
-                    $ht.Keys.Count | Should BeExactly $propertyCount
+                    $hashtable.Keys.Count | Should BeExactly $propertyCount
                 }
 
                 It 'GetProperty() returns property value' {
@@ -98,18 +98,18 @@ try
 
                 It 'GetDscNotConfigurablePropertiesAsHashtable() returns not configurable properties as a hashtable' {
                     # Act
-                    $ht = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
+                    $hashtable = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
 
                     # Assert
-                    $ht.Count | Should BeExactly 9
+                    $hashtable.Count | Should BeExactly 9
                 }
 
                 It 'GetDscConfigurablePropertiesAsHashtable() returns configurable properties as a hashtable' {
                     # Act
-                    $ht = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
+                    $hashtable = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
 
                     # Assert
-                    $ht.Count | Should BeExactly 30
+                    $hashtable.Count | Should BeExactly 30
                 }
             }
         }
