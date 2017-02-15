@@ -81,7 +81,7 @@ try
                 It 'SetProperty() sets property value' {
                     # Act
                     $testSBFarm.SetProperty('RunAsAccount','servicebus2@contoso.com')
-                    $value = [string]$testSBFarm.RunAsAccount
+                    $value = [string] $testSBFarm.RunAsAccount
 
                     # Assert
                     $value | Should BeExactly 'servicebus2@contoso.com'

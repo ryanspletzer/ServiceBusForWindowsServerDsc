@@ -221,12 +221,12 @@ class SBMessageContainer : SBBase
         return $true
     }
 
-    [bool] SBMessageContainerShouldBeCreated([SBMessageContainer]$CurrentValues)
+    [bool] SBMessageContainerShouldBeCreated([SBMessageContainer] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBMessageContainerShouldBeRemoved([SBMessageContainer]$CurrentValues)
+    [bool] SBMessageContainerShouldBeRemoved([SBMessageContainer] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }

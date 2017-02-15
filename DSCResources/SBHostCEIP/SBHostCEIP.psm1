@@ -62,12 +62,12 @@ class SBHostCEIP : SBBase
         return $true
     }
 
-    [bool] SBHostCEIPShouldBeEnabled([SBHostCEIP]$CurrentValues)
+    [bool] SBHostCEIPShouldBeEnabled([SBHostCEIP] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBHostCEIPShouldBeDisabled([SBHostCEIP]$CurrentValues)
+    [bool] SBHostCEIPShouldBeDisabled([SBHostCEIP] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
