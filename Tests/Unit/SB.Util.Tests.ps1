@@ -53,7 +53,9 @@ try
             Context "Validate Test-SBParameterState" {
                 It "Returns true for two identical tables" {
                     # Arrange
-                    $desired = @{ Example = "test" }
+                    $desired = @{
+                        Example = "test"
+                    }
 
                     # Act | Assert
                     Test-SBParameterState -CurrentValues $desired -DesiredValues $desired | Should Be $true
@@ -61,8 +63,12 @@ try
 
                 It "Returns false when a value is different" {
                     # Arrange
-                    $current = @{ Example = "something" }
-                    $desired = @{ Example = "test" }
+                    $current = @{
+                        Example = "something"
+                    }
+                    $desired = @{
+                        Example = "test"
+                    }
 
                     # Act | Assert
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
@@ -70,8 +76,10 @@ try
 
                 It "Returns false when a value is missing" {
                     # Arrange
-                    $current = @{ }
-                    $desired = @{ Example = "test" }
+                    $current = @{}
+                    $desired = @{
+                        Example = "test"
+                    }
 
                     # Act | Assert
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
@@ -79,8 +87,14 @@ try
 
                 It "Returns true when only a specified value matches, but other non-listed values do not" {
                     # Arrange
-                    $current = @{ Example = "test"; SecondExample = "true" }
-                    $desired = @{ Example = "test"; SecondExample = "false"  }
+                    $current = @{
+                        Example       = "test";
+                        SecondExample = "true"
+                    }
+                    $desired = @{
+                        Example       = "test";
+                        SecondExample = "false"
+                    }
 
                     # Act | Assert
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @( "Example" ) | Should Be $true
@@ -88,8 +102,14 @@ try
 
                 It "Returns false when only specified values do not match, but other non-listed values do " {
                     # Arrange
-                    $current = @{ Example = "test"; SecondExample = "true" }
-                    $desired = @{ Example = "test"; SecondExample = "false"  }
+                    $current = @{
+                        Example       = "test";
+                        SecondExample = "true"
+                    }
+                    $desired = @{
+                        Example       = "test";
+                        SecondExample = "false"
+                    }
 
                     # Act | Assert
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired -ValuesToCheck @( "SecondExample" ) | Should Be $false
@@ -97,8 +117,11 @@ try
 
                 It "Returns false when an empty array is used in the current values" {
                     # Arrange
-                    $current = @{ }
-                    $desired = @{ Example = "test"; SecondExample = "false"  }
+                    $current = @{}
+                    $desired = @{
+                        Example       = "test";
+                        SecondExample = "false"
+                    }
 
                     # Act | Assert
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
