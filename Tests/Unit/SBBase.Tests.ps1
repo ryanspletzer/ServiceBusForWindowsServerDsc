@@ -38,10 +38,7 @@ try
         $testSBFarm = [SBFarm]::new()
         $adminApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
-            ArgumentList = @(
-                "adminUser",
-                (ConvertTo-SecureString -String "password" -AsPlainText -Force)
-            )
+            ArgumentList = @( "adminUser", (ConvertTo-SecureString -String "password" -AsPlainText -Force) )
         }
         $testSBFarm.AdminApiCredentials = New-Object @adminApiCredentialParams
         $testSBFarm.EncryptionCertificateThumbprint = '62C99D4B5711E2482A5A1AECE6F8D05231D5678D'
@@ -51,10 +48,7 @@ try
         $testSBFarm.SBFarmDBConnectionStringDataSource = 'SQLSERVER.contoso.com'
         $tenantApiCredentialParams = @{
             TypeName     = 'System.Management.Automation.PSCredential'
-            ArgumentList = @(
-                "tenantUser",
-                (ConvertTo-SecureString -String "password" -AsPlainText -Force)
-            )
+            ArgumentList = @( "tenantUser", (ConvertTo-SecureString -String "password" -AsPlainText -Force) )
         }
         $testSBFarm.TenantApiCredentials = New-Object @tenantApiCredentialParams
 
@@ -62,21 +56,21 @@ try
             Context 'Base methods' {
                 It 'ToHashtable() returns class properties as a hashtable' {
                     # Arrange
-                    $ht = $testSBFarm.ToHashtable()
+                    $hashtable = $testSBFarm.ToHashtable()
 
                     $propertyCount = 0
 
                     # Act
                     Get-Member -InputObject $testSBFarm |
                         Where-Object MemberType -eq 'Property' |
-                        ForEach-Object {
+                        ForEach-Object{
                             # Assert
-                            $ht[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
+                            $hashtable[$_.Name] | Should BeExactly $testSBFarm.($_.Name)
                             $propertyCount += 1
                         }
 
                     # Assert
-                    $ht.Keys.Count | Should BeExactly $propertyCount
+                    $hashtable.Keys.Count | Should BeExactly $propertyCount
                 }
 
                 It 'GetProperty() returns property value' {
@@ -87,7 +81,7 @@ try
                 It 'SetProperty() sets property value' {
                     # Act
                     $testSBFarm.SetProperty('RunAsAccount','servicebus2@contoso.com')
-                    $value = [string]$testSBFarm.RunAsAccount
+                    $value = [string] $testSBFarm.RunAsAccount
 
                     # Assert
                     $value | Should BeExactly 'servicebus2@contoso.com'
@@ -98,18 +92,18 @@ try
 
                 It 'GetDscNotConfigurablePropertiesAsHashtable() returns not configurable properties as a hashtable' {
                     # Act
-                    $ht = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
+                    $hashtable = $testSBFarm.GetDscNotConfigurablePropertiesAsHashtable()
 
                     # Assert
-                    $ht.Count | Should BeExactly 9
+                    $hashtable.Count | Should BeExactly 9
                 }
 
                 It 'GetDscConfigurablePropertiesAsHashtable() returns configurable properties as a hashtable' {
                     # Act
-                    $ht = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
+                    $hashtable = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
 
                     # Assert
-                    $ht.Count | Should BeExactly 30
+                    $hashtable.Count | Should BeExactly 30
                 }
             }
         }

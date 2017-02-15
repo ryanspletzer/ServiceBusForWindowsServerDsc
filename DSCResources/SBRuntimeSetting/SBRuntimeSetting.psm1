@@ -1,11 +1,11 @@
 using module ..\SBBase
 
-
 <#
     SBRuntimeSetting modifies a Service Bus for Windows Server runtime setting.
 #>
 [DscResource()]
-class SBRuntimeSetting : SBBase {
+class SBRuntimeSetting : SBBase
+{
 
     <#
         The name of the Service Bus for Windows Server configuration parameter. The valid setting names that can be
@@ -68,20 +68,25 @@ class SBRuntimeSetting : SBBase {
     [string]
     $Value
 
-    [SBRuntimeSetting] Get() {
+    [SBRuntimeSetting] Get()
+    {
         $result = [SBRuntimeSetting]::new()
 
         Write-Verbose -Message "Checking for SBRuntimeSetting $($this.Name)."
 
         $sbRuntimeSetting = $null
-        try {
+        try
+        {
             $sbRuntimeSetting = Get-SBRuntimeSetting -Name $this.Name
             Write-Verbose "Successfully retrieved SBRuntimeSetting $($this.Name)"
-        } catch {
+        }
+        catch
+        {
             Write-Verbose "Unable to retrieve SBRuntimeSetting $($this.Name)"
         }
 
-        if ($null -eq $sbRuntimeSetting) {
+        if ($null -eq $sbRuntimeSetting)
+        {
             return $result
         }
 
@@ -91,33 +96,37 @@ class SBRuntimeSetting : SBBase {
         return $result
     }
 
-    [bool] Test() {
+    [bool] Test()
+    {
         $current = $this.Get()
 
-        if ($null -eq $current) {
+        if ($null -eq $current)
+        {
             return $false
         }
 
-        if ($this.SBRuntimeSettingShouldBeUpdated($current)) {
+        if ($this.SBRuntimeSettingShouldBeUpdated($current))
+        {
             return $false
         }
 
         return $true
     }
 
-    [bool] SBRuntimeSettingShouldBeUpdated([SBRuntimeSetting]$Current) {
+    [bool] SBRuntimeSettingShouldBeUpdated([SBRuntimeSetting] $Current)
+    {
         return ($Current.Value -ne $this.Value)
     }
 
-    [void] Set() {
+    [void] Set()
+    {
         Write-Verbose -Message "Validating SBRuntimeSetting $($this.Name) for value $($this.Value)."
 
-        if ($this.Name -in @(
-            'IncludeExceptionDetails',
-            'DebugMode'
-        )) {
+        if ($this.Name -in @( 'IncludeExceptionDetails', 'DebugMode' ))
+        {
             $result = $null
-            if (![Boolean]::TryParse($this.Value, [ref]$result)) {
+            if (![Boolean]::TryParse($this.Value, [ref] $result))
+            {
                 throw "String setting for $($this.Name) is not a boolean value."
                 return
             }
@@ -125,51 +134,53 @@ class SBRuntimeSetting : SBBase {
 
         $int64Result = $null
         if ($this.Name -in @(
-            'DefaultMaximumQueueSizeInMegabytes',
-            'DefaultMaximumTopicSizeInMegabytes',
-            'MessageCacheSizePerEntity'
-        )) {
-            if (![Int64]::TryParse($this.Value, [ref]$int64Result)) {
+                'DefaultMaximumQueueSizeInMegabytes',
+                'DefaultMaximumTopicSizeInMegabytes',
+                'MessageCacheSizePerEntity'
+            ))
+        {
+            if (![Int64]::TryParse($this.Value, [ref] $int64Result))
+            {
                 throw "String setting for $($this.Name) is not an Int64 value."
                 return
             }
 
-            if ($this.Name -in @(
-                'DefaultMaximumQueueSizeInMegabytes',
-                'DefaultMaximumTopicSizeInMegabytes'
-            )) {
+            if ($this.Name -in @( 'DefaultMaximumQueueSizeInMegabytes', 'DefaultMaximumTopicSizeInMegabytes'))
+            {
                 if (($int64Result -lt 1) -or
-                    ($int64Result -gt 8796093022207)) {
+                    ($int64Result -gt 8796093022207))
+                {
                     throw "String setting for $($this.Name) not between 1 and 8796093022207."
                     return
                 }
             }
 
-            if ($this.Name -in @(
-                'MessageCacheSizePerEntity'
-            )) {
-                if ($int64Result -lt 1) {
+            if ($this.Name -in @( 'MessageCacheSizePerEntity' ))
+            {
+                if ($int64Result -lt 1)
+                {
                     throw "String setting for $($this.Name) not between 1 and 9223372036854775807."
                     return
                 }
             }
         }
 
-        if ($this.Name -in @(
-            'MaximumQueueSizeInMegabytes',
-            'MaximumTopicSizeInMegabytes'
-        )) {
+        if ($this.Name -in @( 'MaximumQueueSizeInMegabytes', 'MaximumTopicSizeInMegabytes' ))
+        {
             $stringArray = $this.Value.Split(';')
-            ForEach ($string in $stringArray) {
+            foreach ($string in $stringArray)
+            {
                 $int64Result = $null
-                if (![Int64]::TryParse($this.Value, [ref]$int64Result)) {
+                if (![Int64]::TryParse($this.Value, [ref] $int64Result))
+                {
                     throw ("String setting for $($this.Name) must be an enumerable set of Int64 values separated " +
                            "by semicolon characters. $($this.Value) is an invalid value.")
                     return
                 }
 
                 if (($int64Result -lt 1) -or
-                    ($int64Result -gt 8796093022207)) {
+                    ($int64Result -gt 8796093022207))
+                {
                     throw ("Int64 value $int64Result in $($this.Value) for $($this.Name) is not between 1 and " +
                            "8796093022207.")
                     return
@@ -179,19 +190,22 @@ class SBRuntimeSetting : SBBase {
 
         $int32Result = $null
         if ($this.Name -in @(
-            'MaximumNumberOfConnectionsPerEntity',
-            'MaximumNumberOfCorrelationFiltersPerTopic',
-            'MaximumNumberOfQueuesPerNamespace',
-            'MaximumNumberOfSqlFiltersPerTopic',
-            'MaximumNumberOfSubscriptionsPerTopic',
-            'MaximumNumberOfTopicsPerNamespace'
-        )) {
-            if (![Int32]::TryParse($this.Value, $int32Result)) {
+                'MaximumNumberOfConnectionsPerEntity',
+                'MaximumNumberOfCorrelationFiltersPerTopic',
+                'MaximumNumberOfQueuesPerNamespace',
+                'MaximumNumberOfSqlFiltersPerTopic',
+                'MaximumNumberOfSubscriptionsPerTopic',
+                'MaximumNumberOfTopicsPerNamespace'
+            ))
+        {
+            if (![Int32]::TryParse($this.Value, $int32Result))
+            {
                 throw "String setting for $($this.Name) is not an Int32 value."
                 return
             }
 
-            if ($int32Result -lt 1) {
+            if ($int32Result -lt 1)
+            {
                 throw "String setting for $($this.Name) not between 1 and 2147483647."
                 return
             }

@@ -1,11 +1,11 @@
 using module ..\SBBase
 
-
 <#
     SBMessageContainer adds and removes a Service Bus for Windows Server message container.
 #>
 [DscResource()]
-class SBMessageContainer : SBBase {
+class SBMessageContainer : SBBase
+{
 
     <#
         The credential for connecting to the container database. Not required if integrated authentication will be
@@ -146,23 +146,28 @@ class SBMessageContainer : SBBase {
         This method returns an instance of this class with the updated key
         properties.
     #>
-    [SBMessageContainer] Get() {
+    [SBMessageContainer] Get()
+    {
         $result = [SBMessageContainer]::new()
 
         Write-Verbose -Message "Checking for SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
 
         Write-Verbose -Message "Trying to get SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
         $sbMessageContainer = $null
-        try {
+        try
+        {
             $sbMessageContainer = Get-SBMessageContainer |
-                                      Where-Object {
+                                      Where-Object{
                                           $_.DatabaseName -eq $this.ContainerDBConnectionStringInitialCatalog
                                       }
-        } catch {
+        }
+        catch
+        {
             Write-Verbose -Message "Unable to retrieve SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog)"
         }
 
-        if ($null -eq $sbMessageContainer) {
+        if ($null -eq $sbMessageContainer)
+        {
             $result.Ensure = [Ensure]::Absent
             return $result
         }
@@ -199,25 +204,30 @@ class SBMessageContainer : SBBase {
         It should return True or False, showing whether the resource
         is in a desired state.
     #>
-    [bool] Test() {
+    [bool] Test()
+    {
         $currentValues = $this.Get()
 
-        if ($this.SBMessageContainerShouldBeCreated($currentValues)) {
+        if ($this.SBMessageContainerShouldBeCreated($currentValues))
+        {
             return $false
         }
 
-        if ($this.SBMessageContainerShouldBeRemoved($currentValues)) {
+        if ($this.SBMessageContainerShouldBeRemoved($currentValues))
+        {
             return $false
         }
 
         return $true
     }
 
-    [bool] SBMessageContainerShouldBeCreated([SBMessageContainer]$CurrentValues) {
+    [bool] SBMessageContainerShouldBeCreated([SBMessageContainer] $CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBMessageContainerShouldBeRemoved([SBMessageContainer]$CurrentValues) {
+    [bool] SBMessageContainerShouldBeRemoved([SBMessageContainer] $CurrentValues)
+    {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
@@ -225,28 +235,33 @@ class SBMessageContainer : SBBase {
         This method is equivalent of the Set-TargetResource script function.
         It sets the resource to the desired state.
     #>
-    [void] Set() {
+    [void] Set()
+    {
         Write-Verbose -Message "Retrieving current SBMessageContainer values for container $($this.ContainerDBConnectionStringInitialCatalog)"
         $currentValues = $this.Get()
 
         Write-Verbose -Message "Checking if SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog) should be created"
-        if ($this.SBMessageContainerShouldBeCreated($currentValues)) {
+        if ($this.SBMessageContainerShouldBeCreated($currentValues))
+        {
             $this.NewSBMessageContainer()
         }
 
         Write-Verbose -Message "Checking if SBMessageContainer $($this.ContainerDBConnectionStringInitialCatalog) should be removed"
-        if ($this.SBMessageContainerShouldBeRemoved($currentValues)) {
+        if ($this.SBMessageContainerShouldBeRemoved($currentValues))
+        {
             $this.RemoveSBMessageContainer()
         }
     }
 
-    [void] NewSBMessageContainer() {
+    [void] NewSBMessageContainer()
+    {
         Write-Verbose -Message "Getting configurable properties as hashtable for New-SBMessageContainer params"
         $newSBMessageContainerParams = $this.GetDscConfigurablePropertiesAsHashtable()
 
         Write-Verbose -Message "Checking for SBFarmDBConnectionString properties"
         if (($null -ne $this.SBFarmDBConnectionStringDataSource) -and
-            ($null -ne $this.SBFarmDBConnectionStringInitialCatalog)) {
+            ($null -ne $this.SBFarmDBConnectionStringInitialCatalog))
+        {
             Write-Verbose -Message "SBFarmDBConnectionString properties are present"
             Write-Verbose -Message "Creating params for SBFarmDBConnectionString"
             $sbFarmDBConnectionStringParams = @{
@@ -296,7 +311,7 @@ class SBMessageContainer : SBBase {
         Write-Verbose -Message ("Retrieving SBMessageContainer by database name " +
                                 "$($this.ContainerDBConnectionStringInitialCatalog) to get its Id.")
         $sbMessageContainer = Get-SBMessageContainer |
-                                 Where-Object {
+                                 Where-Object{
                                      $_.DatabaseName -eq $this.ContainerDBConnectionStringInitialCatalog
                                  }
 

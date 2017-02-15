@@ -57,7 +57,8 @@ try
         Mock Update-SBHost {}
         Mock Get-CimInstance {
             [CmdletBinding()]
-            param (
+            param
+            (
                 [Parameter(Mandatory)]
                 [string]
                 $ClassName

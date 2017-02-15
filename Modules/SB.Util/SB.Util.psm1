@@ -1,43 +1,114 @@
-#
-# SB.Util.psm1
-#
-# Credit to SharePointDsc Resource module for nested Util approach and ideas for helper cmdlets in this file:
-#
-# https://github.com/PowerShell/SharePointDsc/blob/dev/Modules/SharePointDsc/Modules/SharePointDsc.Util/SharePointDsc.Util.psm1
-#
+<#
+    .SYNOPSIS
+        Tests if a given object contains a property.
 
+    .PARAMETER Object
+        Object to test.
 
-function Test-SBObjectHasProperty() {
+    .PARAMETER PropertyName
+        The name of the property to check.
+
+    .EXAMPLE
+        $object = [pscustomobject] @{
+            TestProperty = "TestValue"
+        }
+        Test-SBDscObjectHasProperty -Object $object -PropertyName 'TestProperty'
+#>
+function Test-SBDscObjectHasProperty
+{
     [CmdletBinding()]
-    [OutputType([bool])]
+    [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true,Position=1)]  [Object] $Object,
-        [parameter(Mandatory = $true,Position=2)]  [String] $PropertyName
+        [parameter(Mandatory = $true,Position=1)]
+        [object]
+        $Object,
+
+        [parameter(Mandatory = $true,Position=2)]
+        [string]
+        $PropertyName
     )
-    if (([bool]($Object.PSobject.Properties.name -contains $PropertyName)) -eq $true) {
-        if ($null -ne $Object.$PropertyName) {
+
+    if (([bool]($Object.PSobject.Properties.name -contains $PropertyName)) -eq $true)
+    {
+        if ($null -ne $Object.$PropertyName)
+        {
             return $true
         }
     }
     return $false
 }
 
+<#
+    .SYNOPSIS
+        Compares a set of current values with desired values based on named keys to check.
 
-function Test-SBParameterState() {
+    .PARAMETER CurrentValues
+        A hashtable of current values.
+
+    .PARAMETER DesiredValues
+        A hashtable of desired values or a CimInstance object.
+
+    .PARAMETER ValuesToCheck
+        An array of key names to check between the current and desired values.
+
+    .EXAMPLE
+        $params = @{
+            CurrentValues = @{
+                Key1 = "value1"
+                Key2 = "value2"
+            }
+            DesiredValues = = @{
+                Key1 = "value1"
+                Key2 = "value3"
+            }
+            ValuesToCheck = @(
+                "Key1"
+            )
+        }
+        # returns true
+        Test-SBParameterState @params
+
+    .EXAMPLE
+        $params = @{
+            CurrentValues = @{
+                Key1 = "value1"
+                Key2 = "value2"
+            }
+            DesiredValues = = @{
+                Key1 = "value1"
+                Key2 = "value3"
+            }
+        }
+        # returns false
+        Test-SBParameterState @params
+
+    .EXAMPLE
+        $cimInstance = Get-CimInstance -ClassName WIN32_ComputerSystem
+        $params = @{
+            CurrentValues = @{
+                Domain = "contoso.com"
+            }
+            DesiredValues = $cimInstance
+        }
+        # returns true if $cimInstance.Domain is 'contoso.com'
+        Test-SBParameterState @params
+#>
+function Test-SBParameterState()
+{
     [CmdletBinding()]
     param
     (
         [parameter(Mandatory = $true, Position=1)]
-        [HashTable]
+        [hashtable]
         $CurrentValues,
 
         [parameter(Mandatory = $true, Position=2)]
-        [Object]
+        [object]
         $DesiredValues,
 
         [parameter(Mandatory = $false, Position=3)]
-        [Array]
+        [array]
         $ValuesToCheck
     )
 
@@ -47,7 +118,7 @@ function Test-SBParameterState() {
         -and ($DesiredValues.GetType().Name -ne "CimInstance") `
         -and ($DesiredValues.GetType().Name -ne "PSBoundParametersDictionary"))
     {
-        throw ("Property 'DesiredValues' in Test-SPDscParameterState must be either a " + `
+        throw ("Property 'DesiredValues' in Test-SBParameterState must be either a " + `
                "Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
     }
 
@@ -81,7 +152,7 @@ function Test-SBParameterState() {
                 }
                 else
                 {
-                    $CheckDesiredValue = Test-SPDSCObjectHasProperty $DesiredValues $_
+                    $CheckDesiredValue = Test-SBDscObjectHasProperty $DesiredValues $_
                 }
 
                 if ($CheckDesiredValue)
@@ -170,7 +241,7 @@ function Test-SBParameterState() {
                                 Write-Verbose -Message ("Unable to compare property $fieldName " + `
                                                         "as the type ($($desiredType.Name)) is " + `
                                                         "not handled by the " + `
-                                                        "Test-SPDscParameterState cmdlet")
+                                                        "Test-SBParameterState cmdlet")
                                 $returnValue = $false
                             }
                         }
@@ -182,66 +253,90 @@ function Test-SBParameterState() {
     return $returnValue
 }
 
-
-function ConvertTo-PlainText {
-    <#
+<#
     .SYNOPSIS
+        Converts a secure string to plaintext.
 
-    .DESCRIPTION
-
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER SecureString
+        SecureString object
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        $secureString = ConvertTo-SecureString -String "string" -AsPlainText -Force
+        ConvertTo-PlainText -SecureString $secureString
+#>
+function ConvertTo-PlainText
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [securestring]
         $SecureString
     )
-    process {
+    process
+    {
         $BTSR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
         return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BTSR)
     }
 }
 
-
-function New-SqlConnectionString {
-    <#
+<#
     .SYNOPSIS
+        Creates a new SQL connection string from the inputs.
 
-    .DESCRIPTION
+    .PARAMETER DataSource
+        The SQL server / instance name.
 
-    .INPUTS
+    .PARAMETER InitialCatalog
+        The SQL database name.
 
-    .OUTPUTS
+    .PARAMETER IntegratedSecurity
+        Type of security for the SQL connection string.
+
+    .PARAMETER Credential
+        Username and password for the connection string. Not needed if IntegratedSecurity is True or SSPI.
+
+    .PARAMETER Encrypt
+        Indicates whether the connection string will be set up to use SSL/TLS.
 
     .EXAMPLE
+        $params = @{
+            DataSource         = 'SQL01.contoso.com'
+            InitialCatalog     = 'MyDatabase'
+            IntegratedSecurity = 'SSPI'
+        }
+        # returns 'Data Source=SQL01.contoso.com;Intial Catalog=MyDatabase;IntegratedSecurity=SSPI'
+        New-SqlConnectionString @params
 
-    .LINK
-
-    .NOTES
-    #>
+    .EXAMPLE
+        $credential = Get-Credential
+        $params = @{
+            DataSource         = 'SQL01.contoso.com'
+            InitialCatalog     = 'MyDatabase'
+            IntegratedSecurity = 'False'
+            Credential         = $credential
+            Encrypt            = $true
+        }
+        # returns 'Data Source=SQL01.contoso.com;Intial Catalog=MyDatabase;IntegratedSecurity=SSPI;`" +`
+        #         'User Name=<username>;Password=<password>'
+        New-SqlConnectionString @params
+#>
+function New-SqlConnectionString
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $DataSource,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $InitialCatalog,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('True','False','SSPI')]
         $IntegratedSecurity,
 
@@ -253,188 +348,204 @@ function New-SqlConnectionString {
         [switch]
         $Encrypt
     )
-    process {
+    process
+    {
         $sqlConnectionStringBuilder = New-Object -TypeName System.Data.Common.DbConnectionStringBuilder
         $sqlConnectionStringBuilder["Data Source"] = $DataSource
         $sqlConnectionStringBuilder["Initial Catalog"] = $InitialCatalog
         $sqlConnectionStringBuilder["Integrated Security"] = 'False'
-        switch ($IntegratedSecurity) {
+        switch ($IntegratedSecurity)
+        {
             'True' { $sqlConnectionStringBuilder["Integrated Security"] = 'True' }
             'False' { $sqlConnectionStringBuilder["Integrated Security"] = 'False' }
             'SSPI' { $sqlConnectionStringBuilder['Integrated Security'] = 'SSPI' }
         }
-        if ($Credential) {
+        if ($Credential)
+        {
             $sqlConnectionStringBuilder.UserID = $Credential.UserName
             $sqlConnectionStringBuilder.Password = (ConvertTo-PlainText -SecureString $Credential.Password)
         }
         $sqlConnectionStringBuilder.Encrypt = $false
-        if ($Encrypt.IsPresent) {
+        if ($Encrypt.IsPresent)
+        {
             $sqlConnectionStringBuilder.Encrypt = $true
         }
         $connectionString = $sqlConnectionStringBuilder.ConnectionString
-        if ($IntegratedSecurity -eq 'SSPI') {
+        if ($IntegratedSecurity -eq 'SSPI')
+        {
             $connectionString = $connectionString.Replace('Integrated Security=True','Integrated Security=SSPI')
         }
         return $sqlConnectionStringBuilder.ConnectionString.Replace("UserID","User Id")
     }
 }
 
-
-function Get-SqlConnectionStringPropertyValue {
-    <#
+<#
     .SYNOPSIS
+        Retrieves a given property value from a SQL connection string.
 
-    .DESCRIPTION
+    .PARAMETER SqlConnectionString
+        A SQL connection string.
 
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER PropertyName
+        The property name whose value to retrieve.
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-    #>
+        $connectionString = "Data Source=SQL1;Initial Catalog=MyDatabase;Integrated Security=SSPI"
+        # returns SQL1
+        Get-SqlConnectionStringPropertyValue -SqlConnectionString $connectionString -PropertyName "Data Source"
+#>
+function Get-SqlConnectionStringPropertyValue
+{
     [CmdletBinding()]
     [OutputType([object])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $SqlConnectionString,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $PropertyName
     )
-    process {
+    process
+    {
         $params = @{
             TypeName     = 'System.Data.SqlClient.SqlConnectionStringBuilder'
             ArgumentList = $SqlConnectionString
         }
         $sqlConnectionStringBuilder = New-Object @params
         if ($PropertyName -eq 'Integrated Security' -and
-            $SqlConnectionString.Contains('Integrated Security=SSPI')) {
+            $SqlConnectionString.Contains('Integrated Security=SSPI'))
+        {
             return 'SSPI'
         }
         return $sqlConnectionStringBuilder[$PropertyName]
     }
 }
 
-
-function Compare-SecureStrings {
-    <#
+<#
     .SYNOPSIS
+        Compares two secure strings, returns true if they are the same, false otherwise.
 
-    .DESCRIPTION
+    .PARAMETER ReferenceSecureString
+        The first secure string.
 
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER DifferenceSecureString
+        The second secure string to compare to.
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        $secureString1 = ConvertTo-SecureString -String "string1" -AsPlainText -Force
+        $secureString2 = ConvertTo-SecureString -String "string2" -AsPlainText -Force
+        # returns false
+        Compare-SecureStrings -ReferenceSecureString $secureString1 -DifferenceSecureString $secureString2
+#>
+function Compare-SecureStrings
+{
     [CmdletBinding()]
     [OutputType([bool])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [securestring]
         $ReferenceSecureString,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [securestring]
         $DifferenceSecureString
     )
-    process {
+    process
+    {
         return ((ConvertTo-PlainText -SecureString $ReferenceSecureString) -eq
                 (ConvertTo-PlainText -SecureString $DifferenceSecureString))
     }
 }
 
-
-function Get-AccountName {
-    <#
+<#
     .SYNOPSIS
+        Gets the account name without the domain prefix or suffix.
 
-    .DESCRIPTION
-
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER FullAccountNameWithDomain
+        An account in the format CORP\account or account@contoso.com
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        # returns 'account'
+        Get-AccountName -FullAccountNameWithDomain 'CORP\account'
+#>
+function Get-AccountName
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $FullAccountNameWithDomain
     )
-    process {
+    process
+    {
         $AccountName = [string]::Empty
-        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0) {
+        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0)
+        {
             $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
                 return $array[1]
             }
-        } else {
+        }
+        else
+        {
             $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
                 return $array[0]
             }
         }
     }
 }
 
-
-function Get-AccountDomainName {
-    <#
+<#
     .SYNOPSIS
+        Retrieves the domain name from a full account name.
 
-    .DESCRIPTION
-
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER FullAccountWithDomain
+        An account in the format CORP\account or account@contoso.com
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        # returns 'CORP'
+        Get-AccountDomainName -FullAccountNameWithDomain 'CORP\account'
+#>
+function Get-AccountDomainName
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $FullAccountNameWithDomain
     )
-    process {
+    process
+    {
         $AccountName = [string]::Empty
-        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0) {
+        if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0)
+        {
             $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
-                if ($array.Length -eq 2) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
+                if ($array.Length -eq 2)
+                {
                     return $array[0]
                 }
             }
-        } else {
+        }
+        else
+        {
             $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0) {
-                if ($array.Length -eq 2) {
+            if ($array -ne $null -and $array.Length -gt 0)
+            {
+                if ($array.Length -eq 2)
+                {
                     return $array[1]
                 }
             }
@@ -442,73 +553,69 @@ function Get-AccountDomainName {
     }
 }
 
-
-function Get-DistinguishedNameForDomain {
-    <#
+<#
     .SYNOPSIS
+        Gets the distinguished name for a domain.
 
-    .DESCRIPTION
-
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER DomainName
+        A domain name like CONTOSO
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        # returns ex. 'DC=contoso,DC=com'
+        Get-DistinguishedNameForDomain -DomainName 'CONTOSO'
+#>
+function Get-DistinguishedNameForDomain
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $DomainName
     )
-    process {
+    process
+    {
         return ([adsi]"LDAP://$domainName").distinguishedName
     }
 }
 
-
-function Get-FullyQualifiedDomainName {
-    <#
+<#
     .SYNOPSIS
+        Fully qualifies a domain name
 
-    .DESCRIPTION
-
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER DomainName
+        The domain name like CONTOSO
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        # returns ex. contoso.com
+        Get-FullyQualifiedDomainName -DomainName "CONTOSO"
+#>
+function Get-FullyQualifiedDomainName
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $DomainName
     )
-    process {
+    process
+    {
         $distinguishedName = Get-DistinguishedNameForDomain -DomainName $DomainName
         $resultArray = @()
         $componentArray = $distinguishedName.Split(',',
                                                    [System.StringSplitOptions]::RemoveEmptyEntries)
-        ForEach ($component in $componentArray) {
+        foreach ($component in $componentArray)
+        {
             $componentKeyValuePairArray = $component.Split('=',
                                                            [System.StringSplitOptions]::RemoveEmptyEntries)
             if ($componentKeyValuePairArray.Length -eq 2 -and
                 [string]::Equals($componentKeyValuePairArray[0],
                                  'DC',
-                                 [System.StringComparison]::OrdinalIgnoreCase)) {
+                                 [System.StringComparison]::OrdinalIgnoreCase))
+            {
                 $resultArray += $componentKeyValuePairArray[1]
             }
         }
@@ -516,76 +623,75 @@ function Get-FullyQualifiedDomainName {
     }
 }
 
-
-function Get-NetBIOSDomainName {
-    <#
+<#
     .SYNOPSIS
+        Gets the NetBIOS format of a domain name
 
-    .DESCRIPTION
-
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER DomainName
+        The domain name like contoso.com
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        # returns ex. 'CONTOSO'
+        Get-NetBIOSDomainName -DomainName 'contoso.com'
+#>
+function Get-NetBIOSDomainName
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $DomainName
     )
-    process {
+    process
+    {
         return ([adsi]"LDAP://$domainName").name.ToUpper()
     }
 }
 
-
-function Format-AccountName {
-    <#
+<#
     .SYNOPSIS
+        Formats an account to a given format.
 
-    .DESCRIPTION
+    .PARAMETER FullAccountNameWithDomain
+        Full account with domain name e.g. CORP\account or account@contoso.com
 
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER Format
+        The format to take the account to.
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        # returns ex. account@contoso.com
+        Format-AccountName -FullAccountNameWithDomain 'CONTOSO\account' -Format 'UserLogonName'
+#>
+function Format-AccountName
+{
     [CmdletBinding()]
     [OutputType([string])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $FullAccountNameWithDomain,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('UserLogonName',
                      'UserLogonNamePreWindows2000')]
         [string]
         $Format
     )
-    process {
-        if ($Format -eq 'UserLogonName') {
+    process
+    {
+        if ($Format -eq 'UserLogonName')
+        {
             $stringFormat = '{0}@{1}'
             $accountName = Get-AccountName -FullAccountNameWithDomain $FullAccountNameWithDomain
             $domainName = Get-AccountDomainName -FullAccountNameWithDomain $FullAccountNameWithDomain
             $fullyQualifiedDomainName = Get-FullyQualifiedDomainName -DomainName $domainName
             return ([string]::Format($stringFormat, $accountName, $fullyQualifiedDomainName))
         }
-        if ($Format -eq 'UserLogonNamePreWindows2000') {
+        if ($Format -eq 'UserLogonNamePreWindows2000')
+        {
             $stringFormat = '{0}\{1}'
             $accountName = Get-AccountName -FullAccountNameWithDomain $FullAccountNameWithDomain
             $domainName = Get-AccountDomainName -FullAccountNameWithDomain $FullAccountNameWithDomain
@@ -595,41 +701,41 @@ function Format-AccountName {
     }
 }
 
-
-function Compare-AccountNames {
-    <#
+<#
     .SYNOPSIS
+        Compares two account names regardless of their formatting
 
-    .DESCRIPTION
+    .PARAMETER ReferenceAccountNameWithDomain
+        Reference account e.g. 'CONTOSO\account'
 
-    .INPUTS
-
-    .OUTPUTS
+    .PARAMETER DifferenceAccountNameWithDomain
+        Difference account e.g. 'account@contoso.com'
 
     .EXAMPLE
-
-    .LINK
-
-    .NOTES
-
-    #>
+        # returns true
+        Compare-AccountNames -ReferenceAccountWithDomain 'CONTOSO\account'`
+                             -DifferenceAccountWithDomain 'account@contoso.com
+#>
+function Compare-AccountNames
+{
     [CmdletBinding()]
     [OutputType([bool])]
-    param (
-        [Parameter(Mandatory)]
+    param
+    (
+        [Parameter(Mandatory = $true)]
         [string]
         $ReferenceAccountNameWithDomain,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $DifferenceAccountNameWithDomain
     )
-    process {
+    process
+    {
         $reference = (Format-AccountName -FullAccountNameWithDomain $ReferenceAccountNameWithDomain -Format UserLogonNamePreWindows2000).ToLower()
         $difference = (Format-AccountName -FullAccountNameWithDomain $DifferenceAccountNameWithDomain -Format UserLogonNamePreWindows2000).ToLower()
         return ($reference -eq $difference)
     }
 }
-
 
 Export-ModuleMember -Function *
