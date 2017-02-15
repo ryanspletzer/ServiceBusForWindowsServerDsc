@@ -3,8 +3,7 @@
 [![Build status](
 https://ci.appveyor.com/api/projects/status/vbumg651tfp6o7os/branch/dev?svg=true
 )](
-https://ci.appveyor.com/project/ryanspletzer/servicebusforwindowsserverdsc\
-branch/dev
+https://ci.appveyor.com/project/ryanspletzer/servicebusforwindowsserverdsc/branch/dev
 )
 
 The ServiceBusForWindowServerDsc PowerShell module provides class-based DSC
