@@ -1,12 +1,3 @@
-#
-# SB.Util.psm1
-#
-# Credit to SharePointDsc Resource module for nested Util approach and ideas for helper cmdlets in this file:
-#
-# https://github.com/PowerShell/SharePointDsc/blob/dev/Modules/SharePointDsc/Modules/SharePointDsc.Util/SharePointDsc.Util.psm1
-#
-
-
 function Test-SBObjectHasProperty() {
     [CmdletBinding()]
     [OutputType([bool])]

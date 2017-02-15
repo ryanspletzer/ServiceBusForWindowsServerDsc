@@ -319,13 +319,6 @@ class SBFarm : SBBase {
     $TenantApiUserName
 
     <#
-        Not sure what this is, it's generally blank.
-    #>
-    # [DscProperty(NotConfigurable)]
-    # [System.Collections.Generic.Dictionary[string,uri]]
-    # $BrokerExternalUrls
-
-    <#
         This is the connection string for the farm management database.
     #>
     [DscProperty(NotConfigurable)]
@@ -345,13 +338,6 @@ class SBFarm : SBBase {
     [DscProperty(NotConfigurable)]
     [string]
     $MessageContainerDBConnectionString
-
-    <#
-        Hosts in the farm.
-    #>
-    # [DscProperty(NotConfigurable)]
-    # [pscustomobject[]]
-    # $Hosts
 
     <#
         This method is equivalent of the Get-TargetResource script function.
@@ -422,12 +408,6 @@ class SBFarm : SBBase {
         $result.GatewayDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
         $params.PropertyName = "Integrated Security"
         $result.GatewayDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
-        # $result.Hosts = $sbFarm.Hosts | ForEach-Object {
-        #     [pscustomobject] @{
-        #         Name               = $_.Name
-        #         ConfigurationState = $_.ConfigurationState
-        #     }
-        # }
 
         $result.HttpsPort = $sbFarm.HttpsPort
         $result.InternalPortRangeStart = $sbFarm.ClusterConnectionEndpointPort
