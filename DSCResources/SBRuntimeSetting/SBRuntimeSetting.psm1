@@ -168,7 +168,7 @@ class SBRuntimeSetting : SBBase
         if ($this.Name -in @( 'MaximumQueueSizeInMegabytes', 'MaximumTopicSizeInMegabytes' ))
         {
             $stringArray = $this.Value.Split(';')
-            ForEach ($string in $stringArray)
+            foreach ($string in $stringArray)
             {
                 $int64Result = $null
                 if (![Int64]::TryParse($this.Value, [ref] $int64Result))

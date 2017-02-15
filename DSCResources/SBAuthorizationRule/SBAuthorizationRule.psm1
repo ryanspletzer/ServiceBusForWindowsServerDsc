@@ -144,7 +144,7 @@ class SBAuthorizationRule : SBBase
         $currentRights = $CurrentValues.Rights
         $desiredRights = $this.Rights
 
-        ForEach ($desiredRight in $desiredRights)
+        foreach ($desiredRight in $desiredRights)
         {
             if ($desiredRight -notin $currentRights)
             {
@@ -153,7 +153,7 @@ class SBAuthorizationRule : SBBase
             }
         }
 
-        ForEach ($currentRight in $currentRights)
+        foreach ($currentRight in $currentRights)
         {
             if ($currentRight -notin $desiredRights)
             {

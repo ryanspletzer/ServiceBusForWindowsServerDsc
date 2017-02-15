@@ -534,7 +534,7 @@ function Get-FullyQualifiedDomainName
         $resultArray = @()
         $componentArray = $distinguishedName.Split(',',
                                                    [System.StringSplitOptions]::RemoveEmptyEntries)
-        ForEach ($component in $componentArray)
+        foreach ($component in $componentArray)
         {
             $componentKeyValuePairArray = $component.Split('=',
                                                            [System.StringSplitOptions]::RemoveEmptyEntries)

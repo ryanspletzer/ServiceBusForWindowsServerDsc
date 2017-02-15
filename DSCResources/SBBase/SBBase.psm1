@@ -67,7 +67,7 @@ class SBBase
         $hashtable = @{}
         $props = $this.GetType().GetProperties() |
             Where-Object CustomAttributes -ne $null
-        ForEach ($prop in $props)
+        foreach ($prop in $props)
         {
             $dscPropertyAttributesWithNamedArguments = $prop.CustomAttributes |
                 Where-Object{
@@ -94,7 +94,7 @@ class SBBase
         $hashtable = @{}
         $props = $this.GetType().GetProperties() |
             Where-Object CustomAttributes -ne $null
-        ForEach ($prop in $props)
+        foreach ($prop in $props)
         {
             $dscPropertyAttributesWithNamedArguments = $prop.CustomAttributes |
                 Where-Object{
