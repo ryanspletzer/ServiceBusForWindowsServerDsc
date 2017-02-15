@@ -1,4 +1,4 @@
-﻿[DscLocalConfigurationManager()]
+[DscLocalConfigurationManager()]
 Configuration PushMetaConfig {
     Node localhost {
         Settings {

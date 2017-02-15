@@ -1,4 +1,4 @@
-﻿$ConfigData = @{
+$ConfigData = @{
      AllNodes   = @(
         @{
             NodeName                    = '*'
