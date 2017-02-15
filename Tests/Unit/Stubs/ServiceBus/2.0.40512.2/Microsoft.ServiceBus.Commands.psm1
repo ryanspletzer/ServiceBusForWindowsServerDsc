@@ -1,36 +1,3 @@
-#region Utility
-
-function GetBuiltInAdministratorsName()
-{
-    [OutputType([string])]
-    param ()
-    $securityIdentifier = New-Object -TypeName SecurityIdentifier -ArgumentList (
-        [WellKnownSidType]::BuiltinAdministratorsSid,
-        $null
-    )
-    $nTAccount = [NTAccount] $securityIdentifier.Translate(
-                     [System.Type]::GetType("System.Security.Principal.NTAccount")
-                 )
-    return $nTAccount.ToString()
-}
-
-function GetCurrentUserName()
-{
-    [OutputType([string])]
-    param ()
-    $string = $env:USERNAME
-    if ((-not [string]::IsNullOrWhiteSpace($env:USERDOMAIN)) -and
-        (-not $env:USERDOMAIN.Equals($env:COMPUTERNAME, [StringComparison]::OrdinalIgnoreCase)))
-    {
-            $string = $string + '@' + $env:USERDOMAIN
-    }
-    return $string
-}
-
-#endregion
-
-#region Stubs
-
 function Add-SBHost()
 {
     [CmdletBinding()]
@@ -1217,8 +1184,6 @@ function Update-SBHost()
         ${SBFarmDBConnectionString}
     )
 }
-
-#endregion
 
 Export-ModuleMember -Function @(
     "Add-SBHost",
