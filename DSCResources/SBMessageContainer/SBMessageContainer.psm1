@@ -1,6 +1,5 @@
 using module ..\SBBase
 
-
 <#
     SBMessageContainer adds and removes a Service Bus for Windows Server message container.
 #>

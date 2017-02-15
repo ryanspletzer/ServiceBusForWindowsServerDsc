@@ -1,6 +1,5 @@
 using module ..\SBBase
 
-
 <#
    SBHost adds and removes a host from a farm, and starts, stops and updates settings for a Service Bus for
    Windows Server host.

@@ -1,6 +1,5 @@
 using module ..\SBBase
 
-
 <#
    SBNamespace adds, removes and updates settings for a Service Bus for Windows Server namespace.
 #>

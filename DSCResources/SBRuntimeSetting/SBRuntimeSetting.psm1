@@ -1,6 +1,5 @@
 using module ..\SBBase
 
-
 <#
     SBRuntimeSetting modifies a Service Bus for Windows Server runtime setting.
 #>

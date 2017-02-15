@@ -3,13 +3,11 @@ enum Ensure {
     Present
 }
 
-
 enum IntegratedSecurity {
     True
     False
     SSPI
 }
-
 
 enum AddressingScheme {
     Cloud
@@ -17,7 +15,6 @@ enum AddressingScheme {
     Path
     PathWithServiceId
 }
-
 
 <#
     SBBase is the base Service Bus for Windows Server resource class that provides commonly used methods.

@@ -14,7 +14,6 @@ function Test-SBObjectHasProperty() {
     return $false
 }
 
-
 function Test-SBParameterState() {
     [CmdletBinding()]
     param
@@ -173,7 +172,6 @@ function Test-SBParameterState() {
     return $returnValue
 }
 
-
 function ConvertTo-PlainText {
     <#
     .SYNOPSIS
@@ -203,7 +201,6 @@ function ConvertTo-PlainText {
         return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BTSR)
     }
 }
-
 
 function New-SqlConnectionString {
     <#
@@ -270,7 +267,6 @@ function New-SqlConnectionString {
     }
 }
 
-
 function Get-SqlConnectionStringPropertyValue {
     <#
     .SYNOPSIS
@@ -312,7 +308,6 @@ function Get-SqlConnectionStringPropertyValue {
     }
 }
 
-
 function Compare-SecureStrings {
     <#
     .SYNOPSIS
@@ -346,7 +341,6 @@ function Compare-SecureStrings {
                 (ConvertTo-PlainText -SecureString $DifferenceSecureString))
     }
 }
-
 
 function Get-AccountName {
     <#
@@ -387,7 +381,6 @@ function Get-AccountName {
         }
     }
 }
-
 
 function Get-AccountDomainName {
     <#
@@ -433,7 +426,6 @@ function Get-AccountDomainName {
     }
 }
 
-
 function Get-DistinguishedNameForDomain {
     <#
     .SYNOPSIS
@@ -462,7 +454,6 @@ function Get-DistinguishedNameForDomain {
         return ([adsi]"LDAP://$domainName").distinguishedName
     }
 }
-
 
 function Get-FullyQualifiedDomainName {
     <#
@@ -507,7 +498,6 @@ function Get-FullyQualifiedDomainName {
     }
 }
 
-
 function Get-NetBIOSDomainName {
     <#
     .SYNOPSIS
@@ -536,7 +526,6 @@ function Get-NetBIOSDomainName {
         return ([adsi]"LDAP://$domainName").name.ToUpper()
     }
 }
-
 
 function Format-AccountName {
     <#
@@ -586,7 +575,6 @@ function Format-AccountName {
     }
 }
 
-
 function Compare-AccountNames {
     <#
     .SYNOPSIS
@@ -621,6 +609,5 @@ function Compare-AccountNames {
         return ($reference -eq $difference)
     }
 }
-
 
 Export-ModuleMember -Function *

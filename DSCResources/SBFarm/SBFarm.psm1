@@ -1,6 +1,5 @@
 using module ..\SBBase
 
-
 <#
    SBFarm creates a new farm and sets certain settings for a Service Bus for Windows Server farm.
 #>
