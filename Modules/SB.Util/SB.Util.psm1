@@ -270,7 +270,7 @@ function ConvertTo-PlainText
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [securestring]
         $SecureString
     )
@@ -328,15 +328,15 @@ function New-SqlConnectionString
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $DataSource,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $InitialCatalog,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('True','False','SSPI')]
         $IntegratedSecurity,
 
@@ -400,11 +400,11 @@ function Get-SqlConnectionStringPropertyValue
     [OutputType([object])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $SqlConnectionString,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $PropertyName
     )
@@ -446,11 +446,11 @@ function Compare-SecureStrings
     [OutputType([bool])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [securestring]
         $ReferenceSecureString,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [securestring]
         $DifferenceSecureString
     )
@@ -478,7 +478,7 @@ function Get-AccountName
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $FullAccountNameWithDomain
     )
@@ -521,7 +521,7 @@ function Get-AccountDomainName
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $FullAccountNameWithDomain
     )
@@ -570,7 +570,7 @@ function Get-DistinguishedNameForDomain
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $DomainName
     )
@@ -597,7 +597,7 @@ function Get-FullyQualifiedDomainName
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $DomainName
     )
@@ -640,7 +640,7 @@ function Get-NetBIOSDomainName
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $DomainName
     )
@@ -670,11 +670,11 @@ function Format-AccountName
     [OutputType([string])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $FullAccountNameWithDomain,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('UserLogonName',
                      'UserLogonNamePreWindows2000')]
         [string]
@@ -722,11 +722,11 @@ function Compare-AccountNames
     [OutputType([bool])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ReferenceAccountNameWithDomain,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $DifferenceAccountNameWithDomain
     )
