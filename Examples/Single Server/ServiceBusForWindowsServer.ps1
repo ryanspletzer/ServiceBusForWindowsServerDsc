@@ -48,9 +48,9 @@ $ConfigurationData = @{
                 ContosoNamespace = 'ContosoNamespace'
             }
             SBMessageContainers = @{
-                1 = 'SBMessageContainer01'
-                2 = 'SBMessageContainer02'
-                3 = 'SBMessageContainer03'
+                '01' = 'SBMessageContainer01'
+                '02' = 'SBMessageContainer02'
+                '03' = 'SBMessageContainer03'
             }
             SBAuthorizationRules = @{
                 ContosoNamespaceRule = @{
@@ -239,7 +239,7 @@ Configuration Example
             DependsOn                                 = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential                      = $DomainInstallAccount
             ContainerDBConnectionStringDataSource     = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.1
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.'01'
             Ensure                                    = 'Present'
         }
 
@@ -248,7 +248,7 @@ Configuration Example
             DependsOn                                 = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential                      = $DomainInstallAccount
             ContainerDBConnectionStringDataSource     = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.2
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.'02'
             Ensure = 'Present'
         }
 
@@ -257,7 +257,7 @@ Configuration Example
             DependsOn                                 = '[SBHost]ContosoSBHost'
             PsDscRunAsCredential                      = $DomainInstallAccount
             ContainerDBConnectionStringDataSource     = $ConfigurationData.NonNodeData.SQLServer.DataSource
-            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.3
+            ContainerDBConnectionStringInitialCatalog = $ConfigurationData.NonNodeData.ServiceBus.SBMessageContainers.'03'
             Ensure = 'Present'
         }
 

@@ -68,7 +68,7 @@ PowerShellVersion = '5.0'
 NestedModules = @(
     'Modules\SB.Util\SB.Util.psd1'
     'DSCResources\SBBase\SBBase.psd1',
-    'DSCResources\SBFarm\SBFarm.psd1'
+    'DSCResources\SBFarm\SBFarm.psd1',
     'DSCResources\SBHost\SBHost.psd1',
     'DSCResources\SBMessageContainer\SBMessageContainer.psd1',
     'DSCResources\SBNamespace\SBNamespace.psd1',

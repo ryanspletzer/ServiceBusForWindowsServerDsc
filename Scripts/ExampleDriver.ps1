@@ -3,6 +3,6 @@ $outputPath = 'C:\Program Files\WindowsPowerShell\Configuration\Schema'
 PushMetaConfig -OutputPath $outputPath
 Set-DscLocalConfigurationManager -Path $outputPath -Force -Verbose
 
-. 'C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\Single Server\SingleServerconfig.ps1'
-Example -OutputPath $outputPath
+. 'C:\Program Files\WindowsPowerShell\Modules\ServiceBusForWindowsServerDsc\Examples\Single Server\ServiceBusForWindowsServer.ps1'
+Example -OutputPath $outputPath -ConfigurationData $ConfigurationData
 Start-DscConfiguration -Wait -Force -Path $outputPath -Verbose
