@@ -100,7 +100,7 @@ PrivateData = @{
 
     PSData = @{
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('DesiredStateConfiguration', 'DSC', 'DSCResource', 'Service Bus for Windows Server')
+        Tags = @( 'DesiredStateConfiguration', 'DSC', 'DSCResource', 'ServiceBusForWindowsServer' )
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/ryanspletzer/ServiceBusForWindowsServerDsc/blob/master/LICENSE'
