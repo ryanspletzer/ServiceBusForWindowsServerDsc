@@ -18,7 +18,7 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
 # Deviating from test template to accomodate copying DSC class resources for tests
-Remove-Module -Name 'SBRuntimeSetting' -Force -ErrorAction SilentlyContinue
+Get-Module -All | Where-Object{$_.Name -eq 'SBRuntimeSetting'} | Remove-Module -Force -ErrorAction SilentlyContinue
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName 'ServiceBusForWindowsServerDsc' `
     -DSCResourceName 'SBRuntimeSetting' `
