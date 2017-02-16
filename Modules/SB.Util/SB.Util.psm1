@@ -97,6 +97,7 @@ function Test-SBDscObjectHasProperty
 function Test-SBParameterState()
 {
     [CmdletBinding()]
+    [OutputType([bool])]
     param
     (
         [parameter(Mandatory = $true, Position=1)]
@@ -438,9 +439,9 @@ function Get-SqlConnectionStringPropertyValue
         $secureString1 = ConvertTo-SecureString -String "string1" -AsPlainText -Force
         $secureString2 = ConvertTo-SecureString -String "string2" -AsPlainText -Force
         # returns false
-        Compare-SecureStrings -ReferenceSecureString $secureString1 -DifferenceSecureString $secureString2
+        Compare-SecureString -ReferenceSecureString $secureString1 -DifferenceSecureString $secureString2
 #>
-function Compare-SecureStrings
+function Compare-SecureString
 {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -484,11 +485,10 @@ function Get-AccountName
     )
     process
     {
-        $AccountName = [string]::Empty
         if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0)
         {
             $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0)
+            if ($null -ne $array -and $array.Length -gt 0)
             {
                 return $array[1]
             }
@@ -496,7 +496,7 @@ function Get-AccountName
         else
         {
             $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0)
+            if ($null -ne $array -and $array.Length -gt 0)
             {
                 return $array[0]
             }
@@ -527,11 +527,10 @@ function Get-AccountDomainName
     )
     process
     {
-        $AccountName = [string]::Empty
         if (($FullAccountNameWithDomain.IndexOf('\')) -gt 0)
         {
             $array = $FullAccountNameWithDomain.Split('\', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0)
+            if ($null -ne $array -and $array.Length -gt 0)
             {
                 if ($array.Length -eq 2)
                 {
@@ -542,7 +541,7 @@ function Get-AccountDomainName
         else
         {
             $array = $FullAccountNameWithDomain.Split('@', [System.StringSplitOptions]::RemoveEmptyEntries)
-            if ($array -ne $null -and $array.Length -gt 0)
+            if ($null -ne $array -and $array.Length -gt 0)
             {
                 if ($array.Length -eq 2)
                 {
@@ -713,10 +712,10 @@ function Format-AccountName
 
     .EXAMPLE
         # returns true
-        Compare-AccountNames -ReferenceAccountWithDomain 'CONTOSO\account'`
-                             -DifferenceAccountWithDomain 'account@contoso.com
+        Compare-AccountName -ReferenceAccountWithDomain 'CONTOSO\account'`
+                            -DifferenceAccountWithDomain 'account@contoso.com
 #>
-function Compare-AccountNames
+function Compare-AccountName
 {
     [CmdletBinding()]
     [OutputType([bool])]

@@ -81,7 +81,6 @@ try
 
             Context "Namespace exists for a given name and should be removed" {
                 # Arrange
-                $createdTime = [datetime]::Now
                 Mock Get-SBNamespace {
                     return @{
                         AddressingScheme = 'Path'
@@ -127,7 +126,6 @@ try
 
             Context "Namespace exists for a given name and should be updated" {
                 # Arrange
-                $createdTime = [datetime]::Now
                 Mock Get-SBNamespace {
                     return @{
                         AddressingScheme = 'Path'

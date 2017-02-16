@@ -66,14 +66,14 @@ FunctionsToExport = @(
     'ConvertTo-PlainText',
     'New-SqlConnectionString',
     'Get-SqlConnectionStringPropertyValue',
-    'Compare-SecureStrings',
+    'Compare-SecureString',
     'Get-AccountName',
     'Get-AccountDomainName',
     'Get-DistinguishedNameForDomain',
     'Get-FullyQualifiedDomainName',
     'Get-NetBIOSDomainName',
     'Format-AccountName',
-    'Compare-AccountNames'
+    'Compare-AccountName'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

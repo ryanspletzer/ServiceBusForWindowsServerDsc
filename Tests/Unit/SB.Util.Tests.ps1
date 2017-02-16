@@ -409,7 +409,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
                 }
             }
 
-            Context 'Validate Compare-AccountNames' {
+            Context 'Validate Compare-AccountName' {
                 # Arrange
                 Mock -ModuleName SB.Util Get-DistinguishedNameForDomain {
                     return 'DC=contoso,DC=com'
@@ -427,7 +427,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
                     }
 
                     # Act | Assert
-                    Compare-AccountNames @compareAccountNamesParams | Should Be $true
+                    Compare-AccountName @compareAccountNamesParams | Should Be $true
                 }
 
                 It 'returns true for two equal UPN formatted accounts' {
@@ -438,7 +438,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
                     }
 
                     # Act | Assert
-                    Compare-AccountNames @compareAccountNamesParams | Should Be $true
+                    Compare-AccountName @compareAccountNamesParams | Should Be $true
                 }
 
                 It 'returns true for a synonymous pre Windows 2000 formatted account and UPN formatted account' {
@@ -449,7 +449,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
                     }
 
                     # Act | Assert
-                    Compare-AccountNames @compareAccountNamesParams | Should Be $true
+                    Compare-AccountName @compareAccountNamesParams | Should Be $true
                 }
 
                 It 'returns false for two inequal pre Windows 2000 formatted accounts' {
@@ -460,7 +460,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
                     }
 
                     # Act | Assert
-                    Compare-AccountNames @compareAccountNamesParams | Should Be $false
+                    Compare-AccountName @compareAccountNamesParams | Should Be $false
                 }
 
                 It 'returns false for two inequal UPN formatted accounts' {
@@ -471,7 +471,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
                     }
 
                     # Act | Assert
-                    Compare-AccountNames @compareAccountNamesParams | Should Be $false
+                    Compare-AccountName @compareAccountNamesParams | Should Be $false
                 }
 
                 It 'returns false for two differently formatted accounts that are not synonymous' {
@@ -482,7 +482,7 @@ Data Source=TestServer;Initial Catalog=TestDB;Integrated Security=SSPI;User Id=u
                     }
 
                     # Act | Assert
-                    Compare-AccountNames @compareAccountNamesParams | Should Be $false
+                    Compare-AccountName @compareAccountNamesParams | Should Be $false
                 }
             }
         }
