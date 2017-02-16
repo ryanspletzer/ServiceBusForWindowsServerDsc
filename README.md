@@ -435,6 +435,12 @@ Windows Server authorization rule.
 
 * Road to 1.0: Refactoring and more testing tasks to come.
   See Issues list for more details.
+
+### 0.10.0
+
+* Added minimum help to functions
+* Refactored to meet DSC Resource Style Guidelines
+* Mocked out environment variables in tests
 * Added [DSCResources.Tests](https://github.com/PowerShell/DscResource.Tests)
   to AppVeyor build
 

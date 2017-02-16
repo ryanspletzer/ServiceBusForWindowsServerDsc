@@ -14,7 +14,7 @@ DscResourcesToExport = @(
 )
 
 # Version number of this module.
-ModuleVersion = '0.9.0.0'
+ModuleVersion = '0.10.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'bd4390dc-a8ad-4bce-8d69-f53ccf8e4163'
@@ -112,7 +112,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* Initial PowerShell Gallery 0.9.0.0 release'
+        ReleaseNotes = '* Initial PowerShell Gallery 0.10.0.0 release'
     }
 }
 
