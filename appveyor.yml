@@ -22,14 +22,14 @@ build: false
 
 test_script:
     - ps: |
-        Rename-Item -Path DSCClassResources -NewName DSCResources -Force
+        Copy-Item -Path DSCClassResources -Destination DSCResources -Container -Recurse -Force
         $testResultsFile = ".\TestsResults.xml"
         $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
         (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
         if ($res.FailedCount -gt 0) {
             throw "$($res.FailedCount) tests failed."
         }
-        Rename-Item -Path DSCResources -NewName DSCClassResources -Force
+        Remove-Item -Path DSCResources -Recurse -Force
 
 #---------------------------------#
 #      deployment configuration   #
