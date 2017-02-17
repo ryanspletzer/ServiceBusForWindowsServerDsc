@@ -1,4 +1,4 @@
-using module ..\..\DSCResources\SBFarm
+using module ..\..\DSCClassResources\SBFarm
 
 #region HEADER
 
