@@ -14,7 +14,7 @@ DscResourcesToExport = @(
 )
 
 # Version number of this module.
-ModuleVersion = '0.10.0.0'
+ModuleVersion = '0.10.1.0'
 
 # ID used to uniquely identify this module
 GUID = 'bd4390dc-a8ad-4bce-8d69-f53ccf8e4163'
@@ -66,15 +66,15 @@ PowerShellVersion = '5.0'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
-    'Modules\SB.Util\SB.Util.psd1'
-    'DSCClassResources\SBBase\SBBase.psd1',
-    'DSCClassResources\SBFarm\SBFarm.psd1',
-    'DSCClassResources\SBHost\SBHost.psd1',
-    'DSCClassResources\SBMessageContainer\SBMessageContainer.psd1',
-    'DSCClassResources\SBNamespace\SBNamespace.psd1',
-    'DSCClassResources\SBAuthorizationRule\SBAuthorizationRule.psd1',
-    'DSCClassResources\SBHostCEIP\SBHostCEIP.psd1',
-    'DSCClassResources\SBRuntimeSetting\SBRuntimeSetting.psd1'
+    'Modules\SB.Util\SB.Util.psm1'
+    'DSCClassResources\SBBase\SBBase.psm1',
+    'DSCClassResources\SBFarm\SBFarm.psm1',
+    'DSCClassResources\SBHost\SBHost.psm1',
+    'DSCClassResources\SBMessageContainer\SBMessageContainer.psm1',
+    'DSCClassResources\SBNamespace\SBNamespace.psm1',
+    'DSCClassResources\SBAuthorizationRule\SBAuthorizationRule.psm1',
+    'DSCClassResources\SBHostCEIP\SBHostCEIP.psm1',
+    'DSCClassResources\SBRuntimeSetting\SBRuntimeSetting.psm1'
 )
 
 # Functions to export from this module
