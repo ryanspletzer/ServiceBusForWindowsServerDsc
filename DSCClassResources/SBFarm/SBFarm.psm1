@@ -70,6 +70,15 @@ class SBFarm : SBBase
     $FarmCertificateThumbprint
 
     <#
+        Represents the subject certificate that is used for securing the certificate. Do not provide this certificate if you
+        are providing CertificateAutoGenerationKey for auto generation of certificates.
+    #>
+    [DscProperty()]
+    [ValidateLength(30,100)]
+    [string]
+    $FarmCertificateSubject
+
+    <#
         The DNS prefix (alias) that is mapped to all server farm nodes. This cmdlet is used when an administrator
         registers a server farm. The server farm node value is returned when you call the Get-SBClientConfiguration
         cmdlet to request a connection string.
