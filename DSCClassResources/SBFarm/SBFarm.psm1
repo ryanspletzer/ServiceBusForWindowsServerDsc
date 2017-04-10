@@ -74,7 +74,6 @@ class SBFarm : SBBase
         are providing CertificateAutoGenerationKey for auto generation of certificates.
     #>
     [DscProperty()]
-    [ValidateLength(30,100)]
     [string]
     $FarmCertificateSubject
 
