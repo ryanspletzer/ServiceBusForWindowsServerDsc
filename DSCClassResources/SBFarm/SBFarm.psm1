@@ -534,11 +534,39 @@ class SBFarm : SBBase
         {
             Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from New-SBFarm params"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
+
+            Write-Verbose -Message "Checking Certificate subject."
+            if ($null -ne $this.FarmCertificateSubject)
+            {
+                if ($this.FarmCertificateSubject.ToLower().Substring(0,3) -ne 'cn=')
+                {
+                    $CertSubject = "cn=" + $this.FarmCertificateSubject.ToLower()
+                }
+                else
+                {
+                    $CertSubject = $this.FarmCertificateSubject.ToLower()
+                }
+
+                $CertificateThumbprint = (Get-ChildItem -Path Cert:\LocalMachine\My\ | Where-Object {$_.Subject.ToLower() -eq $CertSubject}).Thumbprint
+                if ($null -ne $CertificateThumbprint)
+                {
+                    $newSBFarmParams.Remove("FarmCertificateSubject")
+                    $newSBFarmParams.FarmCertificateThumbprint = $CertificateThumbprint
+                    
+                    if ($null -eq $this.EncryptionCertificateThumbprint)
+                    {
+                        $newSBFarmParams.EncryptionCertificateThumbprint = $CertificateThumbprint
+                    }
+                }
+            }
+            
         }
         else
         {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
+            $newSBFarmParams.Remove("FarmCertificateSubject")
+            $newSBFarmParams.Remove("FarmCertificateThumbprint")
             $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
 
