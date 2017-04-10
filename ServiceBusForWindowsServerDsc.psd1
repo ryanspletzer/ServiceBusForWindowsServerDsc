@@ -78,7 +78,18 @@ NestedModules = @(
 )
 
 # Functions to export from this module
-FunctionsToExport = @()
+FunctionsToExport = @('Test-SBParameterState',
+    'ConvertTo-PlainText',
+    'New-SqlConnectionString',
+    'Get-SqlConnectionStringPropertyValue',
+    'Compare-SecureString',
+    'Get-AccountName',
+    'Get-AccountDomainName',
+    'Get-DistinguishedNameForDomain',
+    'Get-FullyQualifiedDomainName',
+    'Get-NetBIOSDomainName',
+    'Format-AccountName',
+    'Compare-AccountName')
 
 # Cmdlets to export from this module
 CmdletsToExport = @()
