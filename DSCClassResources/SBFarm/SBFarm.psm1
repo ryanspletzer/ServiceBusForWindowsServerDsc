@@ -70,6 +70,14 @@ class SBFarm : SBBase
     $FarmCertificateThumbprint
 
     <#
+        Represents the subject certificate that is used for securing the certificate. Do not provide this certificate if you
+        are providing CertificateAutoGenerationKey for auto generation of certificates.
+    #>
+    [DscProperty()]
+    [string]
+    $FarmCertificateSubject
+
+    <#
         The DNS prefix (alias) that is mapped to all server farm nodes. This cmdlet is used when an administrator
         registers a server farm. The server farm node value is returned when you call the Get-SBClientConfiguration
         cmdlet to request a connection string.
@@ -534,11 +542,37 @@ class SBFarm : SBBase
         {
             Write-Verbose -Message "CertificateAutoGenerationKey is absent, removing from New-SBFarm params"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
+
+            Write-Verbose -Message "Checking Certificate subject."
+            if ($null -ne $this.FarmCertificateSubject)
+            {
+                if ($this.FarmCertificateSubject.ToLower().Substring(0,3) -ne 'cn=')
+                {
+                    $CertSubject = "cn=" + $this.FarmCertificateSubject.ToLower()
+                }
+                else
+                {
+                    $CertSubject = $this.FarmCertificateSubject.ToLower()
+                }
+
+                $CertificateThumbprint = (Get-ChildItem -Path Cert:\LocalMachine\My\ | Where-Object {$_.Subject.ToLower() -eq $CertSubject}).Thumbprint
+                if ($null -ne $CertificateThumbprint)
+                {
+                    $newSBFarmParams.FarmCertificateThumbprint = $CertificateThumbprint
+                    
+                    if ($null -eq $this.EncryptionCertificateThumbprint)
+                    {
+                        $newSBFarmParams.EncryptionCertificateThumbprint = $CertificateThumbprint
+                    }
+                }
+            }
+            
         }
         else
         {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
+            $newSBFarmParams.Remove("FarmCertificateThumbprint")
             $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
 
@@ -623,6 +657,9 @@ class SBFarm : SBBase
         $newSBFarmParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
+        
+        Write-Verbose -Message "Removing FarmCertificateSubject regardless of if it was used"
+        $newSBFarmParams.Remove("FarmCertificateSubject")
 
         Write-Verbose -Message "Invoking New-SBFarm with configurable params"
         New-SBFarm @newSBFarmParams
@@ -676,6 +713,7 @@ class SBFarm : SBBase
         $setSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
         $setSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
         $setSBFarmParams.Remove("TcpPort")
+        $setSBFarmParams.Remove("FarmCertificateSubject")
 
         Write-Verbose -Message ("Invoking Stop-SBFarm prior to calling Set-SBFarm. " +
                                 "SBHost resource should re-start hosts individually.")
