@@ -539,6 +539,8 @@ class SBFarm : SBBase
         {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
+            $newSBFarmParams.Remove("FarmCertificateThumbprint")
+            $newSBFarmParams.Remove("EncryptionCertificateThumbprint")
             $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
 
