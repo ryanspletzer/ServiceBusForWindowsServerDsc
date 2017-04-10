@@ -112,7 +112,7 @@ try
                     $hashtable = $testSBFarm.GetDscConfigurablePropertiesAsHashtable()
 
                     # Assert
-                    $hashtable.Count | Should BeExactly 30
+                    $hashtable.Count | Should BeExactly 31
                 }
             }
         }
