@@ -559,7 +559,6 @@ class SBFarm : SBBase
                 $CertificateThumbprint = (Get-ChildItem -Path Cert:\LocalMachine\My\ | Where-Object {$_.Subject.ToLower() -eq $CertSubject}).Thumbprint
                 if ($null -ne $CertificateThumbprint)
                 {
-                    $newSBFarmParams.Remove("FarmCertificateSubject")
                     $newSBFarmParams.FarmCertificateThumbprint = $CertificateThumbprint
                     
                     if ($null -eq $this.EncryptionCertificateThumbprint)
@@ -574,7 +573,6 @@ class SBFarm : SBBase
         {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
-            $newSBFarmParams.Remove("FarmCertificateSubject")
             $newSBFarmParams.Remove("FarmCertificateThumbprint")
             $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
@@ -660,6 +658,9 @@ class SBFarm : SBBase
         $newSBFarmParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
+        
+        Write-Verbose -Message "Removing FarmCertificateSubject regardless of if it was used"
+        $newSBFarmParams.Remove("FarmCertificateSubject")
 
         Write-Verbose -Message "Invoking New-SBFarm with configurable params"
         New-SBFarm @newSBFarmParams
@@ -713,6 +714,7 @@ class SBFarm : SBBase
         $setSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
         $setSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
         $setSBFarmParams.Remove("TcpPort")
+        $setSBFarmParams.Remove("FarmCertificateSubject")
 
         Write-Verbose -Message ("Invoking Stop-SBFarm prior to calling Set-SBFarm. " +
                                 "SBHost resource should re-start hosts individually.")

@@ -86,8 +86,8 @@ farm is created.
   securing TLS connections.
   Do not provide this certificate if you are providing
   CertificateAutoGenerationKey for auto generation of certificates.
-* **$FarmCertificateSubject**: Represents the subject of the certificate that is used for
-  securing TLS connections.
+* **$FarmCertificateSubject**: Represents the subject of the certificate 
+  that is used for securing TLS connections.
   Do not provide this certificate if you are providing
   CertificateAutoGenerationKey for auto generation of certificates.
 * **FarmDNS**: The DNS prefix (alias) that is mapped to all server farm nodes.
