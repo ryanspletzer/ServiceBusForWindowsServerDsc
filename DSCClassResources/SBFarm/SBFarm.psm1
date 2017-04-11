@@ -560,14 +560,14 @@ class SBFarm : SBBase
                 if ($null -ne $CertificateThumbprint)
                 {
                     $newSBFarmParams.FarmCertificateThumbprint = $CertificateThumbprint
-                    
+
                     if ($null -eq $this.EncryptionCertificateThumbprint)
                     {
                         $newSBFarmParams.EncryptionCertificateThumbprint = $CertificateThumbprint
                     }
                 }
             }
-            
+
         }
         else
         {
@@ -659,7 +659,7 @@ class SBFarm : SBBase
         $newSBFarmParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
-        
+
         Write-Verbose -Message "Removing FarmCertificateSubject regardless of if it was used"
         $newSBFarmParams.Remove("FarmCertificateSubject")
 

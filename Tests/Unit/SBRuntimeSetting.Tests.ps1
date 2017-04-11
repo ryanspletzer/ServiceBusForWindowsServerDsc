@@ -49,6 +49,9 @@ try
             Mock New-SBNamespace {}
             Mock Set-SBNamespace {}
             Mock Remove-SBNamespace {}
+            Mock Set-SBRuntimeSetting {}
+            Mock Start-SBFarm {}
+            Mock Stop-SBFarm {}
 
             Context "Runtime setting exists and needs to be updated" {
                 # Arrange

@@ -5,7 +5,7 @@ Using module ..\..\Modules\SB.Util\SB.Util.psd1
    SBNamespace adds, removes and updates settings for a Service Bus for Windows Server namespace.
 #>
 [DscResource()]
-class SBNameSpace : SBBase
+class SBNamespace : SBBase
 {
 
     <#
@@ -176,17 +176,17 @@ class SBNameSpace : SBBase
         return $true
     }
 
-    [bool] SBNamespaceShouldBeCreated([SBNameSpace] $CurrentValues)
+    [bool] SBNamespaceShouldBeCreated([SBNamespace] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBNamespaceShouldBeRemoved([SBNameSpace] $CurrentValues)
+    [bool] SBNamespaceShouldBeRemoved([SBNamespace] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBNamespaceShouldBeUpdated([SBNameSpace] $CurrentValues)
+    [bool] SBNamespaceShouldBeUpdated([SBNamespace] $CurrentValues)
     {
         $currentValuesHt = $CurrentValues.ToHashtable()
 
@@ -240,7 +240,7 @@ class SBNameSpace : SBBase
         $formattedManageUsers = $ManageUsers | ForEach-Object{
             if($this.IsLocalGroup($_))
             {
-                return $_.ToLower()
+                $_.ToLower()
             }
             else
             {

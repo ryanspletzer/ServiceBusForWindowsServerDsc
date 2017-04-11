@@ -29,7 +29,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 function Invoke-TestSetup {
     $serviceBusCmdletModule = Join-Path -Path $PSScriptRoot -ChildPath "Stubs\ServiceBus\2.0.40512.2\Microsoft.ServiceBus.Commands.psm1" -Resolve
     Import-Module -Name $serviceBusCmdletModule -Scope 'Global' -Force
-    Import-Module -Name (Join-Path -Path $moduleRoot -ChildPath "Modules\SB.Util\SB.Util.psm1") -Scope 'Global' -Force
 }
 
 function Invoke-TestCleanup {

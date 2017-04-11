@@ -143,7 +143,7 @@ function Test-SBParameterState()
         {
             if(($DesiredValues.ContainsKey($_) -eq $true) -and ($CurrentValues.$_ -eq $DesiredValues.$_))
             {
-                return $true
+                break
             }
 
             if (($CurrentValues.ContainsKey($_) -eq $false) `
@@ -254,9 +254,13 @@ function Test-SBParameterState()
                     }
                 }
             }
+
+            if($returnValue -eq $false)
+            {
+                break
+            }
         }
     }
-    Write-Verbose "Return [$returnValue]"
     return $returnValue
 }
 
