@@ -65,10 +65,11 @@ try
             "    Prompt you with additional messages that might interrupt your work."
         )
 
-        Mock Enable-SBHostCEIP {}
-        Mock Disable-SBHostCEIP {}
-
         Describe 'SBHostCEIP' {
+
+            Mock Enable-SBHostCEIP {}
+            Mock Disable-SBHostCEIP {}
+
             Context "Customer Experience Improvement Program telemetry is disabled and should be enabled" {
                 # Arrange
                 Mock Get-SBHostCEIP {

@@ -55,11 +55,12 @@ try
         $testSBNamespace.SecondarySymmetricKey = "RvxwTxTctasdf6KzKNfjQzjaV7oc53yUDl08ZUXQrFU="
         $testSBNamespace.SubscriptionId = "00000000000000000000000000000000"
 
-        Mock New-SBNamespace {}
-        Mock Set-SBNamespace {}
-        Mock Remove-SBNamespace {}
-
         Describe 'SBNamespace' {
+
+            Mock New-SBNamespace {}
+            Mock Set-SBNamespace {}
+            Mock Remove-SBNamespace {}
+
             Context "No namespace exists for a given name and should be created" {
                 # Arrange
                 Mock Get-SBNamespace {

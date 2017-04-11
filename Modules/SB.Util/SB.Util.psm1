@@ -256,6 +256,7 @@ function Test-SBParameterState()
             }
         }
     }
+    Write-Verbose "Return [$returnValue]"
     return $returnValue
 }
 

@@ -1,7 +1,7 @@
 #---------------------------------#
 #      environment configuration  #
 #---------------------------------#
-version: 0.10.0.{build}
+version: 0.10.1.{build}
 install:
     - git clone https://github.com/PowerShell/DscResource.Tests
     - ps: |
@@ -13,7 +13,7 @@ install:
 #---------------------------------#
 #      build configuration        #
 #---------------------------------#
-image: WMF 5
+image: Visual Studio 2017
 build: false
 
 #---------------------------------#

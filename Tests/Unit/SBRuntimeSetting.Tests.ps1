@@ -44,11 +44,12 @@ try
         # Arrange
         $testSBRuntimeSetting = [SBRuntimeSetting]::new()
 
-        Mock Set-SBRuntimeSetting {}
-        Mock Stop-SBFarm {}
-        Mock Start-SBFarm {}
-
         Describe 'SBRuntimeSetting' {
+
+            Mock New-SBNamespace {}
+            Mock Set-SBNamespace {}
+            Mock Remove-SBNamespace {}
+
             Context "Runtime setting exists and needs to be updated" {
                 # Arrange
                 Mock Get-SBRuntimeSetting {
