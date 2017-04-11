@@ -412,8 +412,8 @@ class SBNameSpace : SBBase
 
     [bool] IsLocalGroup([string] $Name)
     {
-        $gwmiResult = (Get-WmiObject -class Win32_Group -filter "LocalAccount='True'" | Where-Object { $_.Name -eq $Name })
+        $cimResult = (Get-CimInstance -class Win32_Group -filter "LocalAccount='True'" | Where-Object { $_.Name -eq $Name })
 
-        return -not($null -eq $gwmiResult)
+        return -not($null -eq $cimResult)
     }
 }
