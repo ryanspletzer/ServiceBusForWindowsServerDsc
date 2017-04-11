@@ -1,4 +1,5 @@
 using module ..\SBBase
+Using module ..\..\Modules\SB.Util\SB.Util.psd1
 
 <#
    SBFarm creates a new farm and sets certain settings for a Service Bus for Windows Server farm.

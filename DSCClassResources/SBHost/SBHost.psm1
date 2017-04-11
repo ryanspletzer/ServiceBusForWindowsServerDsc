@@ -1,4 +1,5 @@
 using module ..\SBBase
+Using module ..\..\Modules\SB.Util\SB.Util.psd1
 
 <#
    SBHost adds and removes a host from a farm, and starts, stops and updates settings for a Service Bus for
