@@ -141,7 +141,7 @@ function Test-SBParameterState()
     $KeyList | ForEach-Object -Process {
         if ($_ -ne "Verbose")
         {
-            if(($DesiredValues.ContainsKey($_) -eq $true) -and ($CurrentValues.$_ -ne $DesiredValues.$_))
+            if(($DesiredValues.ContainsKey($_) -eq $true) -and ($CurrentValues.$_ -eq $DesiredValues.$_))
             {
                 return $true
             }

@@ -74,6 +74,32 @@ try
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
                 }
 
+                It "Returns true when values are empty" {
+                    # Arrange
+                    $current = @{
+                        Example = ""
+                    }
+                    $desired = @{
+                        Example = ""
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $true
+                }
+
+                It "Returns true when values are null" {
+                    # Arrange
+                    $current = @{
+                        Example = $null
+                    }
+                    $desired = @{
+                        Example = $null
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $true
+                }
+
                 It "Returns false when a value is missing" {
                     # Arrange
                     $current = @{}
