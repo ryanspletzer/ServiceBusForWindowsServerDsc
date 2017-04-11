@@ -1,4 +1,5 @@
 using module ..\SBBase
+Using module ..\..\Modules\SB.Util\SB.Util.psd1
 
 <#
    SBNamespace adds, removes and updates settings for a Service Bus for Windows Server namespace.
@@ -237,11 +238,18 @@ class SBNameSpace : SBBase
         $formattedManageUsers = @()
 
         $formattedManageUsers = $ManageUsers | ForEach-Object{
-            $formatAccountNameParams = @{
-                FullAccountNameWithDomain = $_
-                Format                    = 'UserLogonNamePreWindows2000'
+            if($this.IsLocalGroup($_))
+            {
+                return $_.ToLower()
             }
-            (Format-AccountName @formatAccountNameParams).ToLower()
+            else
+            {
+                $formatAccountNameParams = @{
+                    FullAccountNameWithDomain = $_
+                    Format                    = 'UserLogonNamePreWindows2000'
+                }
+                (Format-AccountName @formatAccountNameParams).ToLower()
+            }
         }
 
         return $formattedManageUsers
@@ -400,5 +408,12 @@ class SBNameSpace : SBBase
 
         Write-Verbose -Message "Invoking Set-SBNamespace with configurable params"
         Set-SBNamespace @setSBNamespaceParams
+    }
+
+    [bool] IsLocalGroup([string] $Name)
+    {
+        $gwmiResult = (gwmi -class Win32_Group -filter "LocalAccount='True'" | where { $_.Name -eq $Name })
+
+        return -not($gwmiResult -eq $null)
     }
 }
