@@ -146,6 +146,32 @@ try
                     # Act | Assert
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
                 }
+
+                It "Returns false when current is null and desired is null" {
+                    # Arrange
+                    $current = @{
+                        Example = $null
+                    }
+                    $desired = @{
+                        Example = "test"
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
+                }
+
+                It "Returns false when current is empty string and desired is null" {
+                    # Arrange
+                    $current = @{
+                        Example = ""
+                    }
+                    $desired = @{
+                        Example = $null
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
+                }
             }
 
             Context "Validate ConvertTo-PlainText" {

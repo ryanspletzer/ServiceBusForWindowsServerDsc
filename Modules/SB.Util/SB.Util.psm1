@@ -163,6 +163,12 @@ function Test-SBParameterState()
 
                 if ($CheckDesiredValue)
                 {
+                    if(($DesiredValues.$_ -eq $null) -and ($CurrentValues.$_ -ne $null))
+                    {
+                        $returnValue = $false
+                        break
+                    }
+
                     $desiredType = $DesiredValues.$_.GetType()
                     $fieldName = $_
                     if ($desiredType.IsArray -eq $true)
@@ -421,16 +427,19 @@ function Get-SqlConnectionStringPropertyValue
     )
     process
     {
-        $params = @{
-            TypeName     = 'System.Data.SqlClient.SqlConnectionStringBuilder'
-            ArgumentList = $SqlConnectionString
-        }
-        $sqlConnectionStringBuilder = New-Object @params
         if ($PropertyName -eq 'Integrated Security' -and
             $SqlConnectionString.Contains('Integrated Security=SSPI'))
         {
             return 'SSPI'
         }
+
+        $params = @{
+            TypeName     = 'System.Data.SqlClient.SqlConnectionStringBuilder'
+            ArgumentList = $SqlConnectionString
+        }
+
+        $sqlConnectionStringBuilder = New-Object @params
+
         return $sqlConnectionStringBuilder[$PropertyName]
     }
 }

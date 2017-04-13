@@ -414,17 +414,21 @@ class SBFarm : SBBase
 
         $result.GatewayDBConnectionString = $sbFarm.GatewayDBConnectionString
         $result.GatewayDBConnectionStringCredential = $this.GatewayDBConnectionStringCredential
-        $params = @{
-            SqlConnectionString = $sbFarm.GatewayDBConnectionString
+
+        if([string]::IsNullOrEmpty($sbFarm.GatewayDBConnectionString) -eq $false)
+        {
+            $params = @{
+                SqlConnectionString = $sbFarm.GatewayDBConnectionString
+            }
+            $params.PropertyName = "Data Source"
+            $result.GatewayDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Encrypt"
+            $result.GatewayDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Initial Catalog"
+            $result.GatewayDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Integrated Security"
+            $result.GatewayDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
         }
-        $params.PropertyName = "Data Source"
-        $result.GatewayDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Encrypt"
-        $result.GatewayDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Initial Catalog"
-        $result.GatewayDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Integrated Security"
-        $result.GatewayDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
 
         $result.HttpsPort = $sbFarm.HttpsPort
         $result.InternalPortRangeStart = $sbFarm.ClusterConnectionEndpointPort
