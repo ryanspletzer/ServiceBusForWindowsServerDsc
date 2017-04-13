@@ -499,8 +499,29 @@ class SBFarm : SBBase
         $currentValuesHt = $currentValues.ToHashtable()
 
         $desiredValuesHt = $this.ToHashtable()
-        $desiredValuesHt.AdminApiUserName = $desiredValuesHt.AdminApiCredentials.UserName
-        $desiredValuesHt.TenantApiUserName = $desiredValuesHt.TenantApiCredentials.UserName
+
+        if([string]::IsNullOrEmpty($desiredValuesHt.FarmDNS))
+        {
+            $desiredValuesHt.FarmDNS = ""
+        }
+
+        if([string]::IsNullOrEmpty($desiredValuesHt.AdminApiCredentials.UserName))
+        {
+            $desiredValuesHt.AdminApiUserName = ""
+        }
+        else
+        {
+            $desiredValuesHt.AdminApiUserName = $desiredValuesHt.AdminApiCredentials.UserName
+        }
+
+        if([string]::IsNullOrEmpty($desiredValuesHt.TenantApiCredentials.UserName))
+        {
+            $desiredValuesHt.TenantApiUserName = ""
+        }
+        else
+        {
+            $desiredValuesHt.TenantApiUserName = $desiredValuesHt.TenantApiCredentials.UserName
+        }
 
         $params = @{
             CurrentValues = $currentValuesHt
