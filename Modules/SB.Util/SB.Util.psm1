@@ -143,7 +143,7 @@ function Test-SBParameterState()
         {
             if(($DesiredValues.ContainsKey($_) -eq $true) -and ($CurrentValues.$_ -eq $DesiredValues.$_))
             {
-                break
+                return
             }
 
             if (($CurrentValues.ContainsKey($_) -eq $false) `
@@ -166,7 +166,7 @@ function Test-SBParameterState()
                     if(($DesiredValues.$_ -eq $null) -and ($CurrentValues.$_ -ne $null))
                     {
                         $returnValue = $false
-                        break
+                        return
                     }
 
                     $desiredType = $DesiredValues.$_.GetType()
@@ -263,7 +263,7 @@ function Test-SBParameterState()
 
             if($returnValue -eq $false)
             {
-                break
+                return
             }
         }
     }
