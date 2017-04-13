@@ -74,6 +74,26 @@ try
                     Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
                 }
 
+                It "Returns true when values are empty" {
+                    # Arrange
+                    $desired = @{
+                        Example = ""
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $desired -DesiredValues $desired | Should Be $true
+                }
+
+                It "Returns true when values are null" {
+                    # Arrange
+                    $desired = @{
+                        Example = $null
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $desired -DesiredValues $desired | Should Be $true
+                }
+
                 It "Returns false when a value is missing" {
                     # Arrange
                     $current = @{}
@@ -121,6 +141,32 @@ try
                     $desired = @{
                         Example       = "test";
                         SecondExample = "false"
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
+                }
+
+                It "Returns false when current is null and desired is null" {
+                    # Arrange
+                    $current = @{
+                        Example = $null
+                    }
+                    $desired = @{
+                        Example = "test"
+                    }
+
+                    # Act | Assert
+                    Test-SBParameterState -CurrentValues $current -DesiredValues $desired | Should Be $false
+                }
+
+                It "Returns false when current is empty string and desired is null" {
+                    # Arrange
+                    $current = @{
+                        Example = ""
+                    }
+                    $desired = @{
+                        Example = $null
                     }
 
                     # Act | Assert

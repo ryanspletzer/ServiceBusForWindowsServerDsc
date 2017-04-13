@@ -1,10 +1,11 @@
 using module ..\SBBase
+Using module ..\..\Modules\SB.Util\SB.Util.psd1
 
 <#
    SBNamespace adds, removes and updates settings for a Service Bus for Windows Server namespace.
 #>
 [DscResource()]
-class SBNameSpace : SBBase
+class SBNamespace : SBBase
 {
 
     <#
@@ -175,17 +176,17 @@ class SBNameSpace : SBBase
         return $true
     }
 
-    [bool] SBNamespaceShouldBeCreated([SBNameSpace] $CurrentValues)
+    [bool] SBNamespaceShouldBeCreated([SBNamespace] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Present) -and ($CurrentValues.Ensure -eq [Ensure]::Absent))
     }
 
-    [bool] SBNamespaceShouldBeRemoved([SBNameSpace] $CurrentValues)
+    [bool] SBNamespaceShouldBeRemoved([SBNamespace] $CurrentValues)
     {
         return (($this.Ensure -eq [Ensure]::Absent) -and ($CurrentValues.Ensure -eq [Ensure]::Present))
     }
 
-    [bool] SBNamespaceShouldBeUpdated([SBNameSpace] $CurrentValues)
+    [bool] SBNamespaceShouldBeUpdated([SBNamespace] $CurrentValues)
     {
         $currentValuesHt = $CurrentValues.ToHashtable()
 
@@ -237,11 +238,18 @@ class SBNameSpace : SBBase
         $formattedManageUsers = @()
 
         $formattedManageUsers = $ManageUsers | ForEach-Object{
-            $formatAccountNameParams = @{
-                FullAccountNameWithDomain = $_
-                Format                    = 'UserLogonNamePreWindows2000'
+            if($this.IsLocalGroup($_))
+            {
+                $_.ToLower()
             }
-            (Format-AccountName @formatAccountNameParams).ToLower()
+            else
+            {
+                $formatAccountNameParams = @{
+                    FullAccountNameWithDomain = $_
+                    Format                    = 'UserLogonNamePreWindows2000'
+                }
+                (Format-AccountName @formatAccountNameParams).ToLower()
+            }
         }
 
         return $formattedManageUsers
@@ -400,5 +408,12 @@ class SBNameSpace : SBBase
 
         Write-Verbose -Message "Invoking Set-SBNamespace with configurable params"
         Set-SBNamespace @setSBNamespaceParams
+    }
+
+    [bool] IsLocalGroup([string] $Name)
+    {
+        $cimResult = (Get-CimInstance -class Win32_Group -filter "LocalAccount='True'" | Where-Object { $_.Name -eq $Name })
+
+        return -not($null -eq $cimResult)
     }
 }

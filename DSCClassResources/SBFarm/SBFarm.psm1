@@ -1,4 +1,5 @@
 using module ..\SBBase
+Using module ..\..\Modules\SB.Util\SB.Util.psd1
 
 <#
    SBFarm creates a new farm and sets certain settings for a Service Bus for Windows Server farm.
@@ -413,17 +414,21 @@ class SBFarm : SBBase
 
         $result.GatewayDBConnectionString = $sbFarm.GatewayDBConnectionString
         $result.GatewayDBConnectionStringCredential = $this.GatewayDBConnectionStringCredential
-        $params = @{
-            SqlConnectionString = $sbFarm.GatewayDBConnectionString
+
+        if([string]::IsNullOrEmpty($sbFarm.GatewayDBConnectionString) -eq $false)
+        {
+            $params = @{
+                SqlConnectionString = $sbFarm.GatewayDBConnectionString
+            }
+            $params.PropertyName = "Data Source"
+            $result.GatewayDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Encrypt"
+            $result.GatewayDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Initial Catalog"
+            $result.GatewayDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
+            $params.PropertyName = "Integrated Security"
+            $result.GatewayDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
         }
-        $params.PropertyName = "Data Source"
-        $result.GatewayDBConnectionStringDataSource = [string](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Encrypt"
-        $result.GatewayDBConnectionStringEncrypt = [bool](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Initial Catalog"
-        $result.GatewayDBConnectionStringInitialCatalog = [string](Get-SqlConnectionStringPropertyValue @params)
-        $params.PropertyName = "Integrated Security"
-        $result.GatewayDBConnectionStringIntegratedSecurity = [string](Get-SqlConnectionStringPropertyValue @params)
 
         $result.HttpsPort = $sbFarm.HttpsPort
         $result.InternalPortRangeStart = $sbFarm.ClusterConnectionEndpointPort
@@ -494,8 +499,29 @@ class SBFarm : SBBase
         $currentValuesHt = $currentValues.ToHashtable()
 
         $desiredValuesHt = $this.ToHashtable()
-        $desiredValuesHt.AdminApiUserName = $desiredValuesHt.AdminApiCredentials.UserName
-        $desiredValuesHt.TenantApiUserName = $desiredValuesHt.TenantApiCredentials.UserName
+
+        if([string]::IsNullOrEmpty($desiredValuesHt.FarmDNS))
+        {
+            $desiredValuesHt.FarmDNS = ""
+        }
+
+        if([string]::IsNullOrEmpty($desiredValuesHt.AdminApiCredentials.UserName))
+        {
+            $desiredValuesHt.AdminApiUserName = ""
+        }
+        else
+        {
+            $desiredValuesHt.AdminApiUserName = $desiredValuesHt.AdminApiCredentials.UserName
+        }
+
+        if([string]::IsNullOrEmpty($desiredValuesHt.TenantApiCredentials.UserName))
+        {
+            $desiredValuesHt.TenantApiUserName = ""
+        }
+        else
+        {
+            $desiredValuesHt.TenantApiUserName = $desiredValuesHt.TenantApiCredentials.UserName
+        }
 
         $params = @{
             CurrentValues = $currentValuesHt
@@ -559,20 +585,21 @@ class SBFarm : SBBase
                 if ($null -ne $CertificateThumbprint)
                 {
                     $newSBFarmParams.FarmCertificateThumbprint = $CertificateThumbprint
-                    
+
                     if ($null -eq $this.EncryptionCertificateThumbprint)
                     {
                         $newSBFarmParams.EncryptionCertificateThumbprint = $CertificateThumbprint
                     }
                 }
             }
-            
+
         }
         else
         {
             Write-Verbose -Message "CertificateAutoGenerationKey is present, swapping pscredential for securestring"
             $newSBFarmParams.Remove("CertificateAutoGenerationKey")
             $newSBFarmParams.Remove("FarmCertificateThumbprint")
+            $newSBFarmParams.Remove("EncryptionCertificateThumbprint")
             $newSBFarmParams.CertificateAutoGenerationKey = $this.CertificateAutoGenerationKey.Password
         }
 
@@ -657,7 +684,7 @@ class SBFarm : SBBase
         $newSBFarmParams.Remove("SBFarmDBConnectionStringIntegratedSecurity")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringCredential")
         $newSBFarmParams.Remove("SBFarmDBConnectionStringEncrypt")
-        
+
         Write-Verbose -Message "Removing FarmCertificateSubject regardless of if it was used"
         $newSBFarmParams.Remove("FarmCertificateSubject")
 

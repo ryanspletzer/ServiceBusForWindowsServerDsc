@@ -141,6 +141,11 @@ function Test-SBParameterState()
     $KeyList | ForEach-Object -Process {
         if ($_ -ne "Verbose")
         {
+            if(($DesiredValues.ContainsKey($_) -eq $true) -and ($CurrentValues.$_ -eq $DesiredValues.$_))
+            {
+                return
+            }
+
             if (($CurrentValues.ContainsKey($_) -eq $false) `
             -or ($CurrentValues.$_ -ne $DesiredValues.$_) `
             -or (($DesiredValues.ContainsKey($_) -eq $true) -and ($DesiredValues.$_.GetType().IsArray)))
@@ -158,6 +163,12 @@ function Test-SBParameterState()
 
                 if ($CheckDesiredValue)
                 {
+                    if(($DesiredValues.$_ -eq $null) -and ($CurrentValues.$_ -ne $null))
+                    {
+                        $returnValue = $false
+                        return
+                    }
+
                     $desiredType = $DesiredValues.$_.GetType()
                     $fieldName = $_
                     if ($desiredType.IsArray -eq $true)
@@ -248,6 +259,11 @@ function Test-SBParameterState()
                         }
                     }
                 }
+            }
+
+            if($returnValue -eq $false)
+            {
+                return
             }
         }
     }
@@ -411,16 +427,19 @@ function Get-SqlConnectionStringPropertyValue
     )
     process
     {
-        $params = @{
-            TypeName     = 'System.Data.SqlClient.SqlConnectionStringBuilder'
-            ArgumentList = $SqlConnectionString
-        }
-        $sqlConnectionStringBuilder = New-Object @params
         if ($PropertyName -eq 'Integrated Security' -and
             $SqlConnectionString.Contains('Integrated Security=SSPI'))
         {
             return 'SSPI'
         }
+
+        $params = @{
+            TypeName     = 'System.Data.SqlClient.SqlConnectionStringBuilder'
+            ArgumentList = $SqlConnectionString
+        }
+
+        $sqlConnectionStringBuilder = New-Object @params
+
         return $sqlConnectionStringBuilder[$PropertyName]
     }
 }

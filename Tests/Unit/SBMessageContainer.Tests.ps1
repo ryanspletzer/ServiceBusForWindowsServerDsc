@@ -48,10 +48,11 @@ try
         $testSBMessageContainer.ContainerDBConnectionStringInitialCatalog = "SBMessageContainer02"
         $testSBMessageContainer.Ensure = 'Present'
 
-        Mock New-SBMessageContainer {}
-        Mock Remove-SBMessageContainer {}
-
         Describe 'SBMessageContainer' {
+
+            Mock New-SBMessageContainer {}
+            Mock Remove-SBMessageContainer {}
+
             Context "No container exists for a given database name" {
                 # Arrange
                 Mock Get-SBMessageContainer {

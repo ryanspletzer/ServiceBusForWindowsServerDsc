@@ -59,28 +59,30 @@ try
         $testSBHost.SBFarmDBConnectionStringDataSource = "SQLSERVER.contoso.com"
         $testSBHost.Started = $true
 
-        Mock Add-SBHost {}
-        Mock Remove-SBHost {}
-        Mock Start-SBHost {}
-        Mock Stop-SBHost {}
-        Mock Update-SBHost {}
-        Mock Get-CimInstance {
-            [CmdletBinding()]
-            param
-            (
-                [Parameter(Mandatory)]
-                [string]
-                $ClassName
-            )
-            return @{
-                Domain = 'contoso.com'
-            }
-        }
         $env:COMPUTERNAME = "servicebus03"
 
         $hostName = "$env:COMPUTERNAME.$((Get-CimInstance -ClassName WIN32_ComputerSystem).Domain)"
 
         Describe 'SBHost' {
+
+            Mock Add-SBHost {}
+            Mock Remove-SBHost {}
+            Mock Start-SBHost {}
+            Mock Stop-SBHost {}
+            Mock Update-SBHost {}
+            Mock Get-CimInstance {
+                [CmdletBinding()]
+                param
+                (
+                    [Parameter(Mandatory)]
+                    [string]
+                    $ClassName
+                )
+                return @{
+                    Domain = 'contoso.com'
+                }
+            }
+
             Context "Current host is not joined to farm and should be joined and started" {
                 #Arrange
                 Mock Get-SBFarm {

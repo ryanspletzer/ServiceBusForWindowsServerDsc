@@ -48,11 +48,12 @@ try
         $testSBAuthorizationRule.NamespaceName = "TestNamespace"
         $testSBAuthorizationRule.Ensure = 'Present'
 
-        Mock New-SBAuthorizationRule {}
-        Mock Remove-SBAuthorizationRule {}
-        Mock Set-SBAuthorizationRule {}
-
         Describe 'SBAuthorizationRule' {
+
+            Mock New-SBAuthorizationRule {}
+            Mock Remove-SBAuthorizationRule {}
+            Mock Set-SBAuthorizationRule {}
+
             Context "No authorization rule exists for a given name and namespace and should be created" {
                 # Arrange
                 Mock Get-SBAuthorizationRule {

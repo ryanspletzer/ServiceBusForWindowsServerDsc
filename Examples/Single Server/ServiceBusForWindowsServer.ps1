@@ -230,7 +230,7 @@ Configuration Example
             DependsOn            = '[SBFarm]ContosoSBFarm'
             PsDscRunAsCredential = $DomainInstallAccount
             Ensure               = 'Present'
-            Name                 = $ConfigurationData.NonNodeData.ServiceBus.SBNameSpaces.ContosoNamespace
+            Name                 = $ConfigurationData.NonNodeData.ServiceBus.SBNamespaces.ContosoNamespace
             ManageUsers          = $DomainInstallAccount.UserName
         }
 
